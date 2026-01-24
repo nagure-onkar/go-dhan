@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Go-Dhan",
-    "slug": "Go-Dhan",
+    "slug": "go-d",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.onkarnaguresorganization.god"
     },
     "web": {
       "output": "static",
@@ -43,6 +44,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d5b5702b-491c-4f3b-9bca-2e711a555650"
+      }
+    },
+    "owner": "onkarnagures-organization"
   }
 }
