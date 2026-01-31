@@ -1,7 +1,8 @@
+import AppText from "@/components/common/AppText";
 import { LifecycleItem, LifecycleStage } from "@/components/LifecycleItem";
 import { useTheme } from "@/theme/useTheme";
 import { reproductionCycleRouteMap } from "app/navigation/AppNavigator";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
@@ -64,6 +65,8 @@ const lifecycleData: LifecycleStage[] = [
 ];
 
 export function CattleRepeoductionCycleScreen() {
+  const { cattleId } = useLocalSearchParams<{ cattleId: string }>();
+
   const router = useRouter();
   const { colors } = useTheme();
   const scrollRef = useRef<ScrollView>(null);
@@ -87,9 +90,19 @@ export function CattleRepeoductionCycleScreen() {
     <>
       <Stack.Screen
         options={{
-          title: "Cattle Reproduction Cycle (cattle_id)",
+          headerTitle: () => (
+            <View style={{ alignItems: "flex-start" }}>
+              <AppText style={{ fontSize: 16, fontWeight: "700" }}>
+                Cattle Reproduction Cycle
+              </AppText>
+              <AppText style={{ fontSize: 12, opacity: 0.8 }}>
+                ID: {cattleId}
+              </AppText>
+            </View>
+          ),
         }}
       />
+
       <View style={[styles.screen, { backgroundColor: colors.background }]}>
         <ScrollView
           ref={scrollRef}

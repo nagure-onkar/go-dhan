@@ -9,7 +9,7 @@ export default function LifecycleLayout() {
       screenOptions={{
         headerShown: true,
         headerStyle: {
-          backgroundColor: colors.background,
+          backgroundColor: colors.card,
         },
         headerTitleStyle: {
           color: colors.text,
