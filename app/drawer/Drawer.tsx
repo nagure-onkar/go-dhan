@@ -1,7 +1,10 @@
 import AppText from "@/components/common/AppText";
 import { useLanguage } from "@/constants/localization/useLanguage";
 import { useTheme } from "@/theme/useTheme";
+<<<<<<< HEAD
 import { LiveStockScreen } from "app/navigation/AppNavigator";
+=======
+>>>>>>> origin/develop
 import { useRouter } from "expo-router";
 import { Gear, Globe } from "phosphor-react-native";
 import React, { useState } from "react";
@@ -40,7 +43,11 @@ export default function DrawerContent() {
       <TouchableOpacity
         style={styles.item}
         onPress={() => {
+<<<<<<< HEAD
           router.push(LiveStockScreen);
+=======
+          router.push("/screens/cattleReproduction/cattleReproductionCycle");
+>>>>>>> origin/develop
         }}
       >
         <AppText style={{ fontSize: 24 }}>🐄</AppText>
