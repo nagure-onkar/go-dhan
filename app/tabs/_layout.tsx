@@ -2,13 +2,15 @@ import AppText from '@/components/common/AppText';
 import { useLanguage } from '@/constants/localization/useLanguage';
 import BottomTabBar from '@/navigation/BottomNavigationBar';
 import { useTheme } from '@/theme/useTheme';
-import { Tabs, useNavigation } from 'expo-router';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { useNavigation } from '@react-navigation/native';
+import { Tabs } from 'expo-router';
 import { List, UserCircle } from 'phosphor-react-native';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
 
 export default function TabsLayout() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<DrawerNavigationProp<any>>();
   const { colors } = useTheme();
   const { t } = useLanguage();
 
@@ -54,6 +56,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="search" options={{ title: t.home }} />
       <Tabs.Screen name="feed" options={{ title: t.feed}} />
       <Tabs.Screen name="profit" options={{ title: t.profit }} />
+      <Tabs.Screen name="heatonheat" options={{ title: 'Heat on Heat' }} />
     </Tabs>
   );
 }
