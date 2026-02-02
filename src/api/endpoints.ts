@@ -1,12 +1,12 @@
 export const ENDPOINTS = {
   auth: {
-    login: "/auth/login",
+    login: "/api/v1/auth/login",
   },
   healthCheck: {
     root: "",
   },
   cattle: {
-    list: "/cattle",
+    list: "/api/v1/cattle/list",
     details: (id: string) => `/cattle/${id}`,
   },
   milk: {
