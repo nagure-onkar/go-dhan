@@ -1,8 +1,7 @@
 export const lightColors = {
+  primary: "#4CAF50",
   background: "#EAF7EF", // very light green
   headerBackground: "#94f7bf",
-
-  primary: "#4CAF50",
 
   text: "#000000",
   textInverse: "#FFFFFF",
@@ -11,13 +10,14 @@ export const lightColors = {
   border: "#E0E0E0",
 
   drawerBackground: "#FFFFFF",
+
+  subHeading: "#3e6f4f",
 };
 
 export const darkColors = {
+  primary: "#66BB6A",
   background: "#0F1F17", // dark greenish
   headerBackground: "#0B1812",
-
-  primary: "#66BB6A",
 
   text: "#FFFFFF",
   textInverse: "#000000",
@@ -26,4 +26,6 @@ export const darkColors = {
   border: "#2E3B34",
 
   drawerBackground: "#1E1E1E",
+
+  subHeading: "#B7D8C2",
 };
