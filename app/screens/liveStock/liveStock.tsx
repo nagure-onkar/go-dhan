@@ -1,4 +1,5 @@
 import { useTheme } from "@/theme/useTheme";
+import BottomDrawer, { BottomDrawerRef } from "app/drawer/BottomDrawer";
 import { liveStockRouteMap } from "app/navigation/AppNavigator";
 import { Stack, useRouter } from "expo-router";
 import {
@@ -7,7 +8,7 @@ import {
   PencilSimple,
   Syringe,
 } from "phosphor-react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 /* ---------------- MOCK DATA ---------------- */
@@ -144,6 +145,7 @@ export default function LiveStockScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const [openId, setOpenId] = useState<string | null>(null);
+  const bottomSheetRef = useRef<BottomDrawerRef>(null);
 
   const handleAction = (action: LiveStockAction, id: string) => {
     console.log(`${action} clicked for ${id}`);
@@ -159,6 +161,10 @@ export default function LiveStockScreen() {
     setOpenId(null);
   };
 
+  const handlePress = () => {
+    bottomSheetRef.current?.open();
+  };
+
   const renderItem = ({ item }: { item: Cattle }) => {
     const isOpen = openId === item.id;
 
@@ -166,14 +172,24 @@ export default function LiveStockScreen() {
       <View style={[styles.card, { backgroundColor: colors.card }]}>
         {/* Header */}
         <View style={styles.header}>
-          <View>
+          {/* <View>
             <Text style={[styles.name, { color: colors.text }]}>
               {item.name}
             </Text>
             <Text style={[styles.id, { color: colors.subHeading }]}>
               {item.id}
             </Text>
-          </View>
+          </View> */}
+          <Pressable onPress={handlePress} style={styles.container}>
+            <View>
+              <Text style={[styles.name, { color: colors.text }]}>
+                {item.name}
+              </Text>
+              <Text style={[styles.id, { color: colors.subHeading }]}>
+                {item.id}
+              </Text>
+            </View>
+          </Pressable>
 
           <Pressable
             style={[
@@ -234,6 +250,8 @@ export default function LiveStockScreen() {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
         />
+
+        <BottomDrawer ref={bottomSheetRef} />
       </View>
     </>
   );
@@ -313,8 +331,12 @@ const styles = StyleSheet.create({
   },
 
   editBtn: {
-    padding: 8,
-    borderRadius: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 0,
   },
 
   tagRow: {
