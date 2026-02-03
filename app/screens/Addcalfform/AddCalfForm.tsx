@@ -436,7 +436,7 @@ export default function AddCalfForm() {
             )}
           </View>
 
-          {/* Cattle Name */}
+          {/* NDDB Number */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>NDDB Registration Number</Text>
             <TextInput
@@ -489,6 +489,7 @@ export default function AddCalfForm() {
             />
           </View>
 
+          {/* Calving Type */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Calving Type {req}</Text>
             <Dropdown
@@ -522,7 +523,7 @@ export default function AddCalfForm() {
             )}
           </View>
 
-          {/* Cattle ID */}
+          {/* DOB */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Date of Birth{req}</Text>
             <TouchableOpacity
@@ -567,7 +568,7 @@ export default function AddCalfForm() {
             {errors.age && <Text style={styles.errorText}>{errors.age}</Text>}
           </View>
 
-          {/* Cattle ID */}
+          {/* Weight */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Weight (Kg){req}</Text>
             <TextInput
@@ -643,7 +644,7 @@ const styles = StyleSheet.create({
   icon: { marginRight: 8 },
   placeholderStyle: { fontSize: 14, color: "#999" },
   selectedTextStyle: { fontSize: 14 },
-  inputSearchStyle: { height: 40, fontSize: 14 },
+  // inputSearchStyle: { height: 40, fontSize: 14 },
   genderRow: { flexDirection: "row", gap: 10, marginTop: 5 },
   genderBtn: {
     flex: 1,

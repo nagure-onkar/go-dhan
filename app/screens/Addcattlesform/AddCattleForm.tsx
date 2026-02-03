@@ -190,14 +190,11 @@ export default function AddCattleForm() {
               ]}
               placeholderStyle={styles.placeholderStyle}
               selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
               data={cattleType}
-              search
               maxHeight={300}
               labelField="label"
               valueField="value"
               placeholder={!isCattleTypeFocus ? "Select cattle type" : "..."}
-              searchPlaceholder="Search type..."
               value={formData.cattleType}
               onFocus={() => setIsCattleTypeFocus(true)}
               onBlur={() => setIsCattleTypeFocus(false)}
@@ -227,16 +224,13 @@ export default function AddCattleForm() {
               ]}
               placeholderStyle={styles.placeholderStyle}
               selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
               data={
                 formData.cattleType === "buffalo" ? buffaloBreeds : cowBreeds
               }
-              search
               maxHeight={300}
               labelField="label"
               valueField="value"
               placeholder={!isBreedFocus ? "Select breed" : "..."}
-              searchPlaceholder="Search breed..."
               value={formData.breed}
               onFocus={() => setIsBreedFocus(true)}
               onBlur={() => setIsBreedFocus(false)}
@@ -252,7 +246,7 @@ export default function AddCattleForm() {
             )}
           </View>
 
-          {/* Cattle ID */}
+          {/* Treatment given */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Treatment Given At Purchase{req}</Text>
             <TextInput
@@ -268,7 +262,7 @@ export default function AddCattleForm() {
             )}
           </View>
 
-          {/* Cattle Name */}
+          {/* NDDB Number */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>NDDB Registration Number</Text>
             <TextInput
@@ -468,7 +462,7 @@ const styles = StyleSheet.create({
   icon: { marginRight: 8 },
   placeholderStyle: { fontSize: 14, color: "#999" },
   selectedTextStyle: { fontSize: 14 },
-  inputSearchStyle: { height: 40, fontSize: 14 },
+  // inputSearchStyle: { height: 40, fontSize: 14 },
   genderRow: { flexDirection: "row", gap: 10, marginTop: 5 },
   genderBtn: {
     flex: 1,

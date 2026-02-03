@@ -168,14 +168,11 @@ export default function HealthAndManagement() {
               ]}
               placeholderStyle={styles.placeholderStyle}
               selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
               data={cattleStatuses}
-              search
               maxHeight={300}
               labelField="label"
               valueField="value"
               placeholder={!isStatusFocus ? "Select status" : "..."}
-              searchPlaceholder="Search status..."
               value={formData.status}
               onFocus={() => setIsStatusFocus(true)}
               onBlur={() => setIsStatusFocus(false)}
@@ -199,14 +196,11 @@ export default function HealthAndManagement() {
               ]}
               placeholderStyle={styles.placeholderStyle}
               selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
               data={workers}
-              search
               maxHeight={300}
               labelField="label"
               valueField="value"
               placeholder={!isWorkerFocus ? "Select worker" : "..."}
-              searchPlaceholder="Search worker..."
               value={formData.workerAssigned}
               onFocus={() => setIsWorkerFocus(true)}
               onBlur={() => setIsWorkerFocus(false)}
@@ -230,14 +224,11 @@ export default function HealthAndManagement() {
               ]}
               placeholderStyle={styles.placeholderStyle}
               selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
               data={vets}
-              search
               maxHeight={300}
               labelField="label"
               valueField="value"
               placeholder={!isVetFocus ? "Select vet" : "..."}
-              searchPlaceholder="Search vet..."
               value={formData.vetAssigned}
               onFocus={() => setIsVetFocus(true)}
               onBlur={() => setIsVetFocus(false)}
@@ -261,14 +252,11 @@ export default function HealthAndManagement() {
               ]}
               placeholderStyle={styles.placeholderStyle}
               selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
               data={cattleStates}
-              search
               maxHeight={300}
               labelField="label"
               valueField="value"
               placeholder={!isStateFocus ? "Select State" : "..."}
-              searchPlaceholder="Search state..."
               value={formData.state}
               onFocus={() => setIsStateFocus(true)}
               onBlur={() => setIsStateFocus(false)}
