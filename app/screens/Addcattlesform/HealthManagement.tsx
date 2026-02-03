@@ -54,6 +54,18 @@ const vets = [
 
 const req = <Text style={{ color: "red" }}> *</Text>;
 
+const reset = {
+  status: "active",
+  workerAssigned: null,
+  vetAssigned: null,
+  state: null,
+  currentStateDate: null,
+  bloodLine: "",
+  insuranceNumber: "",
+  lactationNumber: "",
+  remark: "",
+};
+
 export default function HealthAndManagement() {
   const [isSaved, setIsSaved] = useState(false);
   const [formData, setFormData] = useState({
@@ -103,6 +115,7 @@ export default function HealthAndManagement() {
       setTimeout(() => {
         router.push("../../tabs");
       }, 2000);
+      setFormData(reset);
     }
   };
 

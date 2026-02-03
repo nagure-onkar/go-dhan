@@ -50,6 +50,21 @@ const cattleType = [
   { label: "Cow", value: "cow" },
 ];
 
+const reset = {
+  cattleId: "",
+  cattleName: "",
+  breed: null,
+  cattleType: "buffalo",
+  gender: "Female",
+  treatment: "",
+  nddbNumber: "",
+  purchaseCost: "",
+  purchaseSource: "",
+  dob: null,
+  age: "",
+  weight: "",
+};
+
 export default function AddCattleForm() {
   const [formData, setFormData] = useState({
     cattleId: "",
@@ -98,6 +113,7 @@ export default function AddCattleForm() {
     if (Object.keys(newErrors).length === 0) {
       console.log("Saving data...", formData);
       router.push("./HealthManagement");
+      setFormData(reset);
     }
   };
 
