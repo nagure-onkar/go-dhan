@@ -24,6 +24,12 @@ export default function DrawerContent() {
   const { colors } = useTheme();
   const { t, setLanguage, language } = useLanguage();
   const [open, setOpen] = useState(false);
+  const addcattle = () => {
+    router.push("../screens/Addcattlesform/AddCattleForm");
+  };
+  const addcalf = () => {
+    router.push("../screens/Addcalfform/AddCalfForm");
+  };
 
   return (
     <View
@@ -45,6 +51,17 @@ export default function DrawerContent() {
       >
         <AppText style={{ fontSize: 24 }}>🐄</AppText>
         <AppText>{t.live_stock}</AppText>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.item} onPress={addcattle}>
+        {/* <Gear size={28} color={colors.text} /> */}
+        <AppText style={styles.emoji}>🐄</AppText>
+        <AppText>{t.addCattle}</AppText>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.item} onPress={addcalf}>
+        {/* <Gear size={28} color={colors.text} /> */}
+        <AppText style={styles.emoji}>𓃔 </AppText>
+        <AppText>{t.addCalf}</AppText>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.item}>
@@ -110,6 +127,9 @@ const styles = StyleSheet.create({
     gap: 12,
     marginVertical: 12,
     alignItems: "center",
+  },
+  emoji: {
+    fontSize: 21,
   },
   overlay: {
     flex: 1,

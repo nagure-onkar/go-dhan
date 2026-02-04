@@ -7,4 +7,6 @@ export default {
   feed: "Feed",
   profit: "Profit",
   live_stock: "Live Stock",
+  addCattle: "AddCattle",
+  addCalf: "AddCalf",
 };
