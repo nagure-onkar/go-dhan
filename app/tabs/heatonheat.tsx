@@ -1,4 +1,3 @@
-
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -121,14 +120,12 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const yyyy = d.getFullYear();
     return `${dd}-${mm}-${yyyy}`;
-
   };
 
   const formatDateTime = (d: Date) => {
     const hh = String(d.getHours()).padStart(2, '0');
     const min = String(d.getMinutes()).padStart(2, '0');
     return `${formatDate(d)} ${hh}:${min}`;
-
   };
 
   const validate = () => {
@@ -244,34 +241,39 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
             returnKeyType="next"
           />
 
-          <View style={styles.sectionTitleContainer}>
-            <Text style={styles.sectionTitle}>Current Heat Symptoms</Text>
-            <View style={styles.sectionDivider} />
-          </View>
-          <View style={styles.symptomGrid2}>
-  {symptomOptions.map((s) => (
-    <View key={s} style={styles.symptomField}>
-      <Text style={styles.symptomLabelSmall}>{s} *</Text>
-      <TouchableOpacity
-        style={styles.selectInput}
-        onPress={() => openSelect(`symptom:${s}`, ['Select', 'Yes', 'No'])} // <- fixed here
-      >
-        <Text
-          style={[
-            styles.selectText,
-            !symptomsMap[s] && styles.selectPlaceholder
-          ]}
+         <View style={styles.sectionCard}>
+
+  <View style={styles.sectionTitleContainer}>
+    <Text style={styles.sectionTitle}>Current Heat Symptoms</Text>
+    <View style={styles.sectionDivider} />
+  </View>
+
+  <View style={styles.symptomGrid2}>
+
+    {symptomOptions.map((s) => (
+      <View key={s} style={styles.symptomField}>
+        <Text style={styles.symptomLabelSmall}>{s} *</Text>
+        <TouchableOpacity
+          style={styles.selectInput}
+          onPress={() => openSelect(`symptom:${s}`, ['Select', 'Yes', 'No'])}
         >
-          {symptomsMap[s] || 'Select'}
-        </Text>
-        <MaterialCommunityIcons
-          name="chevron-down"
-          size={16}
-          color={COLORS.gray600}
-        />
-      </TouchableOpacity>
-    </View>
-  ))}
+          <Text
+            style={[
+              styles.selectText,
+              !symptomsMap[s] && styles.selectPlaceholder
+            ]}
+          >
+            {symptomsMap[s] || 'Select'}
+          </Text>
+          <MaterialCommunityIcons
+            name="chevron-down"
+            size={16}
+            color={COLORS.gray600}
+          />
+        </TouchableOpacity>
+      </View>
+    ))}
+  </View>
 </View>
 
 
@@ -302,10 +304,13 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
             <MaterialCommunityIcons name="chevron-down" size={16} color={COLORS.gray600} />
           </TouchableOpacity>
 
-          <View style={styles.sectionTitleContainer}>
-            <Text style={styles.sectionTitle}>Vet Confirmation</Text>
-            <View style={styles.sectionDivider} />
-          </View>
+         <View style={styles.sectionCard}>
+
+  <View style={styles.sectionTitleContainer}>
+    <Text style={styles.sectionTitle}>Vet Confirmation</Text>
+    <View style={styles.sectionDivider} />
+  </View>
+
           <Text style={styles.small}>Doctor ID</Text>
           <TextInput
             style={[styles.input, doctorId === PRESET_VALUES.doctorId && styles.inputPrefilled]}
@@ -334,6 +339,7 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
             <Text style={[styles.selectText, !finalResult && styles.selectPlaceholder]}>{finalResult || 'Select'}</Text>
             <MaterialCommunityIcons name="chevron-down" size={16} color={COLORS.gray600} />
           </TouchableOpacity>
+          </View>
 
           <Text style={styles.label}>Recommended Date & Time for AI</Text>
           <TouchableOpacity style={styles.selectInput} onPress={() => { setRecommendedPickerMode('date'); setShowRecommendedPicker(true); }}>
@@ -386,16 +392,21 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
 
 
 
-          <View style={styles.sectionTitleContainer}>
-            <Text style={styles.sectionTitle}>Expenses</Text>
-            <View style={styles.sectionDivider} />
-          </View>
+          <View style={styles.sectionCard}>
+
+  <View style={styles.sectionTitleContainer}>
+    <Text style={styles.sectionTitle}>Expenses</Text>
+    <View style={styles.sectionDivider} />
+  </View>
+
           <Text style={styles.small}>Doctor Fees *</Text>
           <TextInput style={styles.inputNumeric} value={doctorFees} onChangeText={setDoctorFees} keyboardType="numeric" />
           <Text style={styles.small}>Treatment Expenses *</Text>
           <TextInput style={styles.inputNumeric} value={treatmentExpenses} onChangeText={setTreatmentExpenses} keyboardType="numeric" />
           <Text style={styles.small}>Other Expenses *</Text>
           <TextInput style={styles.inputNumeric} value={otherExpenses} onChangeText={setOtherExpenses} keyboardType="numeric" />
+
+          </View>
 
           <Modal visible={selectModalVisible} transparent animationType="fade" onRequestClose={() => setSelectModalVisible(false)}>
             <Pressable style={styles.modalOverlay} onPress={() => setSelectModalVisible(false)}>
@@ -423,7 +434,7 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
               onPress={onSubmit}
               disabled={submitting}
             >
-              {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>Submit Heat Form</Text>}
+              {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>Submit</Text>}
             </TouchableOpacity>
           </View>
         </View>
@@ -557,4 +568,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#eef2f7',
   },
-})
+  sectionCard: {
+  backgroundColor: 'transparent', // ❌ no white
+  borderRadius: 12,
+  padding: 14,
+  marginTop: 18,
+
+  borderWidth: 1,
+  borderColor: '#e6edf3',
+
+  // subtle separation
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 4,
+
+  elevation: 3, // Android separation
+},
+
+}); 

@@ -2,7 +2,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   Dimensions,
   RefreshControl,
   SafeAreaView,
@@ -23,21 +22,64 @@ const ICON_SIZES = {
 };
 
 const COLORS = {
-  primary: '#16a34a', 
-  primaryLight: '#dcfce7', 
-  secondary: '#3b82f6', 
-  secondaryLight: '#dbeafe', 
-  warning: '#f59e0b', 
-  warningLight: '#fef3c7', 
-  danger: '#ef4444', 
-  dangerLight: '#fee2e2', 
+  primary: '#16a34a',
+  primaryLight: '#dcfce7',
+  secondary: '#3b82f6',
+  secondaryLight: '#dbeafe',
+  warning: '#f59e0b',
+  warningLight: '#fef3c7',
+  danger: '#ef4444',
+  dangerLight: '#fee2e2',
   white: '#ffffff',
   gray800: '#1f2937',
   gray600: '#4b5563',
   gray500: '#6b7280',
   gray50: '#f9fafb',
-  background: '#f0fdf4', 
+  background: '#f0fdf4',
 };
+
+/* -------------------- DUMMY DATA -------------------- */
+
+const DUMMY_STATS = {
+  totalAnimals: 120,
+  totalCattle: 80,
+  totalCalves: 40,
+  todayMilking: 65,
+  todayTreatments: 4,
+  upcomingTreatments: 7,
+  treatmentExpenses: 18500,
+  workers: 12,
+  veterinarians: 2,
+};
+
+const DUMMY_ACTIVITIES: Activity[] = [
+  {
+    id: 1,
+    message: 'Cow #23 vaccinated',
+    time: '10 minutes ago',
+    type: 'treatment',
+  },
+  {
+    id: 2,
+    message: 'Morning milking completed',
+    time: '1 hour ago',
+    type: 'milking',
+  },
+  {
+    id: 3,
+    message: 'Calf health check scheduled',
+    time: '3 hours ago',
+    type: 'health',
+  },
+  {
+    id: 4,
+    message: 'Feed stock updated',
+    time: 'Yesterday',
+    type: 'general',
+  },
+];
+
+/* --------------------------------------------------- */
 
 interface StatsData {
   totalAnimals: number;
@@ -58,93 +100,30 @@ interface Activity {
   type: 'treatment' | 'milking' | 'health' | 'general';
 }
 
-// Main Dashboard Component
 const DashboardScreen: React.FC = () => {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [farmName, setFarmName] = useState('Dairy Farm');
+  const [farmName] = useState('Dairy Farm');
 
   useEffect(() => {
-    fetchDashboardData();
+    loadDummyData();
   }, []);
 
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-    
-      const token = await getStoredToken(); 
-      
-      
-      const mockStats: StatsData = {
-        totalAnimals: 150,
-        totalCattle: 95,
-        totalCalves: 55,
-        todayMilking: 45,
-        todayTreatments: 3,
-        upcomingTreatments: 8,
-        treatmentExpenses: 5500,
-        workers: 8,
-        veterinarians: 2,
-      };
-
-      const mockActivities: Activity[] = [
-        {
-          id: 1,
-          message: 'Cow #C-001 milking completed',
-          time: '2 hours ago',
-          type: 'milking',
-        },
-        {
-          id: 2,
-          message: 'Vaccination for Calf #CAL-05 scheduled',
-          time: '4 hours ago',
-          type: 'health',
-        },
-        {
-          id: 3,
-          message: 'Treatment expense recorded: ₹1,500',
-          time: '6 hours ago',
-          type: 'treatment',
-        },
-        {
-          id: 4,
-          message: 'Worker assigned to milking shift',
-          time: '8 hours ago',
-          type: 'general',
-        },
-      ];
-
-      setStats(mockStats);
-      setActivities(mockActivities);
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-    } finally {
-      setLoading(false);
-    }
+  const loadDummyData = async () => {
+    setLoading(true);
+    await new Promise(res => setTimeout(res, 500));
+    setStats(DUMMY_STATS);
+    setActivities(DUMMY_ACTIVITIES);
+    setLoading(false);
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchDashboardData();
+    await loadDummyData();
     setRefreshing(false);
   };
-
-  const getStoredToken = async () => {
-    return 'token';
-  };
-
-  if (loading && !refreshing) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Loading Dashboard...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -163,13 +142,10 @@ const DashboardScreen: React.FC = () => {
             />
           }
         >
-          {/* Header */}
           <HeaderSection farmName={farmName} />
 
-          {/* Quick Stats Cards */}
           {stats && (
             <>
-              {/* Animal Count Cards */}
               <SectionTitle title="Animal Summary" />
               <View style={styles.cardGrid}>
                 <StatCard
@@ -198,7 +174,6 @@ const DashboardScreen: React.FC = () => {
                 />
               </View>
 
-              {/* Milking Section */}
               <SectionTitle title="Milking Details" />
               <StatCard
                 label="Today's Milking"
@@ -210,7 +185,6 @@ const DashboardScreen: React.FC = () => {
                 fullWidth
               />
 
-              {/* Treatment Section */}
               <SectionTitle title="Health & Treatment" />
               <View style={styles.cardRowTwo}>
                 <StatCard
@@ -223,7 +197,10 @@ const DashboardScreen: React.FC = () => {
                   subtext="Appointments today"
                 />
                 <StatCard
-                  containerStyle={[styles.statCardTwo, styles.statCardTwoLast]}
+                  containerStyle={[
+                    styles.statCardTwo,
+                    styles.statCardTwoLast,
+                  ]}
                   label="Upcoming Treatment"
                   value={stats.upcomingTreatments.toString()}
                   icon="calendar-clock"
@@ -233,7 +210,6 @@ const DashboardScreen: React.FC = () => {
                 />
               </View>
 
-              {/* Treatment Expenses */}
               <View style={styles.expenseCard}>
                 <View style={styles.expenseHeader}>
                   <MaterialCommunityIcons
@@ -253,7 +229,6 @@ const DashboardScreen: React.FC = () => {
                 </Text>
               </View>
 
-              {/* Staff Section */}
               <SectionTitle title="Staff" />
               <View style={styles.cardRowTwo}>
                 <StatCard
@@ -266,7 +241,10 @@ const DashboardScreen: React.FC = () => {
                   subtext="Assigned workers"
                 />
                 <StatCard
-                  containerStyle={[styles.statCardTwo, styles.statCardTwoLast]}
+                  containerStyle={[
+                    styles.statCardTwo,
+                    styles.statCardTwoLast,
+                  ]}
                   label="Veterinarians"
                   value={stats.veterinarians.toString()}
                   icon="doctor"
@@ -276,13 +254,11 @@ const DashboardScreen: React.FC = () => {
                 />
               </View>
 
-              {/* Recent Activities */}
               <SectionTitle title="Recent Activities" />
               <ActivityList activities={activities} />
             </>
           )}
 
-          {/* Bottom Spacing */}
           <View style={styles.bottomSpacing} />
         </ScrollView>
       </LinearGradient>
@@ -290,7 +266,12 @@ const DashboardScreen: React.FC = () => {
   );
 };
 
-// Header Component
+/* ---------- REST OF COMPONENTS & STYLES ----------
+   UNCHANGED FROM YOUR ORIGINAL FILE
+-------------------------------------------------- */
+
+
+
 interface HeaderSectionProps {
   farmName: string;
 }
@@ -299,15 +280,25 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({ farmName }) => (
   <View style={styles.headerContainer}>
     <View style={styles.headerContent}>
       <View style={styles.headerIconContainer}>
-        <MaterialCommunityIcons name="barn" size={ICON_SIZES.header} color={COLORS.primary} />
+        <MaterialCommunityIcons
+          name="barn"
+          size={ICON_SIZES.header}
+          color={COLORS.primary}
+        />
       </View>
       <View style={styles.headerTextContainer}>
         <Text style={styles.farmName}>{farmName}</Text>
-        <Text style={styles.headerSubtext}>Dairy Farm Dashboard</Text>
+        <Text style={styles.headerSubtext}>
+          Dairy Farm Dashboard
+        </Text>
       </View>
     </View>
     <TouchableOpacity style={styles.notificationButton}>
-      <MaterialCommunityIcons name="bell" size={ICON_SIZES.notification} color={COLORS.primary} />
+      <MaterialCommunityIcons
+        name="bell"
+        size={ICON_SIZES.notification}
+        color={COLORS.primary}
+      />
       <View style={styles.notificationBadge}>
         <Text style={styles.notificationCount}>3</Text>
       </View>
@@ -315,7 +306,6 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({ farmName }) => (
   </View>
 );
 
-// Stat Card Component
 interface StatCardProps {
   label: string;
   value: string;
@@ -344,8 +334,14 @@ const StatCard: React.FC<StatCardProps> = ({
       fullWidth && styles.statCardFullWidth,
     ]}
   >
-    <View style={[styles.iconContainer, { backgroundColor }]}>
-      <MaterialCommunityIcons name={icon} size={ICON_SIZES.stat} color={iconColor} />
+    <View
+      style={[styles.iconContainer, { backgroundColor }]}
+    >
+      <MaterialCommunityIcons
+        name={icon}
+        size={ICON_SIZES.stat}
+        color={iconColor}
+      />
     </View>
     <View style={styles.statContent}>
       <Text style={styles.statLabel}>{label}</Text>
@@ -355,38 +351,46 @@ const StatCard: React.FC<StatCardProps> = ({
   </View>
 );
 
-// Section Title Component
 interface SectionTitleProps {
   title: string;
 }
 
-const SectionTitle: React.FC<SectionTitleProps> = ({ title }) => (
+const SectionTitle: React.FC<SectionTitleProps> = ({
+  title,
+}) => (
   <View style={styles.sectionTitleContainer}>
     <Text style={styles.sectionTitle}>{title}</Text>
     <View style={styles.sectionDivider} />
   </View>
 );
 
-// Activity List Component
 interface ActivityListProps {
   activities: Activity[];
 }
 
-const ActivityList: React.FC<ActivityListProps> = ({ activities }) => (
+const ActivityList: React.FC<ActivityListProps> = ({
+  activities,
+}) => (
   <View style={styles.activityContainer}>
     {activities.map((activity) => (
-      <View key={activity.id} style={styles.activityItem}>
+      <View
+        key={activity.id}
+        style={styles.activityItem}
+      >
         <View style={styles.activityDot} />
         <View style={styles.activityContent}>
-          <Text style={styles.activityMessage}>{activity.message}</Text>
-          <Text style={styles.activityTime}>{activity.time}</Text>
+          <Text style={styles.activityMessage}>
+            {activity.message}
+          </Text>
+          <Text style={styles.activityTime}>
+            {activity.time}
+          </Text>
         </View>
       </View>
     ))}
   </View>
 );
 
-// Styles
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -400,19 +404,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: COLORS.gray600,
-    fontWeight: '600',
-  },
 
-  // Header Styles
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -473,7 +465,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // Card Grid Styles
   cardGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -524,7 +515,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Two-column Treatment row
   cardRowTwo: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
@@ -538,7 +528,6 @@ const styles = StyleSheet.create({
     marginRight: 0,
   },
 
-  // Expense Card Styles
   expenseCard: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
@@ -574,7 +563,6 @@ const styles = StyleSheet.create({
     color: COLORS.gray500,
   },
 
-  // Section Title Styles
   sectionTitleContainer: {
     marginTop: 20,
     marginBottom: 16,
@@ -592,7 +580,6 @@ const styles = StyleSheet.create({
     borderRadius: 1.5,
   },
 
-  // Activity Styles
   activityContainer: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
@@ -632,7 +619,6 @@ const styles = StyleSheet.create({
     color: COLORS.gray500,
   },
 
-  // Bottom Spacing
   bottomSpacing: {
     height: 40,
   },

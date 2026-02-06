@@ -13,4 +13,12 @@ export const ENDPOINTS = {
     record: "/milk/record",
     history: "/milk/history",
   },
+  // for dashboard stats and activities
+  dashboard: {
+    stats: "/dashboard/stats",
+    activities: "/dashboard/activities",
+  },
 };
+
+export const HEAT_ON_HEAT = "/heat/on-heat";
+
