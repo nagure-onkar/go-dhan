@@ -1,3 +1,5 @@
+import { ENDPOINTS } from "@/api/endpoints";
+import { GET } from "@/api/methods";
 import { useTheme } from "@/theme/useTheme";
 import BottomDrawer, { BottomDrawerRef } from "app/drawer/BottomDrawer";
 import { liveStockRouteMap } from "app/navigation/AppNavigator";
@@ -8,134 +10,163 @@ import {
   PencilSimple,
   Syringe,
 } from "phosphor-react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 /* ---------------- MOCK DATA ---------------- */
 
-type Cattle = {
-  id: string;
-  name: string;
-  type: string;
-  reproductionState: string;
-  weight: number;
-  worker: string;
+// type Cattle = {
+//   id: string;
+//   name: string;
+//   type: string;
+//   reproductionState: string;
+//   weight: number;
+//   worker: string;
+// };
+
+type CattleListResponse = {
+  items: Cattle[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 };
 
-const cattleList: Cattle[] = [
-  {
-    id: "C-101",
-    name: "Abcde",
-    type: "Cow",
-    reproductionState: "Pregnant",
-    weight: 420,
-    worker: "Ramesh",
-  },
-  {
-    id: "C-102",
-    name: "Fghi",
-    type: "Buffalo",
-    reproductionState: "Lactating",
-    weight: 510,
-    worker: "Suresh",
-  },
-  {
-    id: "C-103",
-    name: "Abcde",
-    type: "Cow",
-    reproductionState: "Pregnant",
-    weight: 420,
-    worker: "Ramesh",
-  },
-  {
-    id: "C-104",
-    name: "Fghi",
-    type: "Buffalo",
-    reproductionState: "Lactating",
-    weight: 510,
-    worker: "Suresh",
-  },
-  {
-    id: "C-105",
-    name: "Abcde",
-    type: "Cow",
-    reproductionState: "Pregnant",
-    weight: 420,
-    worker: "Ramesh",
-  },
-  {
-    id: "C-106",
-    name: "Fghi",
-    type: "Buffalo",
-    reproductionState: "Lactating",
-    weight: 510,
-    worker: "Suresh",
-  },
-  {
-    id: "C-107",
-    name: "Abcde",
-    type: "Cow",
-    reproductionState: "Pregnant",
-    weight: 420,
-    worker: "Ramesh",
-  },
-  {
-    id: "C-108",
-    name: "Fghi",
-    type: "Buffalo",
-    reproductionState: "Lactating",
-    weight: 510,
-    worker: "Suresh",
-  },
-  {
-    id: "C-109",
-    name: "Abcde",
-    type: "Cow",
-    reproductionState: "Pregnant",
-    weight: 420,
-    worker: "Ramesh",
-  },
-  {
-    id: "C-110",
-    name: "Fghi",
-    type: "Buffalo",
-    reproductionState: "Lactating",
-    weight: 510,
-    worker: "Suresh",
-  },
-  {
-    id: "C-111",
-    name: "Abcde",
-    type: "Cow",
-    reproductionState: "Pregnant",
-    weight: 420,
-    worker: "Ramesh",
-  },
-  {
-    id: "C-112",
-    name: "Fghi",
-    type: "Buffalo",
-    reproductionState: "Lactating",
-    weight: 510,
-    worker: "Suresh",
-  },
-  {
-    id: "C-113",
-    name: "Abcde",
-    type: "Cow",
-    reproductionState: "Pregnant",
-    weight: 420,
-    worker: "Ramesh",
-  },
-  {
-    id: "C-122",
-    name: "Fghi",
-    type: "Buffalo",
-    reproductionState: "Lactating",
-    weight: 510,
-    worker: "Suresh",
-  },
-];
+export type Cattle = {
+  id: string;
+  cattleId: string;
+  cattleType: string;
+  breed: string;
+  gender: string;
+  age: number;
+  weightKg: number;
+  state: string;
+  status: string;
+  lactationNumber: number;
+  thumbnail: string | null;
+  veterinarianAssignedId: string;
+  veterinarianAssignedName: string;
+  workerAssignedId: string;
+  workerAssignedName: string;
+  created_at: string;
+};
+
+const cattleList: Cattle[] = [];
+
+// const cattleList: Cattle[] = [
+//   {
+//     id: "C-101",
+//     name: "Abcde",
+//     type: "Cow",
+//     reproductionState: "Pregnant",
+//     weight: 420,
+//     worker: "Ramesh",
+//   },
+//   {
+//     id: "C-102",
+//     name: "Fghi",
+//     type: "Buffalo",
+//     reproductionState: "Lactating",
+//     weight: 510,
+//     worker: "Suresh",
+//   },
+//   {
+//     id: "C-103",
+//     name: "Abcde",
+//     type: "Cow",
+//     reproductionState: "Pregnant",
+//     weight: 420,
+//     worker: "Ramesh",
+//   },
+//   {
+//     id: "C-104",
+//     name: "Fghi",
+//     type: "Buffalo",
+//     reproductionState: "Lactating",
+//     weight: 510,
+//     worker: "Suresh",
+//   },
+//   {
+//     id: "C-105",
+//     name: "Abcde",
+//     type: "Cow",
+//     reproductionState: "Pregnant",
+//     weight: 420,
+//     worker: "Ramesh",
+//   },
+//   {
+//     id: "C-106",
+//     name: "Fghi",
+//     type: "Buffalo",
+//     reproductionState: "Lactating",
+//     weight: 510,
+//     worker: "Suresh",
+//   },
+//   {
+//     id: "C-107",
+//     name: "Abcde",
+//     type: "Cow",
+//     reproductionState: "Pregnant",
+//     weight: 420,
+//     worker: "Ramesh",
+//   },
+//   {
+//     id: "C-108",
+//     name: "Fghi",
+//     type: "Buffalo",
+//     reproductionState: "Lactating",
+//     weight: 510,
+//     worker: "Suresh",
+//   },
+//   {
+//     id: "C-109",
+//     name: "Abcde",
+//     type: "Cow",
+//     reproductionState: "Pregnant",
+//     weight: 420,
+//     worker: "Ramesh",
+//   },
+//   {
+//     id: "C-110",
+//     name: "Fghi",
+//     type: "Buffalo",
+//     reproductionState: "Lactating",
+//     weight: 510,
+//     worker: "Suresh",
+//   },
+//   {
+//     id: "C-111",
+//     name: "Abcde",
+//     type: "Cow",
+//     reproductionState: "Pregnant",
+//     weight: 420,
+//     worker: "Ramesh",
+//   },
+//   {
+//     id: "C-112",
+//     name: "Fghi",
+//     type: "Buffalo",
+//     reproductionState: "Lactating",
+//     weight: 510,
+//     worker: "Suresh",
+//   },
+//   {
+//     id: "C-113",
+//     name: "Abcde",
+//     type: "Cow",
+//     reproductionState: "Pregnant",
+//     weight: 420,
+//     worker: "Ramesh",
+//   },
+//   {
+//     id: "C-122",
+//     name: "Fghi",
+//     type: "Buffalo",
+//     reproductionState: "Lactating",
+//     weight: 510,
+//     worker: "Suresh",
+//   },
+// ];
 
 /* ---------------- SCREEN ---------------- */
 
@@ -146,6 +177,42 @@ export default function LiveStockScreen() {
   const { colors } = useTheme();
   const [openId, setOpenId] = useState<string | null>(null);
   const bottomSheetRef = useRef<BottomDrawerRef>(null);
+
+  useEffect(() => {
+    const fetchCattle = async () => {
+      try {
+        const data = await GET<CattleListResponse>(ENDPOINTS.cattle.list, {
+          page: 1,
+          limit: 20,
+        });
+
+        // console.log("Cattle list:", response);
+        // console.log("🐄 Cattle list:", );
+
+        data.items.forEach((cattle, index) => {
+          console.log(`
+🐄 Cattle #${index + 1}
+---------------------------
+ID: ${cattle.cattleId}
+Type: ${cattle.cattleType}
+Breed: ${cattle.breed}
+Gender: ${cattle.gender}
+Age: ${cattle.age} yrs
+Weight: ${cattle.weightKg} kg
+State: ${cattle.state}
+Status: ${cattle.status}
+Lactation: ${cattle.lactationNumber}
+Worker: ${cattle.workerAssignedName}
+Vet: ${cattle.veterinarianAssignedName}
+`);
+        });
+      } catch (error) {
+        console.log("Failed to fetch cattle list:", error);
+      }
+    };
+
+    fetchCattle();
+  }, []);
 
   const handleAction = (action: LiveStockAction, id: string) => {
     console.log(`${action} clicked for ${id}`);
