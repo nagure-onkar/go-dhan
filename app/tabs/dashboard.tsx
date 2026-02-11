@@ -183,6 +183,7 @@ const DashboardScreen: React.FC = () => {
                 iconColor={COLORS.primary}
                 subtext="Animals milked today"
                 fullWidth
+                compact
               />
 
               <SectionTitle title="Health & Treatment" />
@@ -239,6 +240,7 @@ const DashboardScreen: React.FC = () => {
                   backgroundColor={COLORS.secondaryLight}
                   iconColor={COLORS.secondary}
                   subtext="Assigned workers"
+                  compact
                 />
                 <StatCard
                   containerStyle={[
@@ -251,6 +253,7 @@ const DashboardScreen: React.FC = () => {
                   backgroundColor={COLORS.dangerLight}
                   iconColor={COLORS.danger}
                   subtext="Assigned vets"
+                  compact
                 />
               </View>
 
@@ -314,6 +317,7 @@ interface StatCardProps {
   iconColor: string;
   subtext: string;
   fullWidth?: boolean;
+  compact?: boolean;
   containerStyle?: any;
 }
 
@@ -325,11 +329,13 @@ const StatCard: React.FC<StatCardProps> = ({
   iconColor,
   subtext,
   fullWidth = false,
+  compact = false,
   containerStyle,
 }) => (
   <View
     style={[
       styles.statCard,
+      compact && styles.statCardCompact,
       containerStyle,
       fullWidth && styles.statCardFullWidth,
     ]}
@@ -339,7 +345,7 @@ const StatCard: React.FC<StatCardProps> = ({
     >
       <MaterialCommunityIcons
         name={icon}
-        size={ICON_SIZES.stat}
+        size={ compact ?18 :ICON_SIZES.stat}
         color={iconColor}
       />
     </View>
@@ -482,14 +488,20 @@ const styles = StyleSheet.create({
     elevation: 3,
     flexDirection: 'column',
   },
+  statCardCompact: {
+  paddingVertical: 8,
+  paddingHorizontal: 10,
+  borderRadius: 12,
+},
+
   statCardFullWidth: {
     width: '100%',
     marginRight: 0,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 42,
+    height: 42,
+    borderRadius: 221,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -498,31 +510,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: COLORS.gray600,
     marginBottom: 6,
     fontWeight: '500',
   },
   statValue: {
-    fontSize: 26,
+    fontSize: 20,
     fontWeight: '700',
     color: COLORS.gray800,
     marginBottom: 8,
   },
   statSubtext: {
-    fontSize: 11,
+    fontSize: 10,
     color: COLORS.primary,
     fontWeight: '600',
   },
 
   cardRowTwo: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 12,
   },
   statCardTwo: {
-    width: '48%',
-    marginRight: 12,
+    width: '49%',
   },
   statCardTwoLast: {
     marginRight: 0,

@@ -1,6 +1,6 @@
-import HeatOnHeatScreen from "./tabs/heatonheat";
+import ProfitLossCalculator from "./tabs/ProfitLossStatement";
 
 export default function Index() {
-  return <HeatOnHeatScreen />;
+  return <ProfitLossCalculator />;
 }
 
