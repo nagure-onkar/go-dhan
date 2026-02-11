@@ -1,24 +1,23 @@
 export const ENDPOINTS = {
   auth: {
-    login: "/auth/login",
+    login: "/api/v1/auth/login",
   },
   healthCheck: {
     root: "",
   },
   cattle: {
-    list: "/cattle",
+    list: "/api/v1/cattle/list",
     details: (id: string) => `/cattle/${id}`,
   },
   milk: {
     record: "/milk/record",
     history: "/milk/history",
   },
-  // for dashboard stats and activities
-  dashboard: {
-    stats: "/dashboard/stats",
-    activities: "/dashboard/activities",
+  insemination: {
+    create: "/api/v1/insemination/create",
+    list: "/api/v1/insemination/list",
+    details: (id: string) => `/api/v1/insemination/${id}`,
   },
 };
 
 export const HEAT_ON_HEAT = "/heat/on-heat";
-

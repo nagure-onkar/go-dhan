@@ -1,25 +1,31 @@
 export const lightColors = {
-  background: '#EAF7EF', // very light green
-  primary: '#4CAF50',
+  primary: "#4CAF50",
+  background: "#EAF7EF", // very light green
+  headerBackground: "#94f7bf",
 
-  text: '#000000',
-  textInverse: '#FFFFFF',
+  text: "#000000",
+  textInverse: "#FFFFFF",
 
-  card: '#FFFFFF',
-  border: '#E0E0E0',
+  card: "#FFFFFF",
+  border: "#E0E0E0",
 
-  drawerBackground: '#FFFFFF',
+  drawerBackground: "#FFFFFF",
+
+  subHeading: "#3e6f4f",
 };
 
 export const darkColors = {
-  background: '#0F1F17', // dark greenish
-  primary: '#66BB6A',
+  primary: "#66BB6A",
+  background: "#0F1F17", // dark greenish
+  headerBackground: "#0B1812",
 
-  text: '#FFFFFF',
-  textInverse: '#000000',
+  text: "#FFFFFF",
+  textInverse: "#000000",
 
-  card: '#1B2B22',
-  border: '#2E3B34',
+  card: "#1B2B22",
+  border: "#2E3B34",
 
-  drawerBackground: '#1E1E1E',
+  drawerBackground: "#1E1E1E",
+
+  subHeading: "#B7D8C2",
 };

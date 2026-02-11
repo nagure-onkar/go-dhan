@@ -17,9 +17,9 @@ export default function SearchScreen() {
     useCallback(() => {
       let isActive = true;
 
-      GET<HealthCheckResponse>(ENDPOINTS.healthCheck.root)
+      GET<any>(ENDPOINTS.cattle.list)
         .then((res) => {
-          if (isActive) setMessage(res.message);
+          if (isActive) setMessage(`Loaded ${res.data.length} cattle`);
         })
         .catch(() => {
           if (isActive) setMessage("Failed to connect to API ❌");

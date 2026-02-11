@@ -46,7 +46,7 @@ export const POST = async <T>(url: string, data?: object): Promise<T> => {
       console.log("✅ POST SUCCESS:", { url: finalUrl, response });
     }
 
-    return response.data;
+    return response;
   } catch (error: any) {
     if (isDev) {
       console.log("❌ POST ERROR:", {

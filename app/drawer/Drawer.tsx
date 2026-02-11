@@ -1,15 +1,24 @@
-import AppText from '@/components/common/AppText';
-import { useLanguage } from '@/constants/localization/useLanguage';
-import { useTheme } from '@/theme/useTheme';
+import AppText from "@/components/common/AppText";
+import { useLanguage } from "@/constants/localization/useLanguage";
+import { useTheme } from "@/theme/useTheme";
+import { LiveStockScreen } from "app/navigation/AppNavigator";
+import { useRouter } from "expo-router";
+import { Gear, Globe } from "phosphor-react-native";
+import React, { useState } from "react";
 import {
-  Gear,
-  Globe
-} from 'phosphor-react-native';
-import React, { useState } from 'react';
-import { Modal, Platform, Pressable, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
+  Modal,
+  Platform,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const STATUS_BAR_HEIGHT =
-  Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0;
+  Platform.OS === "android" ? (StatusBar.currentHeight ?? 0) : 0;
+
+const router = useRouter();
 
 export default function DrawerContent() {
   const { colors } = useTheme();
@@ -17,40 +26,45 @@ export default function DrawerContent() {
   const [open, setOpen] = useState(false);
 
   return (
-     <View style={[styles.container, { 
-        backgroundColor: colors.drawerBackground,
-        paddingTop: STATUS_BAR_HEIGHT + 8,
-      }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.drawerBackground,
+          paddingTop: STATUS_BAR_HEIGHT + 8,
+        },
+      ]}
+    >
       <AppText style={styles.title}>{t.menu}</AppText>
-
-      <TouchableOpacity style={styles.item}>
-        <Gear size={28} color={colors.text}/>
-        <AppText>{t.settings}</AppText>
-      </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.item}
-        onPress={() => setOpen(true)}
+        onPress={() => {
+          router.push(LiveStockScreen);
+        }}
       >
+        <AppText style={{ fontSize: 24 }}>🐄</AppText>
+        <AppText>{t.live_stock}</AppText>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.item}>
+        <Gear size={28} color={colors.text} />
+        <AppText>{t.settings}</AppText>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.item} onPress={() => setOpen(true)}>
         <Globe size={28} color={colors.text} />
         <AppText>{t.changeLanguage}</AppText>
       </TouchableOpacity>
 
       {/* DROPDOWN MODAL */}
-      <Modal
-        transparent
-        visible={open}
-        animationType="fade"
-      >
-        <Pressable
-          style={styles.overlay}
-          onPress={() => setOpen(false)}
-        >
+      <Modal transparent visible={open} animationType="fade">
+        <Pressable style={styles.overlay} onPress={() => setOpen(false)}>
           <View style={[styles.dropdown, { backgroundColor: colors.card }]}>
             <TouchableOpacity
               style={styles.option}
               onPress={() => {
-                setLanguage('en');
+                setLanguage("en");
                 setOpen(false);
               }}
             >
@@ -60,7 +74,7 @@ export default function DrawerContent() {
             <TouchableOpacity
               style={styles.option}
               onPress={() => {
-                setLanguage('mr');
+                setLanguage("mr");
                 setOpen(false);
               }}
             >
@@ -92,16 +106,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   item: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginVertical: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   overlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
   dropdown: {
     width: 200,
@@ -112,6 +126,6 @@ const styles = StyleSheet.create({
   option: {
     padding: 12,
     borderBottomWidth: 0.5,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
   },
 });

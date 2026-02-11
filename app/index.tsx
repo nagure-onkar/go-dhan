@@ -1,6 +1,6 @@
-import ProfitLossCalculator from "./tabs/ProfitLossStatement";
 
 export default function Index() {
-  return <ProfitLossCalculator />;
+  // return <Redirect href="/tabs" />;
+  // return <Redirect href="/screens/cattleReproductionCycle" />;
+  return <Redirect href="/screens/login" />;
 }
-
