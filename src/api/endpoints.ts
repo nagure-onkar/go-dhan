@@ -13,4 +13,11 @@ export const ENDPOINTS = {
     record: "/milk/record",
     history: "/milk/history",
   },
+  // ADD THIS insemination
+  insemination: {
+    create: "/api/v1/insemination/create",
+    list: "/api/v1/insemination/list",
+    details: (id: string) => `/api/v1/insemination/${id}`,
+  },
+
 };
