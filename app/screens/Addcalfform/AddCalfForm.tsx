@@ -1,5 +1,6 @@
 import { ENDPOINTS } from "@/api/endpoints";
 import { GET } from "@/api/methods";
+import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -78,6 +79,44 @@ const HealthObservations = [
   { label: "Fully fit Calf", value: "Fully_fit_Calf" },
 ];
 
+const cattleStates = [
+  { label: "Calf", value: "calf" },
+  { label: "Heifer", value: "heifer" },
+  { label: "On Heat & lactating", value: "on_heat_&_lactating" },
+  { label: "On Heat & Not lactating", value: "on_heat_&_not_lactating" },
+  { label: "Calved", value: "calved" },
+  { label: "Calved & lactating", value: "calved_&_lactating" },
+  { label: "Calved & Not lactating", value: "calved_&_not_lactating" },
+  { label: "Inseminated & lactating", value: "inseminated_&_lactating" },
+  {
+    label: "Inseminated & Not lactating",
+    value: "inseminated_&_not_lactating",
+  },
+  { label: "Pregnant & lactating", value: "pregnant_&_lactating" },
+  { label: "Pregnant & Not lactating", value: "pregnant_&_not_lactating" },
+  { label: "Not Pregnant & lactating", value: "not_pregnant_&_lactating" },
+  {
+    label: "Not Pregnant & Not lactating",
+    value: "not_pregnant_&_not_lactating",
+  },
+  { label: "Dry off", value: "dry_off" },
+];
+
+const cattleStatuses = [
+  { label: "Active", value: "active" },
+  { label: "Inactive", value: "inactive" },
+];
+
+// Mock data - replace with your actual data source (e.g., API call)
+const workers = [
+  { label: "Ram", value: "ram" },
+  { label: "Sham", value: "sham" },
+];
+const vets = [
+  { label: "Dr. Patil", value: "dr_patil" },
+  { label: "Dr. Shinde", value: "dr_shinde" },
+];
+
 const validateForm = (data, rules) => {
   let errors = {};
 
@@ -92,21 +131,6 @@ const validateForm = (data, rules) => {
   });
 
   return errors;
-};
-const reset = {
-  cattleId: "",
-  cattleName: "",
-  cattleType: "buffalo",
-  breed: null,
-  ColostrumIntake: null,
-  HealthObservations: null,
-  gender: "Female",
-  calvingType: "",
-  treatment: "",
-  nddbNumber: "",
-  dob: null,
-  age: "",
-  weight: "",
 };
 
 export default function AddCalfForm() {
@@ -125,7 +149,53 @@ export default function AddCalfForm() {
     dob: null,
     age: "",
     weight: "",
+    status: "active",
+    workerAssigned: null,
+    vetAssigned: null,
+    state: null,
+    currentStateDate: null,
+    insuranceNumber: "",
+    remark: "",
   });
+
+  const reset = {
+    cattleId: "",
+    cattleName: "",
+    cattleType: "buffalo",
+    breed: null,
+    ColostrumIntake: null,
+    HealthObservations: null,
+    gender: "Female",
+    calvingType: "",
+    treatment: "",
+    nddbNumber: "",
+    treatmentExpence: "",
+    dob: null,
+    age: "",
+    weight: "",
+    status: "active",
+    workerAssigned: null,
+    vetAssigned: null,
+    state: null,
+    currentStateDate: null,
+    insuranceNumber: "",
+    remark: "",
+  };
+
+  const saveFormData = async (formData) => {
+    const url = "http://10.240.244.84:3000/Livestock";
+    let result = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    result = await result.json();
+    if (result) {
+      console.log("Form data saved successfully:");
+    }
+  };
 
   const [motherCattleId, setMotherCattleId] = useState("");
   const [motherCattleData, setMotherCattleData] = useState(null);
@@ -141,6 +211,14 @@ export default function AddCalfForm() {
     healthObservations: false,
     calvingType: false,
   });
+  // Separate focus state for health management dropdowns
+  const [isStatusFocus, setIsStatusFocus] = useState(false);
+  const [isWorkerFocus, setIsWorkerFocus] = useState(false);
+  const [isVetFocus, setIsVetFocus] = useState(false);
+  const [isStateFocus, setIsStateFocus] = useState(false);
+  const [showHealthManagementDatePicker, setShowHealthManagementDatePicker] =
+    useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const router = useRouter();
   const req = <Text style={{ color: "red" }}> *</Text>;
 
@@ -170,6 +248,44 @@ export default function AddCalfForm() {
   const handleSave = () => {
     // 1. Define what needs to be checked
     const validationRules = {
+      status: "Status is required",
+      workerAssigned: "Worker is required",
+      vetAssigned: "Vet is required",
+      state: "State is required",
+      currentStateDate: "Date is required",
+    };
+
+    // 2. Call the function
+    const validationErrors = validateForm(formData, validationRules);
+
+    // 3. Update the UI state
+    setErrors(validationErrors);
+
+    // 4. If no errors (empty object), save and show success
+    if (Object.keys(validationErrors).length === 0) {
+      console.log("Success! All form data validated:", formData);
+      setIsSaved(true);
+      saveFormData(formData);
+      setTimeout(() => {
+        router.push("../../tabs");
+        setIsSaved(false);
+      }, 2000);
+      setFormData(reset);
+      {
+        back();
+      }
+    }
+  };
+
+  const handleCancel = () => {
+    router.back();
+  };
+
+  const [screen1, setScreen1] = useState(true);
+  const [screen2, setScreen2] = useState(false);
+
+  const next = () => {
+    const validationRules = {
       cattleId: "Cattle ID is required",
       cattleName: "Cattle Name is required",
       cattleType: "Cattle type is required",
@@ -183,23 +299,18 @@ export default function AddCalfForm() {
       HealthObservations: "Health Observations is required",
       calvingType: "Calving Type is required",
     };
-
-    // 2. Call the function
     const validationErrors = validateForm(formData, validationRules);
-
-    // 3. Update the UI state
     setErrors(validationErrors);
-
-    // 4. If no errors (empty object), move to next screen
     if (Object.keys(validationErrors).length === 0) {
-      console.log("Success! Navigating...");
-      router.push("./HealthManagement");
-      setFormData(reset);
+      setScreen1(!screen1);
+      setScreen2(!screen2);
     }
+    // setScreen1(!screen1);
+    // setScreen2(!screen2);
   };
-
-  const handleCancel = () => {
-    router.back(); // Standard practice for cancel buttons
+  const back = () => {
+    setScreen1(!screen1);
+    setScreen2(!screen2);
   };
 
   const handleDateChange = (event, selectedDate) => {
@@ -222,439 +333,683 @@ export default function AddCalfForm() {
     }
   };
 
+  const handleHealthManagementDateChange = (event, selectedDate) => {
+    setShowHealthManagementDatePicker(false);
+    if (selectedDate) {
+      setFormData({
+        ...formData,
+        currentStateDate: selectedDate,
+      });
+      setErrors((prev) => ({ ...prev, currentStateDate: null }));
+    }
+  };
+
   const setFocus = (field, value) => {
     setFocusState((prevState) => ({ ...prevState, [field]: value }));
   };
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Add New Calf</Text>
-        <Text style={styles.headerSub}>
-          Register a newborn Calf with details
-        </Text>
-      </View>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled" // CRITICAL: Allows dropdown to click while keyboard is open
+  const setFormValue = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: null }));
+  };
+
+  if (isSaved) {
+    return <Success style={{ flex: 1, backgroundColor: "#bbffc4" }} />;
+  }
+
+  if (screen1) {
+    return (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
       >
-        {/* <View style={styles.header}>
+        <View style={styles.header}>
           <Text style={styles.headerTitle}>Add New Calf</Text>
           <Text style={styles.headerSub}>
             Register a newborn Calf with details
           </Text>
-        </View> */}
+        </View>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled" // CRITICAL: Allows dropdown to click while keyboard is open
+        >
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Basic Information</Text>
+            <View style={styles.separator} />
 
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Basic Information</Text>
-          <View style={styles.separator} />
+            {/* Cattle ID */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Cattle ID{req}</Text>
+              <TextInput
+                style={[styles.input, errors.cattleId && styles.inputError]}
+                placeholder="e.g. CAF-001"
+                value={formData.cattleId}
+                onChangeText={(val) =>
+                  setFormData({ ...formData, cattleId: val })
+                }
+              />
+              {errors.cattleId && (
+                <Text style={styles.errorText}>{errors.cattleId}</Text>
+              )}
+            </View>
 
-          {/* Cattle ID */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Cattle ID{req}</Text>
-            <TextInput
-              style={[styles.input, errors.cattleId && styles.inputError]}
-              placeholder="e.g. CAF-001"
-              value={formData.cattleId}
-              onChangeText={(val) =>
-                setFormData({ ...formData, cattleId: val })
-              }
-            />
-            {errors.cattleId && (
-              <Text style={styles.errorText}>{errors.cattleId}</Text>
-            )}
-          </View>
+            {/* Cattle Name */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Cattle Name{req}</Text>
+              <TextInput
+                style={[styles.input, errors.cattleName && styles.inputError]}
+                placeholder="e.g. Daisy"
+                value={formData.cattleName}
+                onChangeText={(val) =>
+                  setFormData({ ...formData, cattleName: val })
+                }
+              />
+              {errors.cattleName && (
+                <Text style={styles.errorText}>{errors.cattleName}</Text>
+              )}
+            </View>
 
-          {/* Cattle Name */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Cattle Name{req}</Text>
-            <TextInput
-              style={[styles.input, errors.cattleName && styles.inputError]}
-              placeholder="e.g. Daisy"
-              value={formData.cattleName}
-              onChangeText={(val) =>
-                setFormData({ ...formData, cattleName: val })
-              }
-            />
-            {errors.cattleName && (
-              <Text style={styles.errorText}>{errors.cattleName}</Text>
-            )}
-          </View>
-
-          {/* Dropdown: Cattle Type Selection */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Cattle Type{req}</Text>
-            <Dropdown
-              style={[
-                styles.dropdown,
-                focusState.cattleType && { borderColor: "#2D6A4F" },
-                errors.cattleType && { borderColor: "red" },
-              ]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              // inputSearchStyle={styles.inputSearchStyle}
-              data={breed}
-              // search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={
-                !focusState.cattleType ? "Select cattle type" : "..."
-              }
-              // searchPlaceholder="Search type..."
-              value={formData.cattleType}
-              onFocus={() => setFocus("cattleType", true)}
-              onBlur={() => setFocus("cattleType", false)}
-              onChange={(item) => {
-                setFormData({
-                  ...formData,
-                  cattleType: item.value,
-                  breed: null,
-                });
-                setFocus("cattleType", false);
-                setErrors((prev) => ({
-                  ...prev,
-                  cattleType: null,
-                  breed: null,
-                }));
-              }}
-            />
-            {errors.cattleType && (
-              <Text style={styles.errorText}>{errors.cattleType}</Text>
-            )}
-          </View>
-
-          {/* Dropdown: Breed Selection */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Breed{req}</Text>
-            <Dropdown
-              style={[
-                styles.dropdown,
-                focusState.breed && { borderColor: "#2D6A4F" },
-                errors.breed && { borderColor: "red" },
-              ]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              // inputSearchStyle={styles.inputSearchStyle}
-              data={
-                formData.cattleType === "buffalo" ? buffaloBreeds : cowBreeds
-              }
-              // search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={!focusState.breed ? "Select breed" : "..."}
-              // searchPlaceholder="Search breed..."
-              value={formData.breed}
-              onFocus={() => setFocus("breed", true)}
-              onBlur={() => setFocus("breed", false)}
-              onChange={(item) => {
-                setFormData({ ...formData, breed: item.value });
-                setFocus("breed", false);
-                setErrors((prev) => ({ ...prev, breed: null }));
-              }}
-              disable={!formData.cattleType}
-            />
-            {errors.breed && (
-              <Text style={styles.errorText}>{errors.breed}</Text>
-            )}
-          </View>
-
-          {/* Treatment */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Treatment{req}</Text>
-            <TextInput
-              style={[styles.input, errors.treatment && styles.inputError]}
-              placeholder="e.g. Vaccination"
-              value={formData.treatment}
-              onChangeText={(val) =>
-                setFormData({ ...formData, treatment: val })
-              }
-            />
-            {errors.treatment && (
-              <Text style={styles.errorText}>{errors.treatment}</Text>
-            )}
-          </View>
-
-          {/* Treatment Expence */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Treatment Expence (₹){req}</Text>
-            <TextInput
-              style={[
-                styles.input,
-                errors.treatmentExpence && styles.inputError,
-              ]}
-              placeholder="Enter treatment cost"
-              value={formData.treatmentExpence}
-              keyboardType="numeric"
-              onChangeText={(val) =>
-                setFormData({ ...formData, treatmentExpence: val })
-              }
-            />
-            {errors.treatmentExpence && (
-              <Text style={styles.errorText}>{errors.treatmentExpence}</Text>
-            )}
-          </View>
-
-          {/* Colostrum Intake */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Colostrum Intake{req}</Text>
-            <Dropdown
-              style={[
-                styles.dropdown,
-                focusState.colostrumIntake && { borderColor: "#2D6A4F" },
-                errors.ColostrumIntake && { borderColor: "red" },
-              ]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              // inputSearchStyle={styles.inputSearchStyle}
-              data={ColostrumIntakes}
-              // search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={
-                !focusState.colostrumIntake ? "Select ColostrumIntake" : "..."
-              }
-              // searchPlaceholder="Search ColostrumIntake..."
-              value={formData.ColostrumIntake}
-              onFocus={() => setFocus("colostrumIntake", true)}
-              onBlur={() => setFocus("colostrumIntake", false)}
-              onChange={(item) => {
-                setFormData({ ...formData, ColostrumIntake: item.value });
-                setFocus("colostrumIntake", false);
-              }}
-            />
-            {errors.ColostrumIntake && (
-              <Text style={styles.errorText}>{errors.ColostrumIntake}</Text>
-            )}
-          </View>
-
-          {/* Health Observations */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Health Observations {req}</Text>
-            <Dropdown
-              style={[
-                styles.dropdown,
-                focusState.healthObservations && { borderColor: "#2D6A4F" },
-                errors.HealthObservations && { borderColor: "red" },
-              ]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              // inputSearchStyle={styles.inputSearchStyle}
-              data={HealthObservations}
-              // search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={
-                !focusState.healthObservations
-                  ? "Select Health Observations"
-                  : "..."
-              }
-              // searchPlaceholder="Search Health Observations..."
-              value={formData.HealthObservations}
-              onFocus={() => setFocus("healthObservations", true)}
-              onBlur={() => setFocus("healthObservations", false)}
-              onChange={(item) => {
-                setFormData({ ...formData, HealthObservations: item.value });
-                setFocus("healthObservations", false);
-              }}
-            />
-            {errors.HealthObservations && (
-              <Text style={styles.errorText}>{errors.HealthObservations}</Text>
-            )}
-          </View>
-
-          {/* NDDB Number */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>NDDB Registration Number</Text>
-            <TextInput
-              style={[styles.input, errors.nddbNumber && styles.inputError]}
-              placeholder="e.g. U01403DL2009NPL195142"
-              value={formData.nddbNumber}
-              onChangeText={(val) =>
-                setFormData({ ...formData, nddbNumber: val })
-              }
-            />
-            {errors.nddbNumber && (
-              <Text style={styles.errorText}>{errors.nddbNumber}</Text>
-            )}
-          </View>
-
-          {/* Gender Selector */}
-          <Text style={styles.label}>Gender{req}</Text>
-          <View style={styles.genderRow}>
-            {["Male", "Female"].map((gender) => (
-              <TouchableOpacity
-                key={gender}
+            {/* Dropdown: Cattle Type Selection */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Cattle Type{req}</Text>
+              <Dropdown
                 style={[
-                  styles.genderBtn,
-                  formData.gender === gender && styles.genderBtnActive,
+                  styles.dropdown,
+                  focusState.cattleType && { borderColor: "#2D6A4F" },
+                  errors.cattleType && { borderColor: "red" },
                 ]}
-                onPress={() => setFormData({ ...formData, gender: gender })}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                // inputSearchStyle={styles.inputSearchStyle}
+                data={breed}
+                // search
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={
+                  !focusState.cattleType ? "Select cattle type" : "..."
+                }
+                // searchPlaceholder="Search type..."
+                value={formData.cattleType}
+                onFocus={() => setFocus("cattleType", true)}
+                onBlur={() => setFocus("cattleType", false)}
+                onChange={(item) => {
+                  setFormData({
+                    ...formData,
+                    cattleType: item.value,
+                    breed: null,
+                  });
+                  setFocus("cattleType", false);
+                  setErrors((prev) => ({
+                    ...prev,
+                    cattleType: null,
+                    breed: null,
+                  }));
+                }}
+              />
+              {errors.cattleType && (
+                <Text style={styles.errorText}>{errors.cattleType}</Text>
+              )}
+            </View>
+
+            {/* Dropdown: Breed Selection */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Breed{req}</Text>
+              <Dropdown
+                style={[
+                  styles.dropdown,
+                  focusState.breed && { borderColor: "#2D6A4F" },
+                  errors.breed && { borderColor: "red" },
+                ]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                // inputSearchStyle={styles.inputSearchStyle}
+                data={
+                  formData.cattleType === "buffalo" ? buffaloBreeds : cowBreeds
+                }
+                // search
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={!focusState.breed ? "Select breed" : "..."}
+                // searchPlaceholder="Search breed..."
+                value={formData.breed}
+                onFocus={() => setFocus("breed", true)}
+                onBlur={() => setFocus("breed", false)}
+                onChange={(item) => {
+                  setFormData({ ...formData, breed: item.value });
+                  setFocus("breed", false);
+                  setErrors((prev) => ({ ...prev, breed: null }));
+                }}
+                disable={!formData.cattleType}
+              />
+              {errors.breed && (
+                <Text style={styles.errorText}>{errors.breed}</Text>
+              )}
+            </View>
+
+            {/* Treatment */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Treatment{req}</Text>
+              <TextInput
+                style={[styles.input, errors.treatment && styles.inputError]}
+                placeholder="e.g. Vaccination"
+                value={formData.treatment}
+                onChangeText={(val) =>
+                  setFormData({ ...formData, treatment: val })
+                }
+              />
+              {errors.treatment && (
+                <Text style={styles.errorText}>{errors.treatment}</Text>
+              )}
+            </View>
+
+            {/* Treatment Expence */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Treatment Expence (₹){req}</Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.treatmentExpence && styles.inputError,
+                ]}
+                placeholder="Enter treatment cost"
+                value={formData.treatmentExpence}
+                keyboardType="numeric"
+                onChangeText={(val) =>
+                  setFormData({ ...formData, treatmentExpence: val })
+                }
+              />
+              {errors.treatmentExpence && (
+                <Text style={styles.errorText}>{errors.treatmentExpence}</Text>
+              )}
+            </View>
+
+            {/* Colostrum Intake */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Colostrum Intake{req}</Text>
+              <Dropdown
+                style={[
+                  styles.dropdown,
+                  focusState.colostrumIntake && { borderColor: "#2D6A4F" },
+                  errors.ColostrumIntake && { borderColor: "red" },
+                ]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                // inputSearchStyle={styles.inputSearchStyle}
+                data={ColostrumIntakes}
+                // search
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={
+                  !focusState.colostrumIntake ? "Select ColostrumIntake" : "..."
+                }
+                // searchPlaceholder="Search ColostrumIntake..."
+                value={formData.ColostrumIntake}
+                onFocus={() => setFocus("colostrumIntake", true)}
+                onBlur={() => setFocus("colostrumIntake", false)}
+                onChange={(item) => {
+                  setFormData({ ...formData, ColostrumIntake: item.value });
+                  setFocus("colostrumIntake", false);
+                }}
+              />
+              {errors.ColostrumIntake && (
+                <Text style={styles.errorText}>{errors.ColostrumIntake}</Text>
+              )}
+            </View>
+
+            {/* Health Observations */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Health Observations {req}</Text>
+              <Dropdown
+                style={[
+                  styles.dropdown,
+                  focusState.healthObservations && { borderColor: "#2D6A4F" },
+                  errors.HealthObservations && { borderColor: "red" },
+                ]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                // inputSearchStyle={styles.inputSearchStyle}
+                data={HealthObservations}
+                // search
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={
+                  !focusState.healthObservations
+                    ? "Select Health Observations"
+                    : "..."
+                }
+                // searchPlaceholder="Search Health Observations..."
+                value={formData.HealthObservations}
+                onFocus={() => setFocus("healthObservations", true)}
+                onBlur={() => setFocus("healthObservations", false)}
+                onChange={(item) => {
+                  setFormData({
+                    ...formData,
+                    HealthObservations: item.value,
+                  });
+                  setFocus("healthObservations", false);
+                }}
+              />
+              {errors.HealthObservations && (
+                <Text style={styles.errorText}>
+                  {errors.HealthObservations}
+                </Text>
+              )}
+            </View>
+
+            {/* NDDB Number */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>NDDB Registration Number</Text>
+              <TextInput
+                style={[styles.input, errors.nddbNumber && styles.inputError]}
+                placeholder="e.g. U01403DL2009NPL195142"
+                value={formData.nddbNumber}
+                onChangeText={(val) =>
+                  setFormData({ ...formData, nddbNumber: val })
+                }
+              />
+              {errors.nddbNumber && (
+                <Text style={styles.errorText}>{errors.nddbNumber}</Text>
+              )}
+            </View>
+
+            {/* Gender Selector */}
+            <Text style={styles.label}>Gender{req}</Text>
+            <View style={styles.genderRow}>
+              {["Male", "Female"].map((gender) => (
+                <TouchableOpacity
+                  key={gender}
+                  style={[
+                    styles.genderBtn,
+                    formData.gender === gender && styles.genderBtnActive,
+                  ]}
+                  onPress={() => setFormData({ ...formData, gender: gender })}
+                >
+                  <Text
+                    style={
+                      formData.gender === gender
+                        ? styles.genderTextActive
+                        : styles.genderText
+                    }
+                  >
+                    {gender}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Birth Details</Text>
+            <View style={styles.separator} />
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Dam (Mother Cattle){req}</Text>
+              <View style={styles.searchRow}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search Mother Cattle by ID"
+                  value={motherCattleId}
+                  onChangeText={setMotherCattleId}
+                />
+                <TouchableOpacity
+                  style={styles.searchButton}
+                  onPress={handleSearchMotherCattle}
+                >
+                  <Text style={styles.searchButtonText}>Search</Text>
+                </TouchableOpacity>
+              </View>
+              {isMotherCattleLoading && <ActivityIndicator />}
+              {motherCattleError && (
+                <Text style={styles.errorText}>{motherCattleError}</Text>
+              )}
+              {motherCattleData && (
+                <View style={styles.searchResult}>
+                  <Text>
+                    <Text style={{ fontWeight: "bold" }}>Name:</Text>{" "}
+                    {motherCattleData.cattleName}
+                  </Text>
+                  <Text>
+                    <Text style={{ fontWeight: "bold" }}>Breed:</Text>{" "}
+                    {motherCattleData.breed}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Calving Type */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Calving Type {req}</Text>
+              <Dropdown
+                style={[
+                  styles.dropdown,
+                  focusState.calvingType && { borderColor: "#2D6A4F" },
+                  errors.calvingType && { borderColor: "red" },
+                ]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                // inputSearchStyle={styles.inputSearchStyle}
+                data={calvingTypes}
+                // search
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={
+                  !focusState.calvingType ? "Select Calving Type" : "..."
+                }
+                // searchPlaceholder="Search Calving Type..."
+                value={formData.calvingType}
+                onFocus={() => setFocus("calvingType", true)}
+                onBlur={() => setFocus("calvingType", false)}
+                onChange={(item) => {
+                  setFormData({ ...formData, calvingType: item.value });
+                  setFocus("calvingType", false);
+                }}
+              />
+              {errors.calvingType && (
+                <Text style={styles.errorText}>{errors.calvingType}</Text>
+              )}
+            </View>
+
+            {/* DOB */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Date of Birth{req}</Text>
+              <TouchableOpacity
+                style={[
+                  styles.input,
+                  errors.dob && styles.inputError,
+                  { justifyContent: "center" },
+                ]}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Text style={{ color: formData.dob ? "#000" : "#999" }}>
+                  {formData.dob
+                    ? formData.dob.toLocaleDateString()
+                    : "Select Date"}
+                </Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={formData.dob || new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                  maximumDate={new Date()}
+                />
+              )}
+              {errors.dob && <Text style={styles.errorText}>{errors.dob}</Text>}
+            </View>
+
+            {/* Age (auto-calculated) */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Age (Years)</Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  styles.disabledInput,
+                  errors.age && styles.inputError,
+                ]}
+                placeholder="Select DOB to calculate age"
+                value={formData.age}
+                editable={false}
+              />
+              {errors.age && <Text style={styles.errorText}>{errors.age}</Text>}
+            </View>
+
+            {/* Weight */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Weight (Kg){req}</Text>
+              <TextInput
+                style={[styles.input, errors.weight && styles.inputError]}
+                placeholder="500"
+                value={formData.weight}
+                keyboardType="numeric"
+                onChangeText={(val) =>
+                  setFormData({ ...formData, weight: val })
+                }
+              />
+              {errors.weight && (
+                <Text style={styles.errorText}>{errors.weight}</Text>
+              )}
+            </View>
+          </View>
+
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel}>
+              <Text style={styles.cancelBtnText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.saveBtn} onPress={next}>
+              <Text style={styles.saveBtnText}>Next</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+  }
+
+  if (screen2) {
+    return (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Add New Calf</Text>
+          <Text style={styles.headerSub}>
+            Register a newborn Calf with details
+          </Text>
+        </View>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Initial Health & Management</Text>
+            <View style={styles.separator} />
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Status{req}</Text>
+              <Dropdown
+                style={[
+                  styles.dropdown,
+                  isStatusFocus && { borderColor: "#2D6A4F" },
+                  errors.status && { borderColor: "red" },
+                ]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={cattleStatuses}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={!isStatusFocus ? "Select status" : "..."}
+                value={formData.status}
+                onFocus={() => setIsStatusFocus(true)}
+                onBlur={() => setIsStatusFocus(false)}
+                onChange={(item) => {
+                  setFormValue("status", item.value);
+                  setIsStatusFocus(false);
+                }}
+              />
+              {errors.status && (
+                <Text style={styles.errorText}>{errors.status}</Text>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Worker Assigned{req}</Text>
+              <Dropdown
+                style={[
+                  styles.dropdown,
+                  isWorkerFocus && { borderColor: "#2D6A4F" },
+                  errors.workerAssigned && { borderColor: "red" },
+                ]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={workers}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={!isWorkerFocus ? "Select worker" : "..."}
+                value={formData.workerAssigned}
+                onFocus={() => setIsWorkerFocus(true)}
+                onBlur={() => setIsWorkerFocus(false)}
+                onChange={(item) => {
+                  setFormValue("workerAssigned", item.value);
+                  setIsWorkerFocus(false);
+                }}
+              />
+              {errors.workerAssigned && (
+                <Text style={styles.errorText}>{errors.workerAssigned}</Text>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Veterinarian Assigned{req}</Text>
+              <Dropdown
+                style={[
+                  styles.dropdown,
+                  isVetFocus && { borderColor: "#2D6A4F" },
+                  errors.vetAssigned && { borderColor: "red" },
+                ]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={vets}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={!isVetFocus ? "Select vet" : "..."}
+                value={formData.vetAssigned}
+                onFocus={() => setIsVetFocus(true)}
+                onBlur={() => setIsVetFocus(false)}
+                onChange={(item) => {
+                  setFormValue("vetAssigned", item.value);
+                  setIsVetFocus(false);
+                }}
+              />
+              {errors.vetAssigned && (
+                <Text style={styles.errorText}>{errors.vetAssigned}</Text>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>State{req}</Text>
+              <Dropdown
+                style={[
+                  styles.dropdown,
+                  isStateFocus && { borderColor: "#2D6A4F" },
+                  errors.state && { borderColor: "red" },
+                ]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={cattleStates}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={!isStateFocus ? "Select State" : "..."}
+                value={formData.state}
+                onFocus={() => setIsStateFocus(true)}
+                onBlur={() => setIsStateFocus(false)}
+                onChange={(item) => {
+                  setFormValue("state", item.value);
+                  setIsStateFocus(false);
+                }}
+              />
+              {errors.state && (
+                <Text style={styles.errorText}>{errors.state}</Text>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Current State Date{req}</Text>
+              <TouchableOpacity
+                style={[
+                  styles.input,
+                  errors.currentStateDate && styles.inputError,
+                  { justifyContent: "center" },
+                ]}
+                onPress={() => setShowHealthManagementDatePicker(true)}
               >
                 <Text
-                  style={
-                    formData.gender === gender
-                      ? styles.genderTextActive
-                      : styles.genderText
-                  }
+                  style={{
+                    color: formData.currentStateDate ? "#000" : "#999",
+                  }}
                 >
-                  {gender}
+                  {formData.currentStateDate
+                    ? formData.currentStateDate.toLocaleDateString()
+                    : "Select Date"}
                 </Text>
               </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Birth Details</Text>
-          <View style={styles.separator} />
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Dam (Mother Cattle){req}</Text>
-            <View style={styles.searchRow}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search Mother Cattle by ID"
-                value={motherCattleId}
-                onChangeText={setMotherCattleId}
-              />
-              <TouchableOpacity
-                style={styles.searchButton}
-                onPress={handleSearchMotherCattle}
-              >
-                <Text style={styles.searchButtonText}>Search</Text>
-              </TouchableOpacity>
+              {showHealthManagementDatePicker && (
+                <DateTimePicker
+                  value={formData.currentStateDate || new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={handleHealthManagementDateChange}
+                  maximumDate={new Date()}
+                />
+              )}
+              {errors.currentStateDate && (
+                <Text style={styles.errorText}>{errors.currentStateDate}</Text>
+              )}
             </View>
-            {isMotherCattleLoading && <ActivityIndicator />}
-            {motherCattleError && (
-              <Text style={styles.errorText}>{motherCattleError}</Text>
-            )}
-            {motherCattleData && (
-              <View style={styles.searchResult}>
-                <Text>
-                  <Text style={{ fontWeight: "bold" }}>Name:</Text>{" "}
-                  {motherCattleData.cattleName}
-                </Text>
-                <Text>
-                  <Text style={{ fontWeight: "bold" }}>Breed:</Text>{" "}
-                  {motherCattleData.breed}
-                </Text>
-              </View>
-            )}
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Insurance Number</Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.insuranceNumber && styles.inputError,
+                ]}
+                placeholder="e.g. INS-2024-001"
+                value={formData.insuranceNumber}
+                onChangeText={(val) => setFormValue("insuranceNumber", val)}
+              />
+              {errors.insuranceNumber && (
+                <Text style={styles.errorText}>{errors.insuranceNumber}</Text>
+              )}
+            </View>
           </View>
 
-          {/* Calving Type */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Calving Type {req}</Text>
-            <Dropdown
-              style={[
-                styles.dropdown,
-                focusState.calvingType && { borderColor: "#2D6A4F" },
-                errors.calvingType && { borderColor: "red" },
-              ]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              // inputSearchStyle={styles.inputSearchStyle}
-              data={calvingTypes}
-              // search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={
-                !focusState.calvingType ? "Select Calving Type" : "..."
-              }
-              // searchPlaceholder="Search Calving Type..."
-              value={formData.calvingType}
-              onFocus={() => setFocus("calvingType", true)}
-              onBlur={() => setFocus("calvingType", false)}
-              onChange={(item) => {
-                setFormData({ ...formData, calvingType: item.value });
-                setFocus("calvingType", false);
-              }}
-            />
-            {errors.calvingType && (
-              <Text style={styles.errorText}>{errors.calvingType}</Text>
-            )}
-          </View>
-
-          {/* DOB */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Date of Birth{req}</Text>
-            <TouchableOpacity
-              style={[
-                styles.input,
-                errors.dob && styles.inputError,
-                { justifyContent: "center" },
-              ]}
-              onPress={() => setShowDatePicker(true)}
-            >
-              <Text style={{ color: formData.dob ? "#000" : "#999" }}>
-                {formData.dob
-                  ? formData.dob.toLocaleDateString()
-                  : "Select Date"}
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Cattle Images</Text>
+            <View style={styles.separator} />
+            <TouchableOpacity style={styles.uploadBox}>
+              <Ionicons name="cloud-upload-outline" size={40} color="#000000" />
+              <Text style={styles.uploadText}>
+                Click to upload Cattle images
               </Text>
             </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker
-                value={formData.dob || new Date()}
-                mode="date"
-                display="default"
-                onChange={handleDateChange}
-                maximumDate={new Date()}
-              />
-            )}
-            {errors.dob && <Text style={styles.errorText}>{errors.dob}</Text>}
           </View>
 
-          {/* Age (auto-calculated) */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Age (Years)</Text>
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Additional Information</Text>
+            <View style={styles.separator} />
+            <Text style={styles.label}>Remarks</Text>
             <TextInput
-              style={[
-                styles.input,
-                styles.disabledInput,
-                errors.age && styles.inputError,
-              ]}
-              placeholder="Select DOB to calculate age"
-              value={formData.age}
-              editable={false}
+              style={styles.remarkInput}
+              placeholder="Add any additional remarks here..."
+              multiline={true}
+              numberOfLines={4}
+              value={formData.remark}
+              onChangeText={(val) => setFormValue("remark", val)}
             />
-            {errors.age && <Text style={styles.errorText}>{errors.age}</Text>}
           </View>
 
-          {/* Weight */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Weight (Kg){req}</Text>
-            <TextInput
-              style={[styles.input, errors.weight && styles.inputError]}
-              placeholder="500"
-              value={formData.weight}
-              keyboardType="numeric"
-              onChangeText={(val) => setFormData({ ...formData, weight: val })}
-            />
-            {errors.weight && (
-              <Text style={styles.errorText}>{errors.weight}</Text>
-            )}
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.cancelBtn} onPress={back}>
+              <Text style={styles.cancelBtnText}>Back</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+              <Ionicons name="save-outline" size={20} color="white" />
+              <Text style={styles.saveBtnText}>Save</Text>
+            </TouchableOpacity>
           </View>
-        </View>
-
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel}>
-            <Text style={styles.cancelBtnText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-            {/* <Ionicons name="save-outline" size={20} color="white" /> */}
-            <Text style={styles.saveBtnText}>Next Page</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+  }
+  return null;
 }
 
 const styles = StyleSheet.create({
@@ -767,5 +1122,26 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#e9f5e9",
     borderRadius: 6,
+  },
+  uploadBox: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: 100,
+    borderWidth: 2,
+    borderStyle: "dashed",
+    borderColor: "#5fcd54",
+    borderRadius: 10,
+    backgroundColor: "#e0f5e5c3",
+    marginBottom: 20,
+  },
+  uploadText: { marginTop: 8, color: "#333" },
+  remarkInput: {
+    height: 100,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 6,
+    padding: 10,
+    backgroundColor: "#fff",
+    textAlignVertical: "top",
   },
 });
