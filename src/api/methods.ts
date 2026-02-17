@@ -21,7 +21,7 @@ export const GET = async <T>(url: string, params?: object): Promise<T> => {
       console.log("✅ GET SUCCESS:", { url: finalUrl, response });
     }
 
-    return response;
+    return response.data;
   } catch (error: any) {
     if (isDev) {
       console.log("❌ GET ERROR:", {
