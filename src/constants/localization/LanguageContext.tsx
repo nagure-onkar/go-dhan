@@ -1,24 +1,31 @@
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useState, useContext } from 'react';
 import { languages, LanguageKey } from '@/constants/localization';
 
-export const LanguageContext = createContext({
-  language: 'en' as LanguageKey,
-  t: languages.en,
-  setLanguage: (_: LanguageKey) => {},
+interface LanguageContextType {
+  language: LanguageKey;
+  t: (key: string) => string;
+  setLanguage: (lang: LanguageKey) => void;
+}
+
+
+export const LanguageContext = createContext<LanguageContextType>({
+  language: 'mr',
+  t: (key: string) => key, 
+  setLanguage: () => {},
 });
 
 export default function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<LanguageKey>('en');
+  const [language, setLanguage] = useState<LanguageKey>('mr');
+
+  
+  const t = (key: string) => languages[language][key] || key;
 
   return (
-    <LanguageContext.Provider
-      value={{
-        language,
-        t: languages[language],
-        setLanguage,
-      }}
-    >
+    <LanguageContext.Provider value={{ language, t, setLanguage }}>
       {children}
     </LanguageContext.Provider>
   );
 }
+
+
+export const useLanguage = () => useContext(LanguageContext);
