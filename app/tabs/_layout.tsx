@@ -1,11 +1,10 @@
-import AppText from '@/components/common/AppText';
-import { useLanguage } from '@/constants/localization/useLanguage';
-import BottomTabBar from '@/navigation/BottomNavigationBar';
-import { useTheme } from '@/theme/useTheme';
-import { Tabs, useNavigation } from 'expo-router';
-import { List, UserCircle } from 'phosphor-react-native';
-import { StyleSheet, TouchableOpacity } from 'react-native';
-
+import AppText from "@/components/common/AppText";
+import { useLanguage } from "@/constants/localization/useLanguage";
+import { useTheme } from "@/theme/useTheme";
+import BottomTabBar from "app/navigation/BottomNavigationBar";
+import { Tabs, useNavigation } from "expo-router";
+import { List, UserCircle } from "phosphor-react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
 export default function TabsLayout() {
   const navigation = useNavigation();
@@ -31,7 +30,9 @@ export default function TabsLayout() {
           </TouchableOpacity>
         ),
         headerTitle: ({ children }) => (
-          <AppText style={{ color: colors.text, fontSize: 20, paddingLeft: 10}}>
+          <AppText
+            style={{ color: colors.text, fontSize: 20, paddingLeft: 10 }}
+          >
             {children}
           </AppText>
         ),
@@ -40,7 +41,7 @@ export default function TabsLayout() {
             style={styles.profileButton}
             onPress={() => {
               // TODO: navigate to profile later
-              console.log('Profile pressed');
+              console.log("Profile pressed");
             }}
           >
             <UserCircle size={30} color={colors.text} />
@@ -52,7 +53,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" options={{ title: t.home }} />
       <Tabs.Screen name="lactation" options={{ title: t.lactation }} />
       <Tabs.Screen name="search" options={{ title: t.home }} />
-      <Tabs.Screen name="feed" options={{ title: t.feed}} />
+      <Tabs.Screen name="feed" options={{ title: t.feed }} />
       <Tabs.Screen name="profit" options={{ title: t.profit }} />
     </Tabs>
   );
@@ -68,10 +69,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   item: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginVertical: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   menuButton: {
     marginLeft: 12,

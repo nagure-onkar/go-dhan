@@ -1,4 +1,5 @@
 import { AppConfig } from "@/config/env";
+import { session } from "@/store/session";
 import axios from "axios";
 
 const apiClient = axios.create({
@@ -9,19 +10,23 @@ const apiClient = axios.create({
   },
 });
 
-// 🔐 Request interceptor (auth, language, etc.)
+// 🔐 Request interceptor
 apiClient.interceptors.request.use(
   async (config) => {
-    // Example: add token later
-    // const token = await getAuthToken();
-    // if (token) config.headers.Authorization = `Bearer ${token}`;
+    const token = session.getToken();
+
+    console.log("Token: ", token);
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
 
     return config;
   },
   (error) => Promise.reject(error),
 );
 
-// ❌ Response interceptor (global error handling)
+// ❌ Response interceptor
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
