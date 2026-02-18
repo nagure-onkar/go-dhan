@@ -6,7 +6,6 @@ import {
   Modal,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,22 +14,16 @@ import {
   View,
 } from 'react-native';
 
+import ScreenWrapper from '../../src/components/common/ScreenWrapper';
+import { useLanguage } from '../../src/constants/localization/useLanguage';
+import spacing from '../../src/constants/spacing';
+import { useTheme } from '../../src/theme/useTheme';
+
 // @ts-ignore
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 
-// Colors matching web project (Tailwind-like)
-const COLORS = {
-  primary: '#16a34a', // green-600
-  primaryLight: '#dcfce7', // green-100
-  danger: '#ef4444', // red-500
-  white: '#ffffff',
-  gray800: '#1f2937',
-  gray600: '#4b5563',
-  gray500: '#6b7280',
-  cardBg: '#ffffff',
-  surface: '#f0fdf4', // green-50
-};
+
 
 // Preset values used as initial defaults — displayed faintly until edited
 const PRESET_VALUES = {
@@ -71,8 +64,8 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
   const [selectModalTarget, setSelectModalTarget] = useState('');
   const [selectModalOptions, setSelectModalOptions] = useState<string[]>([]);
 
-  const methodOptions = ['Select', 'Clinical Examination', 'Ultrasound', 'Owner Report'];
-  const finalResultOptions = ['Select', 'AI Recommended', 'No Action', 'Monitor'];
+  const methodOptions = ['Select', 'Manual Exam', 'Vaginal discharge check ', 'Rectal Exam','Ultrasound'];
+  const finalResultOptions = ['Select', 'Confirmed Heat', 'No Heat', 'Treatment required'];
 
   const openSelect = (target: string, options: string[]) => {
     setSelectModalTarget(target);
@@ -106,6 +99,11 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
   const [doctorFees, setDoctorFees] = useState('');
   const [treatmentExpenses, setTreatmentExpenses] = useState('');
   const [otherExpenses, setOtherExpenses] = useState('');
+
+  const { colors } = useTheme();
+const { t } = useLanguage();
+const styles = createStyles(colors);
+
 
   // Date picker states
   const [dateReportedDate, setDateReportedDate] = useState<Date | null>(null);
@@ -215,12 +213,13 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <ScreenWrapper>
+      <View style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <View style={styles.iconWrap}>
-              <MaterialCommunityIcons name="fire" size={24} color={COLORS.primary} />
+              <MaterialCommunityIcons name="fire" size={24} color={colors.card} />
             </View>
             <View>
               <Text style={styles.title}>Heat Life Cycle</Text>
@@ -267,8 +266,8 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
           </Text>
           <MaterialCommunityIcons
             name="chevron-down"
-            size={16}
-            color={COLORS.gray600}
+            size={spacing.md}
+            color={colors.text}
           />
         </TouchableOpacity>
       </View>
@@ -280,7 +279,7 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
           <Text style={styles.label}>Date of Symptoms Reported *</Text>
           <TouchableOpacity style={styles.selectInput} onPress={() => setShowDateReportedPicker(true)}>
             <Text style={[styles.selectText, !dateReportedDate && styles.selectPlaceholder]}>{dateReportedDate ? formatDate(dateReportedDate) : 'dd-mm-yyyy'}</Text>
-            <MaterialCommunityIcons name="calendar" size={16} color={COLORS.gray600} />
+            <MaterialCommunityIcons name="calendar" size={spacing.md} color={colors.text} />
           </TouchableOpacity>
 
           {showDateReportedPicker && (
@@ -301,7 +300,7 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
           <Text style={styles.label}>Is Cattle Lactating *</Text>
           <TouchableOpacity style={styles.selectInput} onPress={() => openSelect('isLactating', ['Select', 'Yes', 'No'])}>
             <Text style={[styles.selectText, !isLactating && styles.selectPlaceholder]}>{isLactating ? (isLactating === 'yes' ? 'Yes' : 'No') : 'Select Answer'}</Text>
-            <MaterialCommunityIcons name="chevron-down" size={16} color={COLORS.gray600} />
+            <MaterialCommunityIcons name="chevron-down" size={spacing.md} color={colors.text} />
           </TouchableOpacity>
 
          <View style={styles.sectionCard}>
@@ -331,13 +330,13 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
           <Text style={styles.label}>Method of Confirmation *</Text>
           <TouchableOpacity style={styles.selectInput} onPress={() => openSelect('methodConfirmation', methodOptions)}>
             <Text style={[styles.selectText, !methodConfirmation && styles.selectPlaceholder]}>{methodConfirmation || 'Select'}</Text>
-            <MaterialCommunityIcons name="chevron-down" size={16} color={COLORS.gray600} />
+            <MaterialCommunityIcons name="chevron-down" size={spacing.md} color={colors.text} />
           </TouchableOpacity>
 
           <Text style={styles.label}>Final Result *</Text>
           <TouchableOpacity style={styles.selectInput} onPress={() => openSelect('finalResult', finalResultOptions)}>
             <Text style={[styles.selectText, !finalResult && styles.selectPlaceholder]}>{finalResult || 'Select'}</Text>
-            <MaterialCommunityIcons name="chevron-down" size={16} color={COLORS.gray600} />
+            <MaterialCommunityIcons name="chevron-down" size={spacing.md} color={colors.text} />
           </TouchableOpacity>
           </View>
 
@@ -345,8 +344,8 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
           <TouchableOpacity style={styles.selectInput} onPress={() => { setRecommendedPickerMode('date'); setShowRecommendedPicker(true); }}>
             <Text style={[styles.selectText, !recommendedDateTime && styles.selectPlaceholder]}>{recommendedDateTime ? formatDateTime(recommendedDateTime) : 'dd-mm-yyyy --:--'}</Text>
             <View style={styles.datetimeIcons}>
-              <MaterialCommunityIcons name="calendar" size={16} color={COLORS.gray600} />
-              <MaterialCommunityIcons name="clock" size={16} color={COLORS.gray600} style={{ marginLeft: 8 }} />
+              <MaterialCommunityIcons name="calendar" size={spacing.md} color={colors.text} />
+              <MaterialCommunityIcons name="clock" size={spacing.md} color={colors.text} style={{ marginLeft: 8 }} />
             </View>
           </TouchableOpacity>
 
@@ -434,72 +433,75 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
               onPress={onSubmit}
               disabled={submitting}
             >
-              {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>Submit</Text>}
+              {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>Submit Heat Form</Text>}
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+      </View>
+    </ScreenWrapper>
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.surface },
-  container: { padding: 16, paddingBottom: 32 },
-  header: { marginBottom: 12 },
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+
+  safeArea: { flex: 1, backgroundColor: colors.background },
+  container: { padding: spacing.md, paddingBottom: 32 },
+  header: { marginBottom: spacing.sm },
   headerLeft: { flexDirection: 'row', alignItems: 'center' },
   iconWrap: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: spacing.sm,
   },
-  title: { fontSize: 20, color: COLORS.gray800, fontWeight: '700' },
-  subtitle: { fontSize: 13, color: COLORS.gray600 },
+  title: { fontSize: 20, color: colors.text, fontWeight: '700' },
+  subtitle: { fontSize: 13, color: colors.text },
   card: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: colors.card,
+    borderRadius: spacing.sm,
+    padding: spacing.md,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 2,
   },
-  label: { fontSize: 13, color: COLORS.gray600, marginTop: 10, marginBottom: 6, fontWeight: '600' },
-  small: { fontSize: 12, color: COLORS.gray500 },
+  label: { fontSize: 13, color: colors.text, marginTop: 10, marginBottom: 6, fontWeight: '600' },
+  small: { fontSize: spacing.sm, color: colors.text },
   input: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
+    backgroundColor: colors.card,
+    borderRadius: spacing.sm,
+    paddingHorizontal: spacing.sm,
     paddingVertical: 10,
     fontSize: 15,
-    color: COLORS.gray800,
+    color: colors.text,
     borderWidth: 1,
-    borderColor: '#eef2f7',
+    borderColor: colors.border,
   },
-  inputPrefilled: { color: COLORS.gray500, fontStyle: 'italic' },
+  inputPrefilled: { color: colors.text, fontStyle: 'italic' },
   multiline: { minHeight: 72, textAlignVertical: 'top' as const },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 },
   actions: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 },
   button: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: spacing.sm,
     borderRadius: 10,
     alignItems: 'center',
     marginHorizontal: 6,
   },
-  submitButton: { backgroundColor: COLORS.primary },
-  submitText: { color: '#fff', fontWeight: '700' },
-  cancelButton: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb' },
-  cancelText: { color: COLORS.gray600, fontWeight: '700' },
+  submitButton: { backgroundColor: colors.primary },
+  submitText: { color: colors.card, fontWeight: '700' },
+  cancelButton: { backgroundColor: colors.card, borderWidth: 1, borderColor: '#e5e7eb' },
+  cancelText: { color: colors.text, fontWeight: '700' },
 
   // New styles for symptoms, segments and expenses
   symptomGrid2: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 6, justifyContent: 'space-between' },
-  symptomField: { width: '49%', marginBottom: 12 },
-  symptomLabelSmall: { fontSize: 12, color: COLORS.gray600, marginBottom: 6 },
+  symptomField: { width: '49%', marginBottom: spacing.sm },
+  symptomLabelSmall: { fontSize: spacing.sm, color: colors.text, marginBottom: 6 },
 
   // Select input appearance
   selectInput: {
@@ -507,43 +509,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: spacing.sm,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e6edf3',
-    backgroundColor: '#fff',
+    borderColor: colors.border,
+    backgroundColor: colors.card,
   },
-  selectText: { fontSize: 14, color: COLORS.gray800 },
-  selectPlaceholder: { color: COLORS.gray500 },
+  selectText: { fontSize: 14, color: colors.text },
+  selectPlaceholder: { color: colors.text },
 
   // Modal styles
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', paddingHorizontal: 24 },
-  modalContent: { backgroundColor: '#fff', borderRadius: 8, overflow: 'hidden' },
-  modalOption: { padding: 14, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
-  modalOptionText: { fontSize: 16, color: COLORS.gray800 },
+  modalContent: { backgroundColor: colors.card, borderRadius: 8, overflow: 'hidden' },
+  modalOption: { padding: 14, borderBottomWidth: 1, borderBottomColor: colors.border },
+  modalOptionText: { fontSize: spacing.md, color: colors.text },
 
   sectionTitleContainer: {
-    marginTop: 20,
-    marginBottom: 12,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
 
   // Date/time icon row
   datetimeIcons: { flexDirection: 'row', alignItems: 'center' },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: spacing.md,
     fontWeight: '700',
-    color: COLORS.gray800,
-    marginBottom: 8,
+    color: colors.text,
+    marginBottom: spacing.sm,
   },
   sectionDivider: {
     height: 3,
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     width: 40,
     borderRadius: 1.5,
     marginBottom: 6,
   },
 
-  symptomLabel: { fontSize: 13, color: COLORS.gray800 },
+  symptomLabel: { fontSize: 13, color: colors.text },
   segmentRow: { flexDirection: 'row', marginTop: 8 },
   segmentButton: {
     flex: 1,
@@ -552,30 +554,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 8,
     borderWidth: 1,
-    borderColor: '#e6edf3',
-    backgroundColor: '#fff',
+    borderColor: colors.border,
+    backgroundColor: colors.card,
   },
-  segmentActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  segmentText: { color: COLORS.gray600, fontWeight: '600' },
-  segmentTextActive: { color: '#fff' },
+  segmentActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  segmentText: { color: colors.text, fontWeight: '600' },
+  segmentTextActive: { color: colors.card },
   inputNumeric: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     borderRadius: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: spacing.sm,
     paddingVertical: 10,
     fontSize: 15,
-    color: COLORS.gray800,
+    color: colors.text,
     borderWidth: 1,
-    borderColor: '#eef2f7',
+    borderColor: colors.border,
   },
   sectionCard: {
   backgroundColor: 'transparent', // ❌ no white
-  borderRadius: 12,
+  borderRadius: spacing.sm,
   padding: 14,
   marginTop: 18,
 
   borderWidth: 1,
-  borderColor: '#e6edf3',
+  borderColor: colors.border,
 
   // subtle separation
   shadowColor: '#000',

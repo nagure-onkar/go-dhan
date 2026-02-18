@@ -3,6 +3,7 @@ import { useLanguage } from "@/constants/localization/useLanguage";
 import { useTheme } from "@/theme/useTheme";
 import BottomTabBar from "app/navigation/BottomNavigationBar";
 import { Tabs, useNavigation } from "expo-router";
+import { DrawerNavigationProp } from "node_modules/@react-navigation/drawer/lib/typescript/src/types";
 import { List, UserCircle } from "phosphor-react-native";
 import { StyleSheet, TouchableOpacity } from "react-native";
 

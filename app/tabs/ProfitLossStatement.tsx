@@ -1,7 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,6 +9,13 @@ import {
   View,
 } from "react-native";
 
+import AppText from "../../src/components/common/AppText";
+import ScreenWrapper from "../../src/components/common/ScreenWrapper";
+import spacing from "../../src/constants/spacing";
+import { useTheme } from "../../src/theme/useTheme";
+
+
+import { useLanguage } from "@/constants/localization/useLanguage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Platform } from "react-native";
 
@@ -17,7 +23,11 @@ import { Platform } from "react-native";
 
 
 const ProfitLossStatement = () => {
-    const [date, setDate] = React.useState(new Date());
+const { colors } = useTheme();    
+  const { t } = useLanguage();       
+  const styles = createStyles(colors); 
+
+const [date, setDate] = React.useState(new Date());
 const [showPicker, setShowPicker] = React.useState(false);
 
 
@@ -71,9 +81,55 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
   setShowPicker(false);
   if (selectedDate) setDate(selectedDate);
 };
+
+const Section = ({
+  title,
+  style,
+}: {
+  title: string;
+  style?: any;
+}) => (
+  <View style={[styles.sectionHeader, style]}>
+    <AppText style={styles.sectionText}>{title}</AppText>
+  </View>
+);
+
+const Row = ({
+  children,
+  style,
+}: {
+  children: React.ReactNode;
+  style?: any;
+}) => (
+  <View style={[styles.row, style]}>{children}</View>
+);
+
+
+const Input = ({
+  label,
+  value,
+  onChangeText,
+}: {
+  label: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
+}) => (
+  <View style={styles.col}>
+    <Text style={styles.label}>{label}</Text>
+    <TextInput
+      style={styles.input}
+      value={value}
+      onChangeText={onChangeText}
+      keyboardType="numeric"
+      placeholder="₹ 0"
+    />
+  </View>
+);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
+    <ScreenWrapper>
+      <View style={styles.container}>
+        <ScrollView contentContainerStyle={{ padding: 16 }}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
@@ -83,12 +139,12 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
               color="#ffffff"
             />
             <View>
-              <Text style={styles.headerTitle}>
+              <AppText style={styles.headerTitle}>
                 Profit & Loss Statement
-              </Text>
-              <Text style={styles.headerSub}>
+              </AppText>
+              <AppText style={styles.headerSub}>
                 Track monthly income, expenses, and net profit
-              </Text>
+              </AppText>
             </View>
           </View>
 
@@ -96,17 +152,24 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
         </View>
 
         {/* Period */}
-        <Section title="Period" />
+       <AppText style={styles.label}>Date *</AppText>
 
-        <Text style={styles.label}>Date *</Text>
-        <TouchableOpacity onPress={() => setShowPicker(true)}>
-  <View pointerEvents="none">
-    <TextInput
-      style={styles.input}
-      value={date.toLocaleDateString("en-GB")}
+<TouchableOpacity onPress={() => setShowPicker(true)}>
+  <View style={styles.dateInputContainer}>
+    
+    <AppText style={styles.dateText}>
+      {date.toLocaleDateString("en-GB")}
+    </AppText>
+
+    <MaterialCommunityIcons
+      name="calendar-blank-outline"
+      size={20}
+      color="#000"
     />
+
   </View>
 </TouchableOpacity>
+
 
 {showPicker && (
   <DateTimePicker
@@ -127,14 +190,31 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
           <Input label="Cattle Sales" />
         </Row>
 
-        <Row>
-          <Input label="Slurry/Compost Sales" />
-          <Input label="Other Income" />
-          <View style={styles.totalSalesBox}>
-            <Text style={styles.totalLabel}>Total Sales Turnover</Text>
-            <Text style={styles.totalValue}>₹0</Text>
-          </View>
-        </Row>
+        {/* Slurry + Other Income (Half Half) */}
+<Row>
+  <View style={{ flex: 1 }}>
+    <Input label="Slurry/Compost Sales" />
+  </View>
+
+  <View style={{ flex: 1 }}>
+    <Input label="Other Income" />
+  </View>
+</Row>
+
+{/* Total Sales Turnover - Half Width Below */}
+<Row>
+  <View style={{ flex: 1 }}>
+    <View style={styles.totalSalesBox}>
+      <AppText style={styles.totalLabel}>
+        Total Sales Turnover
+      </AppText>
+      <AppText style={styles.totalValue}>₹0</AppText>
+    </View>
+  </View>
+
+  <View style={{ flex: 1 }} /> 
+</Row>
+
 
         {/* Expense Categories */}
         <Section title="Add Expense Categories" />
@@ -175,7 +255,7 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
 </View>
 
 
-        <Text style={styles.checkboxText}>{item.label}</Text>
+        <AppText style={styles.checkboxText}>{item.label}</AppText>
       </TouchableOpacity>
     ))}
   </View>
@@ -186,135 +266,81 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
         <Section title="Total Expenses" />
 
        {/* Dynamic Expense Inputs – 3 per row */}
-
+{/* Fixed Expense Fields - Always Visible */}
 <Row>
-  {expenses.water ? (
-    <Input
-      label="Water Usage"
-      value={expenseAmounts.water}
-      onChangeText={v => updateExpenseAmount("water", v)}
-    />
-  ) : (
-    <EmptyCol />
-  )}
-
-  {expenses.ownerSalary ? (
-    <Input
-      label="Owner Salary"
-      value={expenseAmounts.ownerSalary}
-      onChangeText={v => updateExpenseAmount("ownerSalary", v)}
-    />
-  ) : (
-    <EmptyCol />
-  )}
-
-  {expenses.loanInterest ? (
-    <Input
-      label="Loan Interest"
-      value={expenseAmounts.loanInterest}
-      onChangeText={v => updateExpenseAmount("loanInterest", v)}
-    />
-  ) : (
-    <EmptyCol />
-  )}
+  <Input label="Feed Expenses" />
+  <Input label="Worker Salary *" />
+  <Input label="Medical Expenses" />
 </Row>
 
-<Row>
-  {expenses.farmEquipment ? (
-    <Input
-      label="Farm Equipment"
-      value={expenseAmounts.farmEquipment}
-      onChangeText={v => updateExpenseAmount("farmEquipment", v)}
-    />
-  ) : (
-    <EmptyCol />
-  )}
+{/* Dynamic Expense Inputs - Below Fixed Fields */}
 
-  {expenses.electricity ? (
-    <Input
-      label="Electricity"
-      value={expenseAmounts.electricity}
-      onChangeText={v => updateExpenseAmount("electricity", v)}
-    />
-  ) : (
-    <EmptyCol />
-  )}
+{(() => {
+  const selectedExpenses = Object.keys(expenses).filter(
+    key => expenses[key as keyof typeof expenses]
+  );
 
-  {expenses.miscellaneous ? (
-    <Input
-      label="Miscellaneous"
-      value={expenseAmounts.miscellaneous}
-      onChangeText={v => updateExpenseAmount("miscellaneous", v)}
-    />
-  ) : (
-    <EmptyCol />
-  )}
-</Row>
+  const labelMap: Record<string, string> = {
+    water: "Water Usage",
+    ownerSalary: "Owner Salary",
+    farmEquipment: "Farm Equipment",
+    rent: "Rent",
+    loanInterest: "Loan Interest",
+    miscellaneous: "Miscellaneous",
+    electricity: "Electricity",
+    infrastructureRepair: "Infrastructure Repair",
+  };
 
+  const rows = [];
+  for (let i = 0; i < selectedExpenses.length; i += 3) {
+    rows.push(
+      <Row key={i}>
+        {selectedExpenses.slice(i, i + 3).map(key => (
+          <Input
+            key={key}
+            label={labelMap[key]}
+            value={expenseAmounts[key as keyof typeof expenseAmounts]}
+            onChangeText={(v) =>
+              updateExpenseAmount(
+                key as keyof typeof expenseAmounts,
+                v
+              )
+            }
+          />
+        ))}
+      </Row>
+    );
+  }
 
-<Row>
-  {expenses.rent ? (
-    <Input
-      label="Rent"
-      value={expenseAmounts.rent}
-      onChangeText={v => updateExpenseAmount("rent", v)}
-    />
-  ) : (
-    <EmptyCol />
-  )}
-
-  {expenses.infrastructureRepair ? (
-    <Input
-      label="Infrastructure Repair"
-      value={expenseAmounts.infrastructureRepair}
-      onChangeText={v =>
-        updateExpenseAmount("infrastructureRepair", v)
-      }
-    />
-  ) : (
-    <EmptyCol />
-  )}
-
-  <EmptyCol />
-</Row>
-
-
-
-        <Row>
-          <Input label="Feed Expenses" />
-          <Input label="Worker Salary *" />
-          <Input label="Medical Expenses" />
-        </Row>
-
+  return rows;
+})()}
         <View style={styles.expenseBox}>
-          <Text style={styles.expenseLabel}>Total Expenses</Text>
-          <Text style={styles.expenseValue}>₹0</Text>
+          <AppText style={styles.expenseLabel}>Total Expenses</AppText>
+          <AppText style={styles.expenseValue}>₹0</AppText>
         </View>
 
         {/* Net Profit */}
         <View style={styles.netProfitBox}>
           <View>
-            <Text style={styles.netLabel}>Monthly Net Profit</Text>
-            <Text style={styles.netSub}>
+            <AppText style={styles.netLabel}>Monthly Net Profit</AppText>
+            <AppText style={styles.netSub}>
               Total Sales - Total Expenses
-            </Text>
+            </AppText>
           </View>
-          <Text style={styles.netValue}>₹0</Text>
+          <AppText style={styles.netValue}>₹0</AppText>
         </View>
 
         {/* Submit */}
-       <View style={styles.bottomRow}>
-  <TouchableOpacity style={styles.exportBottomBtn}>
-    <Text style={styles.exportBottomText}>Export Profit-Loss</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity style={styles.submitHalfBtn}>
-    <Text style={styles.submitText}>Submit</Text>
+      <View style={styles.submitContainer}>
+  <TouchableOpacity style={styles.submitButton}>
+    <AppText style={styles.submitText}>Submit</AppText>
   </TouchableOpacity>
 </View>
 
-      </ScrollView>
-    </SafeAreaView>
+
+        </ScrollView>
+      </View>
+    </ScreenWrapper>
   );
 };
 
@@ -322,194 +348,238 @@ export default ProfitLossStatement;
 
 /* ---------- Reusable ---------- */
 
-const Section = ({ title }: { title: string }) => (
-  <View style={styles.sectionHeader}>
-    <Text style={styles.sectionText}>{title}</Text>
-  </View>
-);
 
-const Row = ({ children }: any) => (
-  <View style={styles.row}>{children}</View>
-);
-
-const Input = ({
-  label,
-  value,
-  onChangeText,
-}: {
-  label: string;
-  value?: string;
-  onChangeText?: (text: string) => void;
-}) => (
-  <View style={styles.col}>
-    <Text style={styles.label}>{label}</Text>
-    <TextInput
-      style={styles.input}
-      value={value}
-      onChangeText={onChangeText}
-      keyboardType="numeric"
-      placeholder="₹ 0"
-    />
-  </View>
-);
 
 
 /* ---------- Styles ---------- */
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
 
-  header: {
-    backgroundColor: "#16a34a",
-    padding: 16,
-    borderRadius: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  headerLeft: { flexDirection: "row", gap: 10 },
-  headerTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  headerSub: { color: "#dcfce7", fontSize: 12 },
+    header: {
+      backgroundColor: colors.primary,
+      padding: 16,
+      borderRadius: 10,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: spacing.md,
+    },
 
-  exportBtn: {
-    backgroundColor: "#ffffff",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  exportText: { fontSize: 12, color: "#16a34a", fontWeight: "600" },
+    headerLeft: { flexDirection: "row", gap: spacing.sm },
 
-  sectionHeader: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#22c55e",
-    marginVertical: 16,
-  },
-  sectionText: { fontWeight: "600", marginBottom: 6 },
+    headerTitle: {
+      color: colors.white,
+      fontSize: 16,
+      fontWeight: "600",
+    },
 
-  row: { flexDirection: "row", gap: 12 },
-  col: { flex: 1 },
+    headerSub: {
+      color: colors.textSecondary,
+      fontSize: 12,
+    },
 
-  label: { fontSize: 12, marginBottom: 4 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#cbd5e1",
-    borderRadius: 6,
-    padding: 10,
-    marginBottom: 12,
-  },
+    sectionHeader: {
+      borderBottomWidth: 1,
+      borderBottomColor: colors.primary,
+      marginVertical: spacing.md,
+    },
 
-  totalSalesBox: {
-    flex: 1,
-    backgroundColor: "#f0fdf4",
-    borderWidth: 1,
-    borderColor: "#22c55e",
-    borderRadius: 6,
-    padding: 12,
-    justifyContent: "center",
-  },
-  totalLabel: { fontSize: 12 },
-  totalValue: { fontSize: 16, fontWeight: "700", color: "#16a34a" },
+    sectionText: {
+      fontWeight: "600",
+      marginBottom: spacing.xs,
+      color: colors.textPrimary,
+    },
 
-  checkboxBox: {
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 8,
-    padding: 12,
-  },
-  checkboxRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  checkbox: {
-    width: 16,
-    height: 16,
-    borderWidth: 1,
-    borderColor: "#9ca3af",
-    marginRight: 8,
-  },
-  checkboxText: { fontSize: 12 },
+    row: {
+      flexDirection: "row",
+      gap: spacing.sm,
+    },
 
-  expenseBox: {
-    backgroundColor: "#fff1f2",
-    borderWidth: 1,
-    borderColor: "#f87171",
-    borderRadius: 6,
-    padding: 12,
-    marginVertical: 16,
-  },
-  expenseLabel: { fontSize: 12 },
-  expenseValue: { fontSize: 16, fontWeight: "700", color: "#dc2626" },
+    col: { flex: 1 },
 
-  netProfitBox: {
-    backgroundColor: "#eff6ff",
-    borderWidth: 1,
-    borderColor: "#60a5fa",
-    borderRadius: 8,
-    padding: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  netLabel: { fontSize: 14, fontWeight: "600" },
-  netSub: { fontSize: 11, color: "#475569" },
-  netValue: { fontSize: 18, fontWeight: "700", color: "#16a34a" },
+    label: {
+      fontSize: 12,
+      marginBottom: spacing.xs,
+      color: colors.textPrimary,
+    },
 
-  submitBtn: {
-    backgroundColor: "#16a34a",
-    padding: 14,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  bottomRow: {
-  flexDirection: "row",
-  gap: 12,
-  marginBottom: 30,
-},
+    input: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 6,
+      padding: spacing.sm,
+      marginBottom: spacing.sm,
+      color: colors.textPrimary,
+    },
 
-exportBottomBtn: {
-  flex: 1,
-  backgroundColor: "#ffffff",
-  borderWidth: 1,
-  borderColor: "#16a34a",
-  padding: 14,
-  borderRadius: 8,
-  alignItems: "center",
-},
+    totalSalesBox: {
+      flex: 1,
+      backgroundColor: colors.lightPrimary,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderRadius: 6,
+      padding: spacing.sm,
+      justifyContent: "center",
+    },
 
-exportBottomText: {
-  color: "#16a34a",
-  fontWeight: "600",
-},
+    totalLabel: { fontSize: 12, color: colors.textSecondary },
 
-submitHalfBtn: {
-  flex: 1,
-  backgroundColor: "#16a34a",
-  padding: 14,
-  borderRadius: 8,
-  alignItems: "center",
-},
+    totalValue: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.primary,
+    },
+
+    checkboxBox: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+      padding: spacing.sm,
+    },
+
+    checkbox: {
+      width: 16,
+      height: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginRight: spacing.sm,
+    },
+
+    checkboxChecked: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+
+    checkboxText: {
+      fontSize: 12,
+      color: colors.textPrimary,
+    },
+
+    expenseBox: {
+      backgroundColor: colors.errorLight,
+      borderWidth: 1,
+      borderColor: colors.error,
+      borderRadius: 6,
+      padding: spacing.sm,
+      marginVertical: spacing.md,
+    },
+
+    expenseLabel: { fontSize: 12 },
+
+    expenseValue: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.error,
+    },
+
+    netProfitBox: {
+      backgroundColor: colors.infoLight,
+      borderWidth: 1,
+      borderColor: colors.info,
+      borderRadius: 8,
+      padding: spacing.md,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: spacing.md,
+    },
+
+    netLabel: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.textPrimary,
+    },
+
+    netSub: {
+      fontSize: 11,
+      color: colors.textSecondary,
+    },
+
+    netValue: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.primary,
+    },
+
+    bottomRow: {
+      flexDirection: "row",
+      gap: spacing.sm,
+      marginBottom: spacing.lg,
+    },
+
+    exportBottomBtn: {
+      flex: 1,
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      padding: spacing.sm,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+
+    exportBottomText: {
+      color: colors.primary,
+      fontWeight: "600",
+    },
+
+    submitHalfBtn: {
+      flex: 1,
+      backgroundColor: colors.primary,
+      padding: spacing.sm,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+
+    submitText: {
+      color: colors.white,
+      fontWeight: "600",
+    },
+
+    dateInputContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+
+    dateText: {
+      fontSize: 14,
+      color: colors.textPrimary,
+    },
 checkboxGrid: {
   flexDirection: "row",
   flexWrap: "wrap",
+  gap: spacing.sm,
 },
 
 checkboxItem: {
-  width: "50%", // 2 items per row
   flexDirection: "row",
   alignItems: "center",
-  marginBottom: 10,
+  width: "48%",
+  marginBottom: spacing.sm,
 },
 
-checkboxChecked: {
-  backgroundColor: "#2563eb", // blue
-  borderColor: "#2563eb",
+submitContainer: {
+  alignItems: "center", 
+  marginVertical: spacing.lg,
 },
 
+submitButton: {
+  backgroundColor: colors.primary,
+  paddingVertical: 12,
+  paddingHorizontal: 40,  
+  borderRadius: 8,
+  alignItems: "center",
+},
 
-
-  submitText: { color: "#fff", fontWeight: "600" },
-});
+    
+  });

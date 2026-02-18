@@ -1,7 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,6 +8,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+import AppText from '../../src/components/common/AppText';
+import ScreenWrapper from '../../src/components/common/ScreenWrapper';
+
 
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
@@ -18,7 +21,7 @@ import { Platform } from "react-native";
 
 const SectionTitle = ({ title }: { title: string }) => (
   <View style={styles.sectionHeader}>
-    <Text style={styles.sectionText}>{title}</Text>
+    <AppText style={styles.sectionText}>{title}</AppText>
   </View>
 );
 
@@ -35,6 +38,15 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
     cattleType: "cow",
     date: "10-02-2026",
     recordType: "",
+     forCalf: "",
+  inHouseUtility: "",
+  totalMilkProduced: "",
+  forWorkers: "",
+  wastage: "",
+  actualProduced: "",
+  fat: "",
+  snf: "",
+  expectedTotal: "",
   });
 
   const [cattleType, setCattleType] = React.useState("cow");
@@ -42,17 +54,18 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
 
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
+    <View style={styles.container}>
+      <ScreenWrapper>
+        <ScrollView contentContainerStyle={{ padding: 16 }}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <MaterialCommunityIcons name="cow" size={26} color="#16a34a" />
             <View>
-              <Text style={styles.title}>Milk Profit Calculator</Text>
-              <Text style={styles.subtitle}>
+              <AppText style={styles.title}>Milk Profit Calculator</AppText>
+              <AppText style={styles.subtitle}>
                 Simple daily calculation of milk usage, sales & profit
-              </Text>
+              </AppText>
             </View>
           </View>
 
@@ -61,125 +74,147 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
 
            
        
+<View style={styles.row}>
 
-       <View style={styles.col}>
-  <Text style={styles.label}>Cattle Type *</Text>
-  <View style={styles.pickerWrapper}>
-    <Picker
-      selectedValue={cattleType}
-      onValueChange={(value) => setCattleType(value)}
-      style={{ height: 44 }} 
-    >
-      <Picker.Item label="Select Cattle Type" value="" />
-      <Picker.Item label="Cow" value="cow" />
-      <Picker.Item label="Buffalo" value="buffalo" />
-    </Picker>
+  <View style={styles.col}>
+    <AppText style={styles.label}>Cattle Type *</AppText>
+
+    <View style={styles.pickerWrapper}>
+      <Picker
+        selectedValue={cattleType}
+        onValueChange={(value) => setCattleType(value)}
+        style={styles.picker}
+        dropdownIconColor="#000"
+        mode="dropdown"
+      >
+        <Picker.Item label="Select Cattle Type" value="" />
+        <Picker.Item label="Cow" value="cow" />
+        <Picker.Item label="Buffalo" value="buffalo" />
+      </Picker>
+    </View>
   </View>
+
+  <View style={[styles.col, { marginRight: 0 }]}>
+    {/* Empty half column */}
+  </View>
+
 </View>
 
+  
 
 
         {/* Basic Information */}
         <SectionTitle title="Basic Information" />
 
         
+<View style={styles.row}>
 
-        <View style={styles.row}>
-          <View style={styles.col}>
-            <Text style={styles.label}>Date</Text>
-            <TouchableOpacity onPress={() => setShowPicker(true)}>
-  <View pointerEvents="none">
-    <TextInput
-      style={styles.input}
-      value={date.toLocaleDateString("en-GB")}
-    />
+  <View style={styles.col}>
+    <AppText style={styles.label}>Date</AppText>
+
+    <TouchableOpacity
+      style={styles.dateInputWrapper}
+      onPress={() => setShowPicker(true)}
+    >
+      <Text style={styles.dateText}>
+        {date.toLocaleDateString("en-GB")}
+      </Text>
+
+      <MaterialCommunityIcons
+        name="calendar-month"
+        size={20}
+        color="#16a34a"
+      />
+    </TouchableOpacity>
+
+    {showPicker && (
+      <DateTimePicker
+        value={date}
+        mode="date"
+        display={Platform.OS === "ios" ? "spinner" : "default"}
+        onChange={onChangeDate}
+      />
+    )}
   </View>
-</TouchableOpacity>
 
-{showPicker && (
-  <DateTimePicker
-    value={date}
-    mode="date"
-    display={Platform.OS === "ios" ? "spinner" : "default"}
-    onChange={onChangeDate}
-  />
-)}
+  <View style={[styles.col, { marginRight: 0 }]}>
+    <AppText style={styles.label}>Record Type *</AppText>
 
-          </View>
+    <View style={styles.pickerWrapper}>
+      <Picker
+        selectedValue={recordType}
+        onValueChange={(value) => setRecordType(value)}
+        style={styles.picker}
+        dropdownIconColor="#000"
+        mode="dropdown"
+      >
+        <Picker.Item label="Select Record Type" value="" />
+        <Picker.Item label="Morning" value="morning" />
+        <Picker.Item label="Evening" value="evening" />
+      </Picker>
+    </View>
+  </View>
 
-          <View style={styles.col}>
-            <Text style={styles.label}>Record Type *</Text>
-            <View style={styles.pickerWrapper}>
-  <Picker
-    selectedValue={recordType}
-    onValueChange={(value) => setRecordType(value)}
-    style={{ height: 44 }} 
-  >
-    <Picker.Item label="Select Record Type" value="" />
-    <Picker.Item label="Morning" value="morning" />
-    <Picker.Item label="Evening" value="evening" />
-  </Picker>
 </View>
 
-          </View>
-        </View>
+        
 
         {/* Milk Produced Details */}
         <SectionTitle title="Milk Produced Details" />
 
         <View style={styles.row}>
           <View style={styles.col}>
-            <Text style={styles.label}>Total Milk Produced</Text>
-            <TextInput style={styles.input} value="0" />
+            <AppText style={styles.label}>Total Milk Produced</AppText>
+            <TextInput style={styles.input}  keyboardType="numeric" />
           </View>
           <View style={styles.col}>
-            <Text style={styles.label}>For Workers</Text>
-            <TextInput style={styles.input} value="0" />
-          </View>
-        </View>
-
-        <View style={styles.row}>
-          <View style={styles.col}>
-            <Text style={styles.label}>For Calf</Text>
-            <TextInput style={styles.input} value="0" />
-          </View>
-          <View style={styles.col}>
-            <Text style={styles.label}>In House Utility</Text>
-            <TextInput style={styles.input} value="0" />
+            <AppText style={styles.label}>For Workers</AppText>
+            <TextInput style={styles.input}  keyboardType="numeric" />
           </View>
         </View>
 
         <View style={styles.row}>
           <View style={styles.col}>
-            <Text style={styles.label}>Wastage</Text>
-            <TextInput style={styles.input} value="0" />
+            <AppText style={styles.label}>For Calf</AppText>
+            <TextInput style={styles.input}  keyboardType="numeric" />
           </View>
           <View style={styles.col}>
-            <Text style={styles.label}>Actual Produced</Text>
-            <TextInput style={styles.input} value="0" />
+            <AppText style={styles.label}>In House Utility</AppText>
+            <TextInput style={styles.input}  keyboardType="numeric" />
           </View>
         </View>
 
         <View style={styles.row}>
           <View style={styles.col}>
-            <Text style={styles.label}>FAT %</Text>
-            <TextInput style={styles.input} value="0" />
+            <AppText style={styles.label}>Wastage</AppText>
+            <TextInput style={styles.input}  keyboardType="numeric" />
           </View>
           <View style={styles.col}>
-            <Text style={styles.label}>SNF %</Text>
+            <AppText style={styles.label}>Actual Produced</AppText>
+            <TextInput style={styles.input}  keyboardType="numeric" />
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <View style={styles.col}>
+            <AppText style={styles.label}>FAT %</AppText>
+            <TextInput style={styles.input}  keyboardType="numeric" />
+          </View>
+          <View style={styles.col}>
+            <AppText style={styles.label}>SNF %</AppText>
             <TextInput style={styles.input} />
           </View>
         </View>
 
         <View style={styles.row}>
   <View style={styles.col}>
-    <Text style={styles.label}>Expected Rate per litre</Text>
+    <AppText style={styles.label}>Expected Rate per litre</AppText>
     <TextInput style={styles.input} />
   </View>
 
   <View style={styles.col}>
-    <Text style={styles.label}>Expected Total</Text>
-    <TextInput style={styles.input} value="0" />
+    <AppText style={styles.label}>Expected Total</AppText>
+    <TextInput style={styles.input}  keyboardType="numeric" />
   </View>
 </View>
         {/* Milk Sales Details */}
@@ -187,30 +222,30 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
 
         <View style={styles.row}>
           <View style={styles.col}>
-            <Text style={styles.label}>Sales in Litres</Text>
+            <AppText style={styles.label}>Sales in Litres</AppText>
             <TextInput style={styles.input} />
           </View>
           <View style={styles.col}>
-            <Text style={styles.label}>Sales FAT %</Text>
-            <TextInput style={styles.input} value="0" />
+            <AppText style={styles.label}>Sales FAT %</AppText>
+            <TextInput style={styles.input}  keyboardType="numeric" />
           </View>
         </View>
 
         <View style={styles.row}>
           <View style={styles.col}>
-            <Text style={styles.label}>Sales SNF %</Text>
+            <AppText style={styles.label}>Sales SNF %</AppText>
             <TextInput style={styles.input} />
           </View>
           <View style={styles.col}>
-            <Text style={styles.label}>Org Rate per Litre</Text>
+            <AppText style={styles.label}>Org Rate per Litre</AppText>
             <TextInput style={styles.input} />
           </View>
         </View>
 
         <View style={styles.row}>
   <View style={styles.col}>
-    <Text style={styles.label}>Organization Total</Text>
-    <TextInput style={styles.input} value="0" />
+    <AppText style={styles.label}>Organization Total</AppText>
+    <TextInput style={styles.input} keyboardType="numeric" />
   </View>
 
   <View style={styles.col}>
@@ -228,7 +263,8 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
           <Text style={styles.saveText}>Save Record</Text>
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+      </ScreenWrapper>
+    </View>
   );
 };
 
@@ -268,17 +304,26 @@ const styles = StyleSheet.create({
   },
   sectionText: { fontWeight: "600", marginBottom: 6 },
 
-  row: { flexDirection: "row", gap: 12 },
-  col: { flex: 1 },
+  row: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+},
+
+ col: {
+  flex: 1,
+  marginRight: 8,
+},
+
 
   label: { fontSize: 12, marginBottom: 4 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#22c55e",
-    borderRadius: 6,
-    padding: 10,
-    marginBottom: 12,
-  },
+input: {
+  borderWidth: 1,
+  borderColor: "#22c55e",
+  borderRadius: 6,
+  paddingHorizontal: 10,
+  height: 48,            // MATCH pickerWrapper height
+  marginBottom: 12,
+},
 
   profitBox: {
     backgroundColor: "#f0fdf4",
@@ -301,13 +346,42 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
 pickerWrapper: {
-  width: '49%',   
   borderWidth: 1,
   borderColor: "#22c55e",
   borderRadius: 6,
   marginBottom: 12,
-}
-,
+  height: 48,
+  justifyContent: "center",
+  backgroundColor: "#fff",
+  overflow: "hidden",
+},
+
+picker: {
+  width: "100%",
+  color: "#000",
+},
+
+dateInputWrapper: {
+  borderWidth: 1,
+  borderColor: "#22c55e",
+  borderRadius: 6,
+  height: 48,
+  paddingHorizontal: 12,
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginBottom: 12,
+  backgroundColor: "#fff",
+  width: "100%",
+},
+
+dateText: {
+  fontSize: 14,
+  color: "#000",
+},
+
+
+
 
   saveText: { color: "#fff", fontWeight: "600" },
 });

@@ -5,5 +5,37 @@ export default {
   home: 'मुख्यपृष्ठ',
   lactation: 'दुधकाढणी',
   feed: 'चरापाणी',
-  profit: 'नफा'
+  profit: 'नफा',
+
+animalSummary: "प्राण्यांचा आढावा",
+milkingDetails: "दूध काढण्याची माहिती",
+healthTreatment: "आरोग्य व उपचार",
+staff: "कर्मचारी",
+recentActivities: "अलीकडील क्रियाकलाप",
+todaysMilking: "आजचे दूध काढणे",
+workers: "कामगार",
+veterinarians: "पशुवैद्य",
+
+heatLifeCycle: " माज जीवनचक्र",
+onHeat: "माजावर आहे",
+cancel: "रद्द करा",
+submitHeatForm: "माज फॉर्म सबमिट करा",
+
+profitLossStatement: "नफा व तोटा विवरण",
+trackMonthlyIncome: "मासिक उत्पन्न, खर्च आणि निव्वळ नफा नोंदवा",
+date: "दिनांक",
+salesIncome: "विक्री / उत्पन्न",
+dailyMilkSales: "दैनिक दूध विक्री",
+calfSales: "वासरांची विक्री",
+cattleSales: "जनावरांची विक्री",
+slurrySales: "स्लरी/खत विक्री",
+otherIncome: "इतर उत्पन्न",
+totalSalesTurnover: "एकूण विक्री उलाढाल",
+addExpenseCategories: "खर्च श्रेणी जोडा",
+totalExpenses: "एकूण खर्च",
+monthlyNetProfit: "मासिक निव्वळ नफा",
+exportProfitLoss: "नफा-तोटा निर्यात करा",
+submit: "सबमिट करा",
+
+
 };

@@ -1,16 +1,28 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
+
+import AppText from '../../src/components/common/AppText';
+import ScreenWrapper from '../../src/components/common/ScreenWrapper';
+import { useLanguage } from '../../src/constants/localization/useLanguage';
+import spacing from '../../src/constants/spacing';
+import { useTheme } from '../../src/theme/useTheme';
+
+
+
 import {
   Dimensions,
   RefreshControl,
-  SafeAreaView,
+
   ScrollView,
   StyleSheet,
-  Text,
+
   TouchableOpacity,
   View,
 } from 'react-native';
+
+
+
 
 const { width } = Dimensions.get('window');
 
@@ -21,22 +33,7 @@ const ICON_SIZES = {
   expense: 20,
 };
 
-const COLORS = {
-  primary: '#16a34a',
-  primaryLight: '#dcfce7',
-  secondary: '#3b82f6',
-  secondaryLight: '#dbeafe',
-  warning: '#f59e0b',
-  warningLight: '#fef3c7',
-  danger: '#ef4444',
-  dangerLight: '#fee2e2',
-  white: '#ffffff',
-  gray800: '#1f2937',
-  gray600: '#4b5563',
-  gray500: '#6b7280',
-  gray50: '#f9fafb',
-  background: '#f0fdf4',
-};
+
 
 /* -------------------- DUMMY DATA -------------------- */
 
@@ -101,6 +98,10 @@ interface Activity {
 }
 
 const DashboardScreen: React.FC = () => {
+
+  const { colors } = useTheme();     
+  const { t } = useLanguage();      
+  const styles = createStyles(colors);
   const [stats, setStats] = useState<StatsData | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,10 +127,12 @@ const DashboardScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <LinearGradient
-        colors={[COLORS.background, '#e0f2fe']}
+    <ScreenWrapper>
+  <LinearGradient
+    colors={[colors.background, colors.card]}
+
         style={styles.gradient}
+        
       >
         <ScrollView
           style={styles.container}
@@ -138,63 +141,65 @@ const DashboardScreen: React.FC = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor={COLORS.primary}
+              tintColor={colors.primary}
             />
           }
+          
         >
           <HeaderSection farmName={farmName} />
 
           {stats && (
             <>
-              <SectionTitle title="Animal Summary" />
+              <SectionTitle title={t.animalSummary} />
+
               <View style={styles.cardGrid}>
                 <StatCard
                   label="Total Animals"
                   value={stats.totalAnimals.toString()}
                   icon="cow"
-                  backgroundColor={COLORS.primaryLight}
-                  iconColor={COLORS.primary}
+                  backgroundColor={colors.card}
+                  iconColor={colors.primary}
                   subtext="Overall count"
                 />
                 <StatCard
                   label="Cattle"
                   value={stats.totalCattle.toString()}
                   icon="sheep"
-                  backgroundColor={COLORS.primaryLight}
-                  iconColor={COLORS.primary}
+                  backgroundColor={colors.card}
+                  iconColor={colors.primary}
                   subtext="Adult animals"
                 />
                 <StatCard
                   label="Calves"
                   value={stats.totalCalves.toString()}
                   icon="baby-face"
-                  backgroundColor={COLORS.secondaryLight}
-                  iconColor={COLORS.secondary}
+                  backgroundColor={colors.card}
+                  iconColor={colors.primary}
                   subtext="Young animals"
                 />
               </View>
 
-              <SectionTitle title="Milking Details" />
+              <SectionTitle title={t.milkingDetails} />
               <StatCard
                 label="Today's Milking"
                 value={stats.todayMilking.toString()}
                 icon="water"
-                backgroundColor={COLORS.primaryLight}
-                iconColor={COLORS.primary}
+                backgroundColor={colors.card}
+                iconColor={colors.primary}
                 subtext="Animals milked today"
                 fullWidth
                 compact
               />
 
-              <SectionTitle title="Health & Treatment" />
+              <SectionTitle title={t.healthTreatment} />
               <View style={styles.cardRowTwo}>
                 <StatCard
                   containerStyle={styles.statCardTwo}
                   label="Today's Treatment"
                   value={stats.todayTreatments.toString()}
                   icon="medical-bag"
-                  backgroundColor={COLORS.dangerLight}
-                  iconColor={COLORS.danger}
+                  backgroundColor={colors.card}
+                  iconColor={colors.primary}
                   subtext="Appointments today"
                 />
                 <StatCard
@@ -205,8 +210,8 @@ const DashboardScreen: React.FC = () => {
                   label="Upcoming Treatment"
                   value={stats.upcomingTreatments.toString()}
                   icon="calendar-clock"
-                  backgroundColor={COLORS.warningLight}
-                  iconColor={COLORS.warning}
+                  backgroundColor={colors.card}
+                  iconColor={colors.primary}
                   subtext="Next 7 days"
                 />
               </View>
@@ -216,29 +221,29 @@ const DashboardScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name="cash"
                     size={ICON_SIZES.expense}
-                    color={COLORS.primary}
+                    color={colors.primary}
                   />
-                  <Text style={styles.expenseLabel}>
+                  <AppText style={styles.expenseLabel}>
                     Treatment Expenses (This Month)
-                  </Text>
+                  </AppText>
                 </View>
-                <Text style={styles.expenseAmount}>
+                <AppText style={styles.expenseAmount}>
                   ₹{stats.treatmentExpenses.toLocaleString()}
-                </Text>
-                <Text style={styles.expenseSubtext}>
+                </AppText>
+                <AppText style={styles.expenseSubtext}>
                   Total spent on treatments
-                </Text>
+                </AppText>
               </View>
 
-              <SectionTitle title="Staff" />
+             <SectionTitle title={t.staff} />
               <View style={styles.cardRowTwo}>
                 <StatCard
                   containerStyle={styles.statCardTwo}
                   label="Workers"
                   value={stats.workers.toString()}
                   icon="account-multiple"
-                  backgroundColor={COLORS.secondaryLight}
-                  iconColor={COLORS.secondary}
+                  backgroundColor={colors.card}
+                  iconColor={colors.primary}
                   subtext="Assigned workers"
                   compact
                 />
@@ -250,14 +255,14 @@ const DashboardScreen: React.FC = () => {
                   label="Veterinarians"
                   value={stats.veterinarians.toString()}
                   icon="doctor"
-                  backgroundColor={COLORS.dangerLight}
-                  iconColor={COLORS.danger}
+                  backgroundColor={colors.card}
+                  iconColor={colors.primary}
                   subtext="Assigned vets"
                   compact
                 />
               </View>
 
-              <SectionTitle title="Recent Activities" />
+              <SectionTitle title={t.recentActivities} />
               <ActivityList activities={activities} />
             </>
           )}
@@ -265,7 +270,7 @@ const DashboardScreen: React.FC = () => {
           <View style={styles.bottomSpacing} />
         </ScrollView>
       </LinearGradient>
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 };
 
@@ -279,35 +284,41 @@ interface HeaderSectionProps {
   farmName: string;
 }
 
-const HeaderSection: React.FC<HeaderSectionProps> = ({ farmName }) => (
+const HeaderSection: React.FC<HeaderSectionProps> = ({ farmName }) => {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+
+  return (
+
   <View style={styles.headerContainer}>
     <View style={styles.headerContent}>
       <View style={styles.headerIconContainer}>
         <MaterialCommunityIcons
-          name="barn"
+          name="home"
           size={ICON_SIZES.header}
-          color={COLORS.primary}
+          color={colors.card}
         />
       </View>
       <View style={styles.headerTextContainer}>
-        <Text style={styles.farmName}>{farmName}</Text>
-        <Text style={styles.headerSubtext}>
+        <AppText style={styles.farmName}>{farmName}</AppText>
+        <AppText style={styles.headerSubtext}>
           Dairy Farm Dashboard
-        </Text>
+        </AppText>
       </View>
     </View>
     <TouchableOpacity style={styles.notificationButton}>
       <MaterialCommunityIcons
         name="bell"
         size={ICON_SIZES.notification}
-        color={COLORS.primary}
+        color={colors.card}
       />
       <View style={styles.notificationBadge}>
-        <Text style={styles.notificationCount}>3</Text>
+        <AppText style={styles.notificationCount}>3</AppText>
       </View>
     </TouchableOpacity>
   </View>
 );
+};
 
 interface StatCardProps {
   label: string;
@@ -331,84 +342,94 @@ const StatCard: React.FC<StatCardProps> = ({
   fullWidth = false,
   compact = false,
   containerStyle,
-}) => (
-  <View
-    style={[
-      styles.statCard,
-      compact && styles.statCardCompact,
-      containerStyle,
-      fullWidth && styles.statCardFullWidth,
-    ]}
-  >
+}) => {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+
+  return (
     <View
-      style={[styles.iconContainer, { backgroundColor }]}
+      style={[
+        styles.statCard,
+        compact && styles.statCardCompact,
+        containerStyle,
+        fullWidth && styles.statCardFullWidth,
+      ]}
     >
-      <MaterialCommunityIcons
-        name={icon}
-        size={ compact ?18 :ICON_SIZES.stat}
-        color={iconColor}
-      />
+      <View style={[styles.iconContainer, { backgroundColor }]}>
+        <MaterialCommunityIcons
+          name={icon}
+          size={compact ? 18 : ICON_SIZES.stat}
+          color={iconColor}
+        />
+      </View>
+
+      <View style={styles.statContent}>
+        <AppText style={styles.statLabel}>{label}</AppText>
+        <AppText style={styles.statValue}>{value}</AppText>
+        <AppText style={styles.statSubtext}>{subtext}</AppText>
+      </View>
     </View>
-    <View style={styles.statContent}>
-      <Text style={styles.statLabel}>{label}</Text>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statSubtext}>{subtext}</Text>
-    </View>
-  </View>
-);
+  );
+};
+
 
 interface SectionTitleProps {
   title: string;
 }
 
-const SectionTitle: React.FC<SectionTitleProps> = ({
-  title,
-}) => (
-  <View style={styles.sectionTitleContainer}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    <View style={styles.sectionDivider} />
-  </View>
-);
+const SectionTitle: React.FC<SectionTitleProps> = ({ title }) => {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+
+  return (
+    <View style={styles.sectionTitleContainer}>
+      <AppText style={styles.sectionTitle}>{title}</AppText>
+      <View style={styles.sectionDivider} />
+    </View>
+  );
+};
+
 
 interface ActivityListProps {
   activities: Activity[];
 }
 
-const ActivityList: React.FC<ActivityListProps> = ({
-  activities,
-}) => (
-  <View style={styles.activityContainer}>
-    {activities.map((activity) => (
-      <View
-        key={activity.id}
-        style={styles.activityItem}
-      >
-        <View style={styles.activityDot} />
-        <View style={styles.activityContent}>
-          <Text style={styles.activityMessage}>
-            {activity.message}
-          </Text>
-          <Text style={styles.activityTime}>
-            {activity.time}
-          </Text>
-        </View>
-      </View>
-    ))}
-  </View>
-);
+const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
 
-const styles = StyleSheet.create({
+  return (
+    <View style={styles.activityContainer}>
+      {activities.map((activity) => (
+        <View key={activity.id} style={styles.activityItem}>
+          <View style={styles.activityDot} />
+          <View style={styles.activityContent}>
+            <AppText style={styles.activityMessage}>
+              {activity.message}
+            </AppText>
+            <AppText style={styles.activityTime}>
+              {activity.time}
+            </AppText>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+};
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   gradient: {
     flex: 1,
   },
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
   },
 
   headerContainer: {
@@ -416,7 +437,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 24,
-    paddingVertical: 16,
+    paddingVertical: spacing.md,
   },
   headerContent: {
     flexDirection: 'row',
@@ -427,7 +448,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -438,19 +459,19 @@ const styles = StyleSheet.create({
   farmName: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.gray800,
+    color: colors.text,
     marginBottom: 4,
   },
   headerSubtext: {
     fontSize: 13,
-    color: COLORS.gray600,
+    color: colors.textSecondary,
   },
   notificationButton: {
     position: 'relative',
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -458,7 +479,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -6,
     right: -6,
-    backgroundColor: COLORS.danger,
+    backgroundColor: colors.primary,
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -466,7 +487,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   notificationCount: {
-    color: COLORS.white,
+    color: colors.card,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -478,9 +499,9 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: '32%',
-    backgroundColor: COLORS.white,
+    backgroundColor: colors.card,
     borderRadius: 16,
-    padding: 12,
+    padding: spacing.sm,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -489,8 +510,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   statCardCompact: {
-  paddingVertical: 8,
-  paddingHorizontal: 10,
+  paddingVertical: spacing.xs,
+  paddingHorizontal: spacing.sm,
   borderRadius: 12,
 },
 
@@ -511,19 +532,19 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 11,
-    color: COLORS.gray600,
+    color: colors.textSecondary,
     marginBottom: 6,
     fontWeight: '500',
   },
   statValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.gray800,
+    color: colors.text,
     marginBottom: 8,
   },
   statSubtext: {
     fontSize: 10,
-    color: COLORS.primary,
+    color: colors.primary,
     fontWeight: '600',
   },
 
@@ -541,62 +562,62 @@ const styles = StyleSheet.create({
   },
 
   expenseCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: colors.card,
     borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
+    padding: spacing.lg,
+    marginBottom: spacing.xl,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
     borderLeftWidth: 4,
-    borderLeftColor: COLORS.primary,
+    borderLeftColor: colors.primary,
   },
   expenseHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   expenseLabel: {
     fontSize: 14,
-    color: COLORS.gray600,
-    marginLeft: 12,
+    color: colors.textSecondary,
+    marginLeft: spacing.sm,
     fontWeight: '600',
   },
   expenseAmount: {
     fontSize: 32,
     fontWeight: '700',
-    color: COLORS.gray800,
+    color: colors.text,
     marginBottom: 4,
   },
   expenseSubtext: {
     fontSize: 12,
-    color: COLORS.gray500,
+    color: colors.textSecondary,
   },
 
   sectionTitleContainer: {
-    marginTop: 20,
-    marginBottom: 16,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.gray800,
-    marginBottom: 12,
+    color: colors.text,
+    marginBottom: spacing.xs,
   },
   sectionDivider: {
     height: 3,
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     width: 40,
     borderRadius: 1.5,
   },
 
   activityContainer: {
-    backgroundColor: COLORS.white,
+    backgroundColor: colors.card,
     borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
+    padding: spacing.md,
+    marginBottom: spacing.xl,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -605,7 +626,7 @@ const styles = StyleSheet.create({
   },
   activityItem: {
     flexDirection: 'row',
-    paddingVertical: 12,
+    paddingVertical: spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
@@ -613,22 +634,22 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     marginTop: 6,
-    marginRight: 12,
+    marginRight: spacing.sm,
   },
   activityContent: {
     flex: 1,
   },
   activityMessage: {
     fontSize: 14,
-    color: COLORS.gray800,
+    color: colors.text,
     fontWeight: '500',
     marginBottom: 4,
   },
   activityTime: {
     fontSize: 12,
-    color: COLORS.gray500,
+    color: colors.textSecondary,
   },
 
   bottomSpacing: {
