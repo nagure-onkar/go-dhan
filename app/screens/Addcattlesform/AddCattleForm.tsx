@@ -1,14 +1,15 @@
+import AppText from "@/components/common/AppText";
+import { useLanguage } from "@/constants/localization/useLanguage";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -16,36 +17,38 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import Success from "../success";
 
+const { t, setLanguage, language } = useLanguage();
+
 const buffaloBreeds = [
-  { label: "Murrah", value: "murrah" },
-  { label: "Nili Ravi", value: "nili_ravi" },
-  { label: "Bhadawari", value: "bhadawari" },
-  { label: "Mehsana", value: "mehsana" },
-  { label: "Surti", value: "surti" },
-  { label: "Jaffarabadi", value: "jaffarabadi" },
-  { label: "Nagpuri", value: "nagpuri" },
-  { label: "Pandharpuri", value: "pandharpuri" },
-  { label: "Marathwadi", value: "marathwadi" },
-  { label: "Toda", value: "toda" },
+  { label: `${t.murrah}`, value: "murrah" },
+  { label: `${t.nili_ravi}`, value: "nili_ravi" },
+  { label: `${t.bhadawari}`, value: "bhadawari" },
+  { label: `${t.mehsana}`, value: "mehsana" },
+  { label: `${t.surti}`, value: "surti" },
+  { label: `${t.jaffarabadi}`, value: "jaffarabadi" },
+  { label: `${t.nagpuri}`, value: "nagpuri" },
+  { label: `${t.pandharpuri}`, value: "pandharpuri" },
+  { label: `${t.marathwadi}`, value: "marathwadi" },
+  { label: `${t.toda}`, value: "toda" },
 ];
 
 const cowBreeds = [
-  { label: "HF", value: "hf" },
-  { label: "Jersey", value: "jersey" },
-  { label: "Brown Swiss", value: "brown swiss" },
-  { label: "Karan Fries", value: "karan fries" },
-  { label: "Karan Swiss", value: "karan swiss" },
-  { label: "Frieswal", value: "frieswal" },
-  { label: "Sunandini", value: "sunandini" },
-  { label: "Phule Triveni", value: "phule triveni" },
-  { label: "Vrindavani", value: "vrindavani" },
-  { label: "Jersindh", value: "jersindh" },
-  { label: "Gir", value: "gir" },
-  { label: "Sahiwal", value: "sahiwal" },
-  { label: "Red Sindhi", value: "red sindhi" },
-  { label: "Tharparkar", value: "tharparkar" },
-  { label: "Rathi", value: "rathi" },
-  { label: "Kankrej", value: "kankrej" },
+  { label: `${t.hf}`, value: "hf" },
+  { label: `${t.jersey}`, value: "jersey" },
+  { label: `${t.brown_swiss}`, value: "brown swiss" },
+  { label: `${t.karan_fries}`, value: "karan fries" },
+  { label: `${t.karan_swiss}`, value: "karan swiss" },
+  { label: `${t.frieswal}`, value: "frieswal" },
+  { label: `${t.sunandini}`, value: "sunandini" },
+  { label: `${t.phule_triveni}`, value: "phule triveni" },
+  { label: `${t.vrindavani}`, value: "vrindavani" },
+  { label: `${t.jersindh}`, value: "jersindh" },
+  { label: `${t.gir}`, value: "gir" },
+  { label: `${t.sahiwal}`, value: "sahiwal" },
+  { label: `${t.red_sindhi}`, value: "red sindhi" },
+  { label: `${t.tharparkar}`, value: "tharparkar" },
+  { label: `${t.rathi}`, value: "rathi" },
+  { label: `${t.kankrej}`, value: "kankrej" },
 ];
 
 const cattleType = [
@@ -54,30 +57,30 @@ const cattleType = [
 ];
 
 const cattleStates = [
-  { label: "Heifer", value: "heifer" },
-  { label: "On Heat & lactating", value: "on_heat_&_lactating" },
-  { label: "On Heat & Not lactating", value: "on_heat_&_not_lactating" },
-  { label: "Calved", value: "calved" },
-  { label: "Calved & lactating", value: "calved_&_lactating" },
-  { label: "Calved & Not lactating", value: "calved_&_not_lactating" },
-  { label: "Inseminated & lactating", value: "inseminated_&_lactating" },
+  { label: `${t.heifer}`, value: "heifer" },
+  { label: `${t.on_heatlactating}`, value: "on_heatlactating" },
+  { label: `${t.on_heatnot_lactating}`, value: "on_heatnot_lactating" },
+  { label: `${t.calved}`, value: "calved" },
+  { label: `${t.calvedlactating}`, value: "calvedlactating" },
+  { label: `${t.calvednot_lactating}`, value: "calvednot_lactating" },
+  { label: `${t.inseminatedlactating}`, value: "inseminatedlactating" },
   {
-    label: "Inseminated & Not lactating",
+    label: `${t.inseminatednot_lactating}`,
     value: "inseminated_&_not_lactating",
   },
-  { label: "Pregnant & lactating", value: "pregnant_&_lactating" },
-  { label: "Pregnant & Not lactating", value: "pregnant_&_not_lactating" },
-  { label: "Non Pregnant & lactating", value: "non_pregnant_&_lactating" },
+  { label: `${t.pregnantlactating}`, value: "pregnantlactating" },
+  { label: `${t.pregnantnot_lactating}`, value: "pregnantnot_lactating" },
+  { label: `${t.non_pregnantlactating}`, value: "non_pregnantlactating" },
   {
-    label: "Non Pregnant & Not lactating",
+    label: `${t.non_pregnantnot_lactating}`,
     value: "non_pregnant_&_not_lactating",
   },
-  { label: "Dry off", value: "dry_off" },
+  { label: `${t.dry_off}`, value: "dry_off" },
 ];
 
 const cattleStatuses = [
-  { label: "Active", value: "active" },
-  { label: "Inactive", value: "inactive" },
+  { label: `${t.active}`, value: "active" },
+  { label: `${t.inactive}`, value: "inactive" },
 ];
 
 // Mock data - replace with your actual data source (e.g., API call)
@@ -115,6 +118,7 @@ const reset = {
 };
 
 export default function AddCattleForm() {
+  const { t, setLanguage, language } = useLanguage();
   const [isSaved, setIsSaved] = useState(false);
   const [formData, setFormData] = useState({
     cattleId: "",
@@ -152,45 +156,61 @@ export default function AddCattleForm() {
   const [isVetFocus, setIsVetFocus] = useState(false);
   const [isStateFocus, setIsStateFocus] = useState(false);
   const router = useRouter();
-  const req = <Text style={{ color: "red" }}> *</Text>;
+  const req = <AppText style={{ color: "red" }}> *</AppText>;
 
   const [screen1, setScreen1] = useState(true);
   const [screen2, setScreen2] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const saveFormData = async (formData) => {
-    const url = "http://10.240.244.84:3000/cattlestock";
-    let result = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-    result = await result.json();
-    if (result) {
-      console.log("Form data saved successfully:");
+    try {
+      setIsLoading(true);
+      const url = "http://10.124.247.84:3000/cattlestock";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Form data saved successfully:", result);
+      return result;
+    } catch (error) {
+      console.error("Error saving form data:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const next = () => {
     let newErrors = {};
     // Added .trim() to prevent empty spaces from passing
-    if (!formData.cattleId.trim()) newErrors.cattleId = "Cattle ID is required";
-    if (!formData.cattleName.trim())
-      newErrors.cattleName = "Cattle Name is required";
-    if (!formData.cattleType) newErrors.cattleType = "Cattle type is required";
-    if (!formData.breed) newErrors.breed = "Please select a breed";
-    if (!formData.treatment.trim())
-      newErrors.treatment = "Treatment is required";
-    // if (!formData.nddbNumber.trim())
+    if (!formData.cattleId || !formData.cattleId.trim())
+      newErrors.cattleId = `${t.cattleIdrequired}`;
+    if (!formData.cattleName || !formData.cattleName.trim())
+      newErrors.cattleName = `${t.cattleNamerequired}`;
+    if (!formData.cattleType) newErrors.cattleType = `${t.cattleTyperequired}`;
+    if (!formData.breed) newErrors.breed = `${t.breedrequired}`;
+    if (!formData.treatment || !formData.treatment.trim())
+      newErrors.treatment = `${t.treatmentrequired}`;
+    // if (!formData.nddbNumber || !formData.nddbNumber.trim())
     //   newErrors.nddbNumber = "NDDB Number is required";
-    if (!formData.purchaseCost.trim())
-      newErrors.purchaseCost = "Cost is required";
-    if (!formData.purchaseSource.trim())
-      newErrors.purchaseSource = "Source is required";
-    if (!formData.dob) newErrors.dob = "Date of Birth is required";
-    if (!formData.age.trim()) newErrors.age = "Age is required";
-    if (!formData.weight.trim()) newErrors.weight = "Weight is required";
+    if (!formData.purchaseCost || !formData.purchaseCost.trim())
+      newErrors.purchaseCost = `${t.purchaseCostrequired}`;
+    if (!formData.purchaseSource || !formData.purchaseSource.trim())
+      newErrors.purchaseSource = `${t.purchaseSourcerequired}`;
+    if (!formData.dob) newErrors.dob = `${t.dobrequired}`;
+    if (!formData.age || !formData.age.trim())
+      newErrors.age = `${t.agerequired}`;
+    if (!formData.weight || !formData.weight.trim())
+      newErrors.weight = `${t.weightrequired}`;
 
     setErrors(newErrors);
 
@@ -205,41 +225,47 @@ export default function AddCattleForm() {
     setScreen2(!screen2);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     let newErrors = {};
     // if (!formData.status) newErrors.status = "Status is required";
     if (!formData.workerAssigned)
-      newErrors.workerAssigned = "Worker is required";
-    if (!formData.vetAssigned) newErrors.vetAssigned = "Vet is required";
-    if (!formData.state) newErrors.state = "State is required";
+      newErrors.workerAssigned = `${t.workerAssignedrequired}`;
+    if (!formData.vetAssigned)
+      newErrors.vetAssigned = `${t.vetAssignedrequired}`;
+    if (!formData.state) newErrors.state = `${t.staterequired}`;
     if (!formData.currentStateDate)
-      newErrors.currentStateDate = "Date is required";
-    // if (!formData.bloodLine.trim())
+      newErrors.currentStateDate = `${t.currentStateDaterequired}`;
+    // if (!formData.bloodLine || !formData.bloodLine.trim())
     //   newErrors.bloodLine = "Blood Line is required";
-    // if (!formData.insuranceNumber.trim())
+    // if (!formData.insuranceNumber || !formData.insuranceNumber.trim())
     //   newErrors.insuranceNumber = "Insurance Number is required";
-    if (!formData.lactationNumber.trim())
-      newErrors.lactationNumber = "Lactation Number is required";
+    if (!formData.lactationNumber || !formData.lactationNumber.trim())
+      newErrors.lactationNumber = `${t.lactationNumberrequired}`;
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      console.log("Saving form data...", formData);
-      saveFormData(formData);
-      setIsSaved(true);
-      setTimeout(() => {
-        router.push("../../tabs");
-        setIsSaved(false);
-      }, 2000);
-      setFormData(reset);
-      {
-        back();
+      try {
+        console.log("Saving form data...", formData);
+        await saveFormData(formData);
+        setIsSaved(true);
+        setFormData(reset);
+        setScreen1(true);
+        setScreen2(false);
+        setTimeout(() => {
+          router.push("../../tabs");
+          setIsSaved(false);
+        }, 2000);
+      } catch (error) {
+        console.error("Failed to save form:", error);
+        setErrors({ submit: "Failed to save. Please try again." });
       }
     }
   };
 
   const handleCancel = () => {
     router.back(); // Standard practice for cancel buttons
+    setFormData(reset);
   };
 
   const handleDateChange = (event, selectedDate) => {
@@ -287,57 +313,63 @@ export default function AddCattleForm() {
         style={styles.container}
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Add New Cattle</Text>
-          <Text style={styles.headerSub}>Register a Cattle with details</Text>
+          <AppText style={styles.headerTitle}>{t.addNewCattle}</AppText>
+          <AppText style={styles.headerSub}>{t.registerCattleDetails} </AppText>
         </View>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled" // CRITICAL: Allows dropdown to click while keyboard is open
         >
-          {/* <View style={styles.header}>
-          <Text style={styles.headerTitle}>Add New Cattle</Text>
-          <Text style={styles.headerSub}>Register a Cattle with details</Text>
-        </View> */}
-
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Basic Information</Text>
+            <AppText style={styles.sectionTitle}>{t.basicInformation}</AppText>
             <View style={styles.separator} />
 
             {/* Cattle ID */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Cattle ID{req}</Text>
+              <AppText style={styles.label}>
+                {t.cattleId}
+                {req}
+              </AppText>
               <TextInput
                 style={[styles.input, errors.cattleId && styles.inputError]}
-                placeholder="e.g. CTL-001"
+                placeholder={`${t.egctl}`}
                 value={formData.cattleId}
                 onChangeText={(val) =>
                   setFormData({ ...formData, cattleId: val })
                 }
               />
               {errors.cattleId && (
-                <Text style={styles.errorText}>{errors.cattleId}</Text>
+                <AppText style={styles.errorAppText}>{errors.cattleId}</AppText>
               )}
             </View>
 
             {/* Cattle Name */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Cattle Name{req}</Text>
+              <AppText style={styles.label}>
+                {t.cattleName}
+                {req}
+              </AppText>
               <TextInput
                 style={[styles.input, errors.cattleName && styles.inputError]}
-                placeholder="e.g. Daisy"
+                placeholder={`${t.egdaisy}`}
                 value={formData.cattleName}
                 onChangeText={(val) =>
                   setFormData({ ...formData, cattleName: val })
                 }
               />
               {errors.cattleName && (
-                <Text style={styles.errorText}>{errors.cattleName}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.cattleName}
+                </AppText>
               )}
             </View>
 
             {/* Dropdown: Cattle Type Selection */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Cattle Type{req}</Text>
+              <AppText style={styles.label}>
+                {t.cattleType}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -345,7 +377,7 @@ export default function AddCattleForm() {
                   errors.cattleType && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedAppTextStyle={styles.selectedAppTextStyle}
                 data={cattleType}
                 maxHeight={300}
                 labelField="label"
@@ -365,13 +397,18 @@ export default function AddCattleForm() {
                 }}
               />
               {errors.cattleType && (
-                <Text style={styles.errorText}>{errors.cattleType}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.cattleType}
+                </AppText>
               )}
             </View>
 
             {/* Dropdown: Breed Selection */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Breed{req}</Text>
+              <AppText style={styles.label}>
+                {t.breed}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -379,7 +416,7 @@ export default function AddCattleForm() {
                   errors.breed && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedAppTextStyle={styles.selectedAppTextStyle}
                 data={
                   formData.cattleType === "buffalo" ? buffaloBreeds : cowBreeds
                 }
@@ -398,44 +435,53 @@ export default function AddCattleForm() {
                 disable={!formData.cattleType}
               />
               {errors.breed && (
-                <Text style={styles.errorText}>{errors.breed}</Text>
+                <AppText style={styles.errorAppText}>{errors.breed}</AppText>
               )}
             </View>
 
             {/* Treatment given */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Treatment Given At Purchase{req}</Text>
+              <AppText style={styles.label}>
+                Treatment Given At Purchase{req}
+              </AppText>
               <TextInput
                 style={[styles.input, errors.treatment && styles.inputError]}
-                placeholder="e.g. Deworming"
+                placeholder={`${t.egdeworming}`}
                 value={formData.treatment}
                 onChangeText={(val) =>
                   setFormData({ ...formData, treatment: val })
                 }
               />
               {errors.treatment && (
-                <Text style={styles.errorText}>{errors.treatment}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.treatment}
+                </AppText>
               )}
             </View>
 
             {/* NDDB Number */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>NDDB Registration Number</Text>
+              <AppText style={styles.label}>{t.nddbNumber}</AppText>
               <TextInput
                 style={[styles.input, errors.nddbNumber && styles.inputError]}
-                placeholder="e.g. U01403DL2009NPL195142"
+                placeholder={`${t.egnddb}`}
                 value={formData.nddbNumber}
                 onChangeText={(val) =>
                   setFormData({ ...formData, nddbNumber: val })
                 }
               />
               {errors.nddbNumber && (
-                <Text style={styles.errorText}>{errors.nddbNumber}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.nddbNumber}
+                </AppText>
               )}
             </View>
 
             {/* Gender Selector */}
-            <Text style={styles.label}>Gender{req}</Text>
+            <AppText style={styles.label}>
+              {t.gender}
+              {req}
+            </AppText>
             <View style={styles.genderRow}>
               {["Male", "Female"].map((gender) => (
                 <TouchableOpacity
@@ -446,27 +492,30 @@ export default function AddCattleForm() {
                   ]}
                   onPress={() => setFormData({ ...formData, gender: gender })}
                 >
-                  <Text
+                  <AppText
                     style={
                       formData.gender === gender
-                        ? styles.genderTextActive
-                        : styles.genderText
+                        ? styles.genderAppTextActive
+                        : styles.genderAppText
                     }
                   >
                     {gender}
-                  </Text>
+                  </AppText>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
 
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Purchase Details</Text>
+            <AppText style={styles.sectionTitle}>{t.purchaseDetails}</AppText>
             <View style={styles.separator} />
 
             {/* Cattle ID */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Purchasing Cost (₹){req}</Text>
+              <AppText style={styles.label}>
+                {t.purchaseCost}
+                {req}
+              </AppText>
               <TextInput
                 style={[styles.input, errors.purchaseCost && styles.inputError]}
                 placeholder="50000"
@@ -477,13 +526,18 @@ export default function AddCattleForm() {
                 }
               />
               {errors.purchaseCost && (
-                <Text style={styles.errorText}>{errors.purchaseCost}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.purchaseCost}
+                </AppText>
               )}
             </View>
 
             {/* Cattle Name */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Purchase Source{req}</Text>
+              <AppText style={styles.label}>
+                {t.purchaseSource}
+                {req}
+              </AppText>
               <TextInput
                 style={[
                   styles.input,
@@ -496,13 +550,18 @@ export default function AddCattleForm() {
                 }
               />
               {errors.purchaseSource && (
-                <Text style={styles.errorText}>{errors.purchaseSource}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.purchaseSource}
+                </AppText>
               )}
             </View>
 
             {/* Cattle ID */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Date of Birth{req}</Text>
+              <AppText style={styles.label}>
+                {t.dateOfBirth}
+                {req}
+              </AppText>
               <TouchableOpacity
                 style={[
                   styles.input,
@@ -511,11 +570,11 @@ export default function AddCattleForm() {
                 ]}
                 onPress={() => setDatePickerFor("dob")}
               >
-                <Text style={{ color: formData.dob ? "#000" : "#999" }}>
+                <AppText style={{ color: formData.dob ? "#000" : "#999" }}>
                   {formData.dob
                     ? formData.dob.toLocaleDateString()
                     : "Select Date"}
-                </Text>
+                </AppText>
               </TouchableOpacity>
               {datePickerFor === "dob" && (
                 <DateTimePicker
@@ -526,12 +585,14 @@ export default function AddCattleForm() {
                   maximumDate={new Date()}
                 />
               )}
-              {errors.dob && <Text style={styles.errorText}>{errors.dob}</Text>}
+              {errors.dob && (
+                <AppText style={styles.errorAppText}>{errors.dob}</AppText>
+              )}
             </View>
 
             {/* Age (auto-calculated) */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Age (Years)</Text>
+              <AppText style={styles.label}>{t.age}</AppText>
               <TextInput
                 style={[
                   styles.input,
@@ -542,12 +603,17 @@ export default function AddCattleForm() {
                 value={formData.age}
                 editable={false}
               />
-              {errors.age && <Text style={styles.errorText}>{errors.age}</Text>}
+              {errors.age && (
+                <AppText style={styles.errorAppText}>{errors.age}</AppText>
+              )}
             </View>
 
             {/* Cattle ID */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Weight (Kg){req}</Text>
+              <AppText style={styles.label}>
+                {t.weight}
+                {req}
+              </AppText>
               <TextInput
                 style={[styles.input, errors.weight && styles.inputError]}
                 placeholder="500"
@@ -558,18 +624,18 @@ export default function AddCattleForm() {
                 }
               />
               {errors.weight && (
-                <Text style={styles.errorText}>{errors.weight}</Text>
+                <AppText style={styles.errorAppText}>{errors.weight}</AppText>
               )}
             </View>
           </View>
 
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel}>
-              <Text style={styles.cancelBtnText}>Cancel</Text>
+              <AppText style={styles.cancelBtnAppText}>{t.cancel}</AppText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.saveBtn} onPress={next}>
               {/* <Ionicons name="save-outline" size={20} color="white" /> */}
-              <Text style={styles.saveBtnText}>Next Page</Text>
+              <AppText style={styles.saveBtnAppText}>{t.next}</AppText>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -583,19 +649,24 @@ export default function AddCattleForm() {
         style={styles.container}
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Add New Cattle</Text>
-          <Text style={styles.headerSub}>Register a Cattle with details</Text>
+          <AppText style={styles.headerTitle}>{t.addCattle}</AppText>
+          <AppText style={styles.headerSub}>
+            Register a Cattle with details
+          </AppText>
         </View>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Health & Management</Text>
+            <AppText style={styles.sectionTitle}>{t.healthmanagement}</AppText>
             <View style={styles.separator} />
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Status{req}</Text>
+              <AppText style={styles.label}>
+                {t.status}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -603,7 +674,7 @@ export default function AddCattleForm() {
                   errors.status && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedAppTextStyle={styles.selectedAppTextStyle}
                 data={cattleStatuses}
                 maxHeight={300}
                 labelField="label"
@@ -618,12 +689,15 @@ export default function AddCattleForm() {
                 }}
               />
               {/* {errors.status && (
-              <Text style={styles.errorText}>{errors.status}</Text>
+              <AppText style={styles.errorAppText}>{errors.status}</AppText>
             )} */}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Worker Assigned{req}</Text>
+              <AppText style={styles.label}>
+                {t.workerAssigned}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -631,7 +705,7 @@ export default function AddCattleForm() {
                   errors.workerAssigned && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedAppTextStyle={styles.selectedAppTextStyle}
                 // inputSearchStyle={styles.inputSearchStyle}
                 data={workers}
                 // search
@@ -649,12 +723,17 @@ export default function AddCattleForm() {
                 }}
               />
               {errors.workerAssigned && (
-                <Text style={styles.errorText}>{errors.workerAssigned}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.workerAssigned}
+                </AppText>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Vet Assigned{req}</Text>
+              <AppText style={styles.label}>
+                {t.vetAssigned}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -662,7 +741,7 @@ export default function AddCattleForm() {
                   errors.vetAssigned && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedAppTextStyle={styles.selectedAppTextStyle}
                 // inputSearchStyle={styles.inputSearchStyle}
                 data={vets}
                 // search
@@ -680,12 +759,17 @@ export default function AddCattleForm() {
                 }}
               />
               {errors.vetAssigned && (
-                <Text style={styles.errorText}>{errors.vetAssigned}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.vetAssigned}
+                </AppText>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>State{req}</Text>
+              <AppText style={styles.label}>
+                {t.state}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -693,7 +777,7 @@ export default function AddCattleForm() {
                   errors.state && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedAppTextStyle={styles.selectedAppTextStyle}
                 // inputSearchStyle={styles.inputSearchStyle}
                 data={cattleStates}
                 // search
@@ -711,12 +795,15 @@ export default function AddCattleForm() {
                 }}
               />
               {errors.state && (
-                <Text style={styles.errorText}>{errors.state}</Text>
+                <AppText style={styles.errorAppText}>{errors.state}</AppText>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Current State Date{req}</Text>
+              <AppText style={styles.label}>
+                {t.currentStateDate}
+                {req}
+              </AppText>
               <TouchableOpacity
                 style={[
                   styles.input,
@@ -725,13 +812,13 @@ export default function AddCattleForm() {
                 ]}
                 onPress={() => setDatePickerFor("currentState")}
               >
-                <Text
+                <AppText
                   style={{ color: formData.currentStateDate ? "#000" : "#999" }}
                 >
                   {formData.currentStateDate
                     ? formData.currentStateDate.toLocaleDateString()
                     : "Select Date"}
-                </Text>
+                </AppText>
               </TouchableOpacity>
               {datePickerFor === "currentState" && (
                 <DateTimePicker
@@ -743,71 +830,84 @@ export default function AddCattleForm() {
                 />
               )}
               {errors.currentStateDate && (
-                <Text style={styles.errorText}>{errors.currentStateDate}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.currentStateDate}
+                </AppText>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Blood Line</Text>
+              <AppText style={styles.label}>{t.bloodLine}</AppText>
               <TextInput
                 style={[styles.input, errors.bloodLine && styles.inputError]}
                 value={formData.bloodLine}
                 onChangeText={(val) => setFormValue("bloodLine", val)}
               />
               {errors.bloodLine && (
-                <Text style={styles.errorText}>{errors.bloodLine}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.bloodLine}
+                </AppText>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Insurance Number</Text>
+              <AppText style={styles.label}>{t.insuranceNumber}</AppText>
               <TextInput
                 style={[
                   styles.input,
                   errors.insuranceNumber && styles.inputError,
                 ]}
-                placeholder="e.g. INS-2024-001"
+                placeholder={`${t.egins}`}
                 value={formData.insuranceNumber}
                 onChangeText={(val) => setFormValue("insuranceNumber", val)}
               />
               {errors.insuranceNumber && (
-                <Text style={styles.errorText}>{errors.insuranceNumber}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.insuranceNumber}
+                </AppText>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Lactation Number{req}</Text>
+              <AppText style={styles.label}>
+                {t.lactationNumber}
+                {req}
+              </AppText>
               <TextInput
                 style={[
                   styles.input,
                   errors.lactationNumber && styles.inputError,
                 ]}
-                placeholder="e.g. 3"
+                placeholder={`${t.eglactationnumber}`}
                 value={formData.lactationNumber}
                 keyboardType="numeric"
                 onChangeText={(val) => setFormValue("lactationNumber", val)}
               />
               {errors.lactationNumber && (
-                <Text style={styles.errorText}>{errors.lactationNumber}</Text>
+                <AppText style={styles.errorAppText}>
+                  {errors.lactationNumber}
+                </AppText>
               )}
             </View>
           </View>
 
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Cattle Images</Text>
+            <AppText style={styles.sectionTitle}>{t.cattleImages}</AppText>
             <View style={styles.separator} />
             <TouchableOpacity style={styles.uploadBox}>
               <Ionicons name="cloud-upload-outline" size={40} color="#000000" />
-              <Text style={styles.uploadText}>
+              <AppText style={styles.uploadAppText}>
                 Click to upload Cattle images
-              </Text>
+              </AppText>
             </TouchableOpacity>
           </View>
 
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Additional Information</Text>
+            <AppText style={styles.sectionTitle}>
+              {t.additionalInformation}
+            </AppText>
             <View style={styles.separator} />
-            <Text style={styles.label}>Remarks</Text>
+            <AppText style={styles.label}>{t.remarks}</AppText>
             <TextInput
               style={styles.remarkInput}
               placeholder="Add any additional remarks here..."
@@ -820,11 +920,11 @@ export default function AddCattleForm() {
 
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.cancelBtn} onPress={back}>
-              <Text style={styles.cancelBtnText}>Back</Text>
+              <AppText style={styles.cancelBtnAppText}>{t.back}</AppText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
               <Ionicons name="save-outline" size={20} color="white" />
-              <Text style={styles.saveBtnText}>Save</Text>
+              <AppText style={styles.saveBtnAppText}>{t.save}</AppText>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -868,7 +968,7 @@ const styles = StyleSheet.create({
   },
   inputError: { borderColor: "red" },
   disabledInput: { backgroundColor: "#f0f0f0", color: "#666" },
-  errorText: { color: "red", fontSize: 11, marginTop: 4 },
+  errorAppText: { color: "red", fontSize: 11, marginTop: 4 },
   dropdown: {
     height: 50,
     borderColor: "#ddd",
@@ -879,7 +979,7 @@ const styles = StyleSheet.create({
   },
   icon: { marginRight: 8 },
   placeholderStyle: { fontSize: 14, color: "#999" },
-  selectedTextStyle: { fontSize: 14 },
+  selectedAppTextStyle: { fontSize: 14 },
   // inputSearchStyle: { height: 40, fontSize: 14 },
   genderRow: { flexDirection: "row", gap: 10, marginTop: 5 },
   genderBtn: {
@@ -891,8 +991,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   genderBtnActive: { backgroundColor: "#2D6A4F" },
-  genderText: { color: "#2D6A4F", fontWeight: "600" },
-  genderTextActive: { color: "white", fontWeight: "600" },
+  genderAppText: { color: "#2D6A4F", fontWeight: "600" },
+  genderAppTextActive: { color: "white", fontWeight: "600" },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
@@ -910,7 +1010,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#e0f5e5c3",
     marginBottom: 20,
   },
-  uploadText: { marginTop: 8, color: "#333" },
+  uploadAppText: { marginTop: 8, color: "#333" },
   saveBtn: {
     flexDirection: "row",
     backgroundColor: "#2D6A4F",
@@ -920,21 +1020,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
-  saveBtnText: { color: "white", fontWeight: "bold" },
+  saveBtnAppText: { color: "white", fontWeight: "bold" },
   cancelBtn: {
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
     backgroundColor: "#f1f1f1",
   },
-  cancelBtnText: { color: "#666" },
+  cancelBtnAppText: { color: "#666" },
   backBtn: {
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
     backgroundColor: "#f1f1f1",
   },
-  backBtnText: { color: "#666", fontWeight: "bold" },
+  backBtnAppText: { color: "#666", fontWeight: "bold" },
   remarkInput: {
     height: 100,
     borderWidth: 1,
@@ -942,6 +1042,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 10,
     backgroundColor: "#fff",
-    textAlignVertical: "top",
+    AppTextAlignVertical: "top",
   },
 });

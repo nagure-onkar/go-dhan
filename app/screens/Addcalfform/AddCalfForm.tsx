@@ -1,5 +1,7 @@
 import { ENDPOINTS } from "@/api/endpoints";
 import { GET } from "@/api/methods";
+import AppText from "@/components/common/AppText";
+import { useLanguage } from "@/constants/localization/useLanguage";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
@@ -10,7 +12,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -18,38 +19,38 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import Success from "../success";
 
-// ... (rest of the imports and constants are unchanged)
+const { t, setLanguage, language } = useLanguage();
 
 const buffaloBreeds = [
-  { label: "Murrah", value: "murrah" },
-  { label: "Nili Ravi", value: "nili_ravi" },
-  { label: "Bhadawari", value: "bhadawari" },
-  { label: "Mehsana", value: "mehsana" },
-  { label: "Surti", value: "surti" },
-  { label: "Jaffarabadi", value: "jaffarabadi" },
-  { label: "Nagpuri", value: "nagpuri" },
-  { label: "Pandharpuri", value: "pandharpuri" },
-  { label: "Marathwadi", value: "marathwadi" },
-  { label: "Toda", value: "toda" },
+  { label: `${t.murrah}`, value: "murrah" },
+  { label: `${t.nili_ravi}`, value: "nili_ravi" },
+  { label: `${t.bhadawari}`, value: "bhadawari" },
+  { label: `${t.mehsana}`, value: "mehsana" },
+  { label: `${t.surti}`, value: "surti" },
+  { label: `${t.jaffarabadi}`, value: "jaffarabadi" },
+  { label: `${t.nagpuri}`, value: "nagpuri" },
+  { label: `${t.pandharpuri}`, value: "pandharpuri" },
+  { label: `${t.marathwadi}`, value: "marathwadi" },
+  { label: `${t.toda}`, value: "toda" },
 ];
 
 const cowBreeds = [
-  { label: "HF", value: "hf" },
-  { label: "Jersey", value: "jersey" },
-  { label: "Brown Swiss", value: "brown swiss" },
-  { label: "Karan Fries", value: "karan fries" },
-  { label: "Karan Swiss", value: "karan swiss" },
-  { label: "Frieswal", value: "frieswal" },
-  { label: "Sunandini", value: "sunandini" },
-  { label: "Phule Triveni", value: "phule triveni" },
-  { label: "Vrindavani", value: "vrindavani" },
-  { label: "Jersindh", value: "jersindh" },
-  { label: "Gir", value: "gir" },
-  { label: "Sahiwal", value: "sahiwal" },
-  { label: "Red Sindhi", value: "red sindhi" },
-  { label: "Tharparkar", value: "tharparkar" },
-  { label: "Rathi", value: "rathi" },
-  { label: "Kankrej", value: "kankrej" },
+  { label: `${t.hf}`, value: "hf" },
+  { label: `${t.jersey}`, value: "jersey" },
+  { label: `${t.brown_swiss}`, value: "brown swiss" },
+  { label: `${t.karan_fries}`, value: "karan fries" },
+  { label: `${t.karan_swiss}`, value: "karan swiss" },
+  { label: `${t.frieswal}`, value: "frieswal" },
+  { label: `${t.sunandini}`, value: "sunandini" },
+  { label: `${t.phule_triveni}`, value: "phule triveni" },
+  { label: `${t.vrindavani}`, value: "vrindavani" },
+  { label: `${t.jersindh}`, value: "jersindh" },
+  { label: `${t.gir}`, value: "gir" },
+  { label: `${t.sahiwal}`, value: "sahiwal" },
+  { label: `${t.red_sindhi}`, value: "red sindhi" },
+  { label: `${t.tharparkar}`, value: "tharparkar" },
+  { label: `${t.rathi}`, value: "rathi" },
+  { label: `${t.kankrej}`, value: "kankrej" },
 ];
 
 const breed = [
@@ -80,39 +81,46 @@ const HealthObservations = [
   { label: "Fully fit Calf", value: "Fully_fit_Calf" },
 ];
 
-const cattleStates = [
-  { label: "Calf", value: "calf" },
-  { label: "Heifer", value: "heifer" },
-  { label: "On Heat & lactating", value: "on_heat_&_lactating" },
-  { label: "On Heat & Not lactating", value: "on_heat_&_not_lactating" },
-  { label: "Calved", value: "calved" },
-  { label: "Calved & lactating", value: "calved_&_lactating" },
-  { label: "Calved & Not lactating", value: "calved_&_not_lactating" },
-  { label: "Inseminated & lactating", value: "inseminated_&_lactating" },
+const calfStates = [
+  { label: `${t.heifer}`, value: "heifer" },
+  { label: `${t.on_heatlactating}`, value: "on_heatlactating" },
+  { label: `${t.on_heatnot_lactating}`, value: "on_heatnot_lactating" },
+  { label: `${t.calved}`, value: "calved" },
+  { label: `${t.calvedlactating}`, value: "calvedlactating" },
+  { label: `${t.calvednot_lactating}`, value: "calvednot_lactating" },
+  { label: `${t.inseminatedlactating}`, value: "inseminatedlactating" },
   {
-    label: "Inseminated & Not lactating",
+    label: `${t.inseminatednot_lactating}`,
     value: "inseminated_&_not_lactating",
   },
-  { label: "Pregnant & lactating", value: "pregnant_&_lactating" },
-  { label: "Pregnant & Not lactating", value: "pregnant_&_not_lactating" },
-  { label: "Not Pregnant & lactating", value: "not_pregnant_&_lactating" },
+  { label: `${t.pregnantlactating}`, value: "pregnantlactating" },
+  { label: `${t.pregnantnot_lactating}`, value: "pregnantnot_lactating" },
+  { label: `${t.non_pregnantlactating}`, value: "non_pregnantlactating" },
   {
-    label: "Not Pregnant & Not lactating",
-    value: "not_pregnant_&_not_lactating",
+    label: `${t.non_pregnantnot_lactating}`,
+    value: "non_pregnant_&_not_lactating",
   },
-  { label: "Dry off", value: "dry_off" },
+  { label: `${t.dry_off}`, value: "dry_off" },
 ];
 
-const cattleStatuses = [
-  { label: "Active", value: "active" },
-  { label: "Inactive", value: "inactive" },
+const calfStatuses = [
+  { label: `${t.active}`, value: "active" },
+  { label: `${t.inactive}`, value: "inactive" },
 ];
 
 // Mock data - replace with your actual data source (e.g., API call)
+// const workers = async () => {
+//   const url = "http://10.124.247.84:3000/workers";
+//   let result = await fetch(url);
+//   result = await result.json();
+//   return result;
+// };
+
 const workers = [
   { label: "Ram", value: "ram" },
   { label: "Sham", value: "sham" },
 ];
+
 const vets = [
   { label: "Dr. Patil", value: "dr_patil" },
   { label: "Dr. Shinde", value: "dr_shinde" },
@@ -136,9 +144,9 @@ const validateForm = (data, rules) => {
 
 export default function AddCalfForm() {
   const [formData, setFormData] = useState({
-    cattleId: "",
-    cattleName: "",
-    cattleType: "buffalo",
+    calfId: "",
+    calfName: "",
+    calfType: "buffalo",
     breed: null,
     ColostrumIntake: null,
     HealthObservations: null,
@@ -160,9 +168,9 @@ export default function AddCalfForm() {
   });
 
   const reset = {
-    cattleId: "",
-    cattleName: "",
-    cattleType: "buffalo",
+    CalfId: "",
+    calfName: "",
+    calfType: "buffalo",
     breed: null,
     ColostrumIntake: null,
     HealthObservations: null,
@@ -184,7 +192,7 @@ export default function AddCalfForm() {
   };
 
   const saveFormData = async (formData) => {
-    const url = "http://10.240.244.84:3000/Livestock";
+    const url = "http://10.124.247.84:3000/calfstock";
     let result = await fetch(url, {
       method: "POST",
       headers: {
@@ -198,15 +206,15 @@ export default function AddCalfForm() {
     }
   };
 
-  const [motherCattleId, setMotherCattleId] = useState("");
-  const [motherCattleData, setMotherCattleData] = useState(null);
-  const [motherCattleError, setMotherCattleError] = useState("");
-  const [isMotherCattleLoading, setIsMotherCattleLoading] = useState(false);
+  const [mothercalfId, setMothercalfId] = useState("");
+  const [mothercalfData, setMothercalfData] = useState(null);
+  const [mothercalfError, setMothercalfError] = useState("");
+  const [isMothercalfLoading, setIsMothercalfLoading] = useState(false);
 
   const [errors, setErrors] = useState({});
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [focusState, setFocusState] = useState({
-    cattleType: false,
+    calfType: false,
     breed: false,
     colostrumIntake: false,
     healthObservations: false,
@@ -221,39 +229,39 @@ export default function AddCalfForm() {
     useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const router = useRouter();
-  const req = <Text style={{ color: "red" }}> *</Text>;
+  const req = <AppText style={{ color: "red" }}> *</AppText>;
 
-  const handleSearchMotherCattle = async () => {
-    if (!motherCattleId.trim()) {
-      setMotherCattleError("Please enter a Cattle ID to search.");
+  const handleSearchMothercalf = async () => {
+    if (!mothercalfId.trim()) {
+      setMothercalfError("Please enter a calf ID to search.");
       return;
     }
-    setIsMotherCattleLoading(true);
-    setMotherCattleError("");
-    setMotherCattleData(null);
+    setIsMothercalfLoading(true);
+    setMothercalfError("");
+    setMothercalfData(null);
     try {
-      const result = await GET(ENDPOINTS.cattle.search(motherCattleId));
+      const result = await GET(ENDPOINTS.calf.search(mothercalfId));
       if (result) {
-        setMotherCattleData(result);
+        setMothercalfData(result);
       } else {
-        setMotherCattleError("No cattle found with this ID.");
+        setMothercalfError("No calf found with this ID.");
       }
     } catch (error) {
       console.error(error);
-      setMotherCattleError("An error occurred while searching for the cattle.");
+      setMothercalfError("An error occurred while searching for the calf.");
     } finally {
-      setIsMotherCattleLoading(false);
+      setIsMothercalfLoading(false);
     }
   };
 
   const handleSave = () => {
     // 1. Define what needs to be checked
     const validationRules = {
-      status: "Status is required",
-      workerAssigned: "Worker is required",
-      vetAssigned: "Vet is required",
-      state: "State is required",
-      currentStateDate: "Date is required",
+      status: `${t.statusrequired}`,
+      workerAssigned: `${t.workerAssignedrequired}`,
+      vetAssigned: `${t.vetAssignedrequired}`,
+      state: `${t.staterequired}`,
+      currentStateDate: `${t.currentStateDaterequired}`,
     };
 
     // 2. Call the function
@@ -280,6 +288,7 @@ export default function AddCalfForm() {
 
   const handleCancel = () => {
     router.back();
+    // setFormData(reset);
   };
 
   const [screen1, setScreen1] = useState(true);
@@ -287,18 +296,18 @@ export default function AddCalfForm() {
 
   const next = () => {
     const validationRules = {
-      cattleId: "Cattle ID is required",
-      cattleName: "Cattle Name is required",
-      cattleType: "Cattle type is required",
-      breed: "Please select a breed",
-      treatment: "Treatment is required",
-      treatmentExpence: "Cost is required",
-      dob: "Date of Birth is required",
-      age: "Age is required",
-      weight: "Weight is required",
-      ColostrumIntake: "Colostrum Intake is required",
-      HealthObservations: "Health Observations is required",
-      calvingType: "Calving Type is required",
+      calfId: `${t.calfIdrequired}`,
+      calfName: `${t.calfNamerequired}`,
+      calfType: `${t.calfTyperequired}`,
+      breed: `${t.breedrequired}`,
+      treatment: `${t.treatmentrequired}`,
+      treatmentExpence: `${t.treatmentExpencerequired}`,
+      dob: `${t.dobrequired}`,
+      age: `${t.agerequired}`,
+      weight: `${t.weightrequired}`,
+      ColostrumIntake: `${t.ColostrumIntakerequired}`,
+      HealthObservations: `${t.HealthObservationsrequired}`,
+      calvingType: `${t.calvingTyperequired}`,
     };
     const validationErrors = validateForm(formData, validationRules);
     setErrors(validationErrors);
@@ -365,59 +374,66 @@ export default function AddCalfForm() {
         style={styles.container}
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Add New Calf</Text>
-          <Text style={styles.headerSub}>
-            Register a newborn Calf with details
-          </Text>
+          <AppText style={styles.headerTitle}>{t.addNewCalf}</AppText>
+          <AppText style={styles.headerSub}>{t.registerCalfDetails}</AppText>
         </View>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled" // CRITICAL: Allows dropdown to click while keyboard is open
         >
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Basic Information</Text>
+            <AppText style={styles.sectionTitle}>{t.basicInformation}</AppText>
             <View style={styles.separator} />
 
-            {/* Cattle ID */}
+            {/* calf ID */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Cattle ID{req}</Text>
+              <AppText style={styles.label}>
+                {t.calfId}
+                {req}
+              </AppText>
               <TextInput
-                style={[styles.input, errors.cattleId && styles.inputError]}
+                style={[styles.input, errors.calfId && styles.inputError]}
                 placeholder="e.g. CAF-001"
-                value={formData.cattleId}
+                value={formData.calfId}
                 onChangeText={(val) =>
-                  setFormData({ ...formData, cattleId: val })
+                  setFormData({ ...formData, calfId: val })
                 }
               />
-              {errors.cattleId && (
-                <Text style={styles.errorText}>{errors.cattleId}</Text>
+              {errors.calfId && (
+                <AppText style={styles.errorText}>{errors.calfId}</AppText>
               )}
             </View>
 
-            {/* Cattle Name */}
+            {/* calf Name */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Cattle Name{req}</Text>
+              <AppText style={styles.label}>
+                {t.calfName}
+                {req}
+              </AppText>
               <TextInput
-                style={[styles.input, errors.cattleName && styles.inputError]}
+                style={[styles.input, errors.calfName && styles.inputError]}
                 placeholder="e.g. Daisy"
-                value={formData.cattleName}
+                value={formData.calfName}
                 onChangeText={(val) =>
-                  setFormData({ ...formData, cattleName: val })
+                  setFormData({ ...formData, calfName: val })
                 }
               />
-              {errors.cattleName && (
-                <Text style={styles.errorText}>{errors.cattleName}</Text>
+              {errors.calfName && (
+                <AppText style={styles.errorText}>{errors.calfName}</AppText>
               )}
             </View>
 
-            {/* Dropdown: Cattle Type Selection */}
+            {/* Dropdown: calf Type Selection */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Cattle Type{req}</Text>
+              <AppText style={styles.label}>
+                {t.calfType}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
-                  focusState.cattleType && { borderColor: "#2D6A4F" },
-                  errors.cattleType && { borderColor: "red" },
+                  focusState.calfType && { borderColor: "#2D6A4F" },
+                  errors.calfType && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
@@ -427,35 +443,36 @@ export default function AddCalfForm() {
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={
-                  !focusState.cattleType ? "Select cattle type" : "..."
-                }
+                placeholder={!focusState.calfType ? "Select calf type" : "..."}
                 // searchPlaceholder="Search type..."
-                value={formData.cattleType}
-                onFocus={() => setFocus("cattleType", true)}
-                onBlur={() => setFocus("cattleType", false)}
+                value={formData.calfType}
+                onFocus={() => setFocus("calfType", true)}
+                onBlur={() => setFocus("calfType", false)}
                 onChange={(item) => {
                   setFormData({
                     ...formData,
-                    cattleType: item.value,
+                    calfType: item.value,
                     breed: null,
                   });
-                  setFocus("cattleType", false);
+                  setFocus("calfType", false);
                   setErrors((prev) => ({
                     ...prev,
-                    cattleType: null,
+                    calfType: null,
                     breed: null,
                   }));
                 }}
               />
-              {errors.cattleType && (
-                <Text style={styles.errorText}>{errors.cattleType}</Text>
+              {errors.calfType && (
+                <AppText style={styles.errorText}>{errors.calfType}</AppText>
               )}
             </View>
 
             {/* Dropdown: Breed Selection */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Breed{req}</Text>
+              <AppText style={styles.label}>
+                {t.breed}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -466,7 +483,7 @@ export default function AddCalfForm() {
                 selectedTextStyle={styles.selectedTextStyle}
                 // inputSearchStyle={styles.inputSearchStyle}
                 data={
-                  formData.cattleType === "buffalo" ? buffaloBreeds : cowBreeds
+                  formData.calfType === "buffalo" ? buffaloBreeds : cowBreeds
                 }
                 // search
                 maxHeight={300}
@@ -482,16 +499,19 @@ export default function AddCalfForm() {
                   setFocus("breed", false);
                   setErrors((prev) => ({ ...prev, breed: null }));
                 }}
-                disable={!formData.cattleType}
+                disable={!formData.calfType}
               />
               {errors.breed && (
-                <Text style={styles.errorText}>{errors.breed}</Text>
+                <AppText style={styles.errorText}>{errors.breed}</AppText>
               )}
             </View>
 
             {/* Treatment */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Treatment{req}</Text>
+              <AppText style={styles.label}>
+                {t.treatment}
+                {req}
+              </AppText>
               <TextInput
                 style={[styles.input, errors.treatment && styles.inputError]}
                 placeholder="e.g. Vaccination"
@@ -501,13 +521,15 @@ export default function AddCalfForm() {
                 }
               />
               {errors.treatment && (
-                <Text style={styles.errorText}>{errors.treatment}</Text>
+                <AppText style={styles.errorText}>{errors.treatment}</AppText>
               )}
             </View>
 
             {/* Treatment Expence */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Treatment Expence (₹){req}</Text>
+              <AppText style={styles.label}>
+                {t.treatmentExpence} (₹){req}
+              </AppText>
               <TextInput
                 style={[
                   styles.input,
@@ -521,13 +543,18 @@ export default function AddCalfForm() {
                 }
               />
               {errors.treatmentExpence && (
-                <Text style={styles.errorText}>{errors.treatmentExpence}</Text>
+                <AppText style={styles.errorText}>
+                  {errors.treatmentExpence}
+                </AppText>
               )}
             </View>
 
             {/* Colostrum Intake */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Colostrum Intake{req}</Text>
+              <AppText style={styles.label}>
+                {t.colostrumIntake}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -555,13 +582,17 @@ export default function AddCalfForm() {
                 }}
               />
               {errors.ColostrumIntake && (
-                <Text style={styles.errorText}>{errors.ColostrumIntake}</Text>
+                <AppText style={styles.errorText}>
+                  {errors.ColostrumIntake}
+                </AppText>
               )}
             </View>
 
             {/* Health Observations */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Health Observations {req}</Text>
+              <AppText style={styles.label}>
+                {t.healthObservations} {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -594,15 +625,15 @@ export default function AddCalfForm() {
                 }}
               />
               {errors.HealthObservations && (
-                <Text style={styles.errorText}>
+                <AppText style={styles.errorText}>
                   {errors.HealthObservations}
-                </Text>
+                </AppText>
               )}
             </View>
 
             {/* NDDB Number */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>NDDB Registration Number</Text>
+              <AppText style={styles.label}>{t.nddbNumber}</AppText>
               <TextInput
                 style={[styles.input, errors.nddbNumber && styles.inputError]}
                 placeholder="e.g. U01403DL2009NPL195142"
@@ -612,12 +643,12 @@ export default function AddCalfForm() {
                 }
               />
               {errors.nddbNumber && (
-                <Text style={styles.errorText}>{errors.nddbNumber}</Text>
+                <AppText style={styles.errorText}>{errors.nddbNumber}</AppText>
               )}
             </View>
 
             {/* Gender Selector */}
-            <Text style={styles.label}>Gender{req}</Text>
+            <AppText style={styles.label}>Gender{req}</AppText>
             <View style={styles.genderRow}>
               {["Male", "Female"].map((gender) => (
                 <TouchableOpacity
@@ -628,7 +659,7 @@ export default function AddCalfForm() {
                   ]}
                   onPress={() => setFormData({ ...formData, gender: gender })}
                 >
-                  <Text
+                  <AppText
                     style={
                       formData.gender === gender
                         ? styles.genderTextActive
@@ -636,52 +667,54 @@ export default function AddCalfForm() {
                     }
                   >
                     {gender}
-                  </Text>
+                  </AppText>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
 
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Birth Details</Text>
+            <AppText style={styles.sectionTitle}>{t.basicInformation}</AppText>
             <View style={styles.separator} />
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Dam (Mother Cattle){req}</Text>
+              <AppText style={styles.label}>Dam (Mother calf){req}</AppText>
               <View style={styles.searchRow}>
                 <TextInput
                   style={styles.searchInput}
-                  placeholder="Search Mother Cattle by ID"
-                  value={motherCattleId}
-                  onChangeText={setMotherCattleId}
+                  placeholder="Search Mother calf by ID"
+                  value={mothercalfId}
+                  onChangeText={setMothercalfId}
                 />
                 <TouchableOpacity
                   style={styles.searchButton}
-                  onPress={handleSearchMotherCattle}
+                  onPress={handleSearchMothercalf}
                 >
-                  <Text style={styles.searchButtonText}>Search</Text>
+                  <AppText style={styles.searchButtonText}>Search</AppText>
                 </TouchableOpacity>
               </View>
-              {isMotherCattleLoading && <ActivityIndicator />}
-              {motherCattleError && (
-                <Text style={styles.errorText}>{motherCattleError}</Text>
+              {isMothercalfLoading && <ActivityIndicator />}
+              {mothercalfError && (
+                <AppText style={styles.errorText}>{mothercalfError}</AppText>
               )}
-              {motherCattleData && (
+              {mothercalfData && (
                 <View style={styles.searchResult}>
-                  <Text>
-                    <Text style={{ fontWeight: "bold" }}>Name:</Text>{" "}
-                    {motherCattleData.cattleName}
-                  </Text>
-                  <Text>
-                    <Text style={{ fontWeight: "bold" }}>Breed:</Text>{" "}
-                    {motherCattleData.breed}
-                  </Text>
+                  <AppText>
+                    <AppText style={{ fontWeight: "bold" }}>Name:</AppText>{" "}
+                    {mothercalfData.calfName}
+                  </AppText>
+                  <AppText>
+                    <AppText style={{ fontWeight: "bold" }}>Breed:</AppText>{" "}
+                    {mothercalfData.breed}
+                  </AppText>
                 </View>
               )}
             </View>
 
             {/* Calving Type */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Calving Type {req}</Text>
+              <AppText style={styles.label}>
+                {t.calvingType} {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -709,13 +742,16 @@ export default function AddCalfForm() {
                 }}
               />
               {errors.calvingType && (
-                <Text style={styles.errorText}>{errors.calvingType}</Text>
+                <AppText style={styles.errorText}>{errors.calvingType}</AppText>
               )}
             </View>
 
             {/* DOB */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Date of Birth{req}</Text>
+              <AppText style={styles.label}>
+                {t.dateOfBirth}
+                {req}
+              </AppText>
               <TouchableOpacity
                 style={[
                   styles.input,
@@ -724,11 +760,11 @@ export default function AddCalfForm() {
                 ]}
                 onPress={() => setShowDatePicker(true)}
               >
-                <Text style={{ color: formData.dob ? "#000" : "#999" }}>
+                <AppText style={{ color: formData.dob ? "#000" : "#999" }}>
                   {formData.dob
                     ? formData.dob.toLocaleDateString()
                     : "Select Date"}
-                </Text>
+                </AppText>
               </TouchableOpacity>
               {showDatePicker && (
                 <DateTimePicker
@@ -739,12 +775,14 @@ export default function AddCalfForm() {
                   maximumDate={new Date()}
                 />
               )}
-              {errors.dob && <Text style={styles.errorText}>{errors.dob}</Text>}
+              {errors.dob && (
+                <AppText style={styles.errorText}>{errors.dob}</AppText>
+              )}
             </View>
 
             {/* Age (auto-calculated) */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Age (Years)</Text>
+              <AppText style={styles.label}>{t.age}</AppText>
               <TextInput
                 style={[
                   styles.input,
@@ -755,12 +793,17 @@ export default function AddCalfForm() {
                 value={formData.age}
                 editable={false}
               />
-              {errors.age && <Text style={styles.errorText}>{errors.age}</Text>}
+              {errors.age && (
+                <AppText style={styles.errorText}>{errors.age}</AppText>
+              )}
             </View>
 
             {/* Weight */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Weight (Kg){req}</Text>
+              <AppText style={styles.label}>
+                {t.weight}
+                {req}
+              </AppText>
               <TextInput
                 style={[styles.input, errors.weight && styles.inputError]}
                 placeholder="500"
@@ -771,17 +814,17 @@ export default function AddCalfForm() {
                 }
               />
               {errors.weight && (
-                <Text style={styles.errorText}>{errors.weight}</Text>
+                <AppText style={styles.errorText}>{errors.weight}</AppText>
               )}
             </View>
           </View>
 
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel}>
-              <Text style={styles.cancelBtnText}>Cancel</Text>
+              <AppText style={styles.cancelBtnText}>{t.cancel}</AppText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.saveBtn} onPress={next}>
-              <Text style={styles.saveBtnText}>Next</Text>
+              <AppText style={styles.saveBtnText}>{t.next}</AppText>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -796,21 +839,22 @@ export default function AddCalfForm() {
         style={styles.container}
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Add New Calf</Text>
-          <Text style={styles.headerSub}>
-            Register a newborn Calf with details
-          </Text>
+          <AppText style={styles.headerTitle}>{t.addNewCalf}</AppText>
+          <AppText style={styles.headerSub}>{t.registerCalfDetails}</AppText>
         </View>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Initial Health & Management</Text>
+            <AppText style={styles.sectionTitle}>{t.healthmanagement}</AppText>
             <View style={styles.separator} />
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Status{req}</Text>
+              <AppText style={styles.label}>
+                {t.status}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -819,7 +863,7 @@ export default function AddCalfForm() {
                 ]}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
-                data={cattleStatuses}
+                data={calfStatuses}
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
@@ -833,12 +877,15 @@ export default function AddCalfForm() {
                 }}
               />
               {errors.status && (
-                <Text style={styles.errorText}>{errors.status}</Text>
+                <AppText style={styles.errorText}>{errors.status}</AppText>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Worker Assigned{req}</Text>
+              <AppText style={styles.label}>
+                {t.workerAssigned}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -861,12 +908,17 @@ export default function AddCalfForm() {
                 }}
               />
               {errors.workerAssigned && (
-                <Text style={styles.errorText}>{errors.workerAssigned}</Text>
+                <AppText style={styles.errorText}>
+                  {errors.workerAssigned}
+                </AppText>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Veterinarian Assigned{req}</Text>
+              <AppText style={styles.label}>
+                {t.vetAssigned}
+                {req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -889,12 +941,12 @@ export default function AddCalfForm() {
                 }}
               />
               {errors.vetAssigned && (
-                <Text style={styles.errorText}>{errors.vetAssigned}</Text>
+                <AppText style={styles.errorText}>{errors.vetAssigned}</AppText>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>State{req}</Text>
+              <AppText style={styles.label}>State{req}</AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
@@ -903,7 +955,7 @@ export default function AddCalfForm() {
                 ]}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
-                data={cattleStates}
+                data={calfStates}
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
@@ -917,12 +969,15 @@ export default function AddCalfForm() {
                 }}
               />
               {errors.state && (
-                <Text style={styles.errorText}>{errors.state}</Text>
+                <AppText style={styles.errorText}>{errors.state}</AppText>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Current State Date{req}</Text>
+              <AppText style={styles.label}>
+                {t.currentStateDate}
+                {req}
+              </AppText>
               <TouchableOpacity
                 style={[
                   styles.input,
@@ -931,7 +986,7 @@ export default function AddCalfForm() {
                 ]}
                 onPress={() => setShowHealthManagementDatePicker(true)}
               >
-                <Text
+                <AppText
                   style={{
                     color: formData.currentStateDate ? "#000" : "#999",
                   }}
@@ -939,7 +994,7 @@ export default function AddCalfForm() {
                   {formData.currentStateDate
                     ? formData.currentStateDate.toLocaleDateString()
                     : "Select Date"}
-                </Text>
+                </AppText>
               </TouchableOpacity>
               {showHealthManagementDatePicker && (
                 <DateTimePicker
@@ -951,12 +1006,14 @@ export default function AddCalfForm() {
                 />
               )}
               {errors.currentStateDate && (
-                <Text style={styles.errorText}>{errors.currentStateDate}</Text>
+                <AppText style={styles.errorText}>
+                  {errors.currentStateDate}
+                </AppText>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Insurance Number</Text>
+              <AppText style={styles.label}>{t.insuranceNumber}</AppText>
               <TextInput
                 style={[
                   styles.input,
@@ -967,26 +1024,30 @@ export default function AddCalfForm() {
                 onChangeText={(val) => setFormValue("insuranceNumber", val)}
               />
               {errors.insuranceNumber && (
-                <Text style={styles.errorText}>{errors.insuranceNumber}</Text>
+                <AppText style={styles.errorText}>
+                  {errors.insuranceNumber}
+                </AppText>
               )}
             </View>
           </View>
 
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Cattle Images</Text>
+            <AppText style={styles.sectionTitle}>{t.calfImages}</AppText>
             <View style={styles.separator} />
             <TouchableOpacity style={styles.uploadBox}>
               <Ionicons name="cloud-upload-outline" size={40} color="#000000" />
-              <Text style={styles.uploadText}>
-                Click to upload Cattle images
-              </Text>
+              <AppText style={styles.uploadText}>
+                Click to upload calf images
+              </AppText>
             </TouchableOpacity>
           </View>
 
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Additional Information</Text>
+            <AppText style={styles.sectionTitle}>
+              {t.additionalInformation}
+            </AppText>
             <View style={styles.separator} />
-            <Text style={styles.label}>Remarks</Text>
+            <AppText style={styles.label}>{t.remarks}</AppText>
             <TextInput
               style={styles.remarkInput}
               placeholder="Add any additional remarks here..."
@@ -999,11 +1060,11 @@ export default function AddCalfForm() {
 
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.cancelBtn} onPress={back}>
-              <Text style={styles.cancelBtnText}>Back</Text>
+              <AppText style={styles.cancelBtnText}>{t.back}</AppText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
               <Ionicons name="save-outline" size={20} color="white" />
-              <Text style={styles.saveBtnText}>Save</Text>
+              <AppText style={styles.saveBtnText}>{t.save}</AppText>
             </TouchableOpacity>
           </View>
         </ScrollView>
