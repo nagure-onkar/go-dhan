@@ -1,5 +1,5 @@
-import ProfitLossCalculator from "./tabs/ProfitLossStatement";
+import DashboardScreen from "./tabs/dashboard";
 
 export default function App() {
-  return <ProfitLossCalculator />;
+  return <DashboardScreen />;
 }

@@ -18,6 +18,12 @@ export const ENDPOINTS = {
     list: "/api/v1/insemination/list",
     details: (id: string) => `/api/v1/insemination/${id}`,
   },
+
+  dashboard: {
+  stats: "/api/v1/dashboard/stats",
+  activities: "/api/v1/dashboard/activities",
+},
+
 };
 
 export const HEAT_ON_HEAT = "/heat/on-heat";
