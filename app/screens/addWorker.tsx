@@ -228,14 +228,14 @@ const AddWorker = () => {
             {t("Personal Information")}
           </AppText>
 
-          <Input label="Worker ID *" icon="id-card" placeholder="eg.WKR-001 " value={workerId} onChangeText={setWorkerId} />
-          <Input label="First Name *" icon="person"placeholder=" eg Ravi " value={firstName} onChangeText={setFirstName} />
-          <Input label="Father's Name *" icon="person-outline"placeholder="eg. Mohan " value={fatherName} onChangeText={setFatherName} />
-          <Input label="Surname *" icon="people-outline" value={surname} placeholder="eg.Patil" onChangeText={setSurname} />
+          <Input label={t("workerId")} icon="id-card" placeholder="eg.WKR-001 " value={workerId} onChangeText={setWorkerId} />
+          <Input label={t("First Name *")} icon="person"placeholder=" eg Ravi " value={firstName} onChangeText={setFirstName} />
+          <Input label={t("Father's Name *")} icon="person-outline"placeholder="eg. Mohan " value={fatherName} onChangeText={setFatherName} />
+          <Input label={t("Surname *")} icon="people-outline" value={surname} placeholder="eg.Patil" onChangeText={setSurname} />
 
-          <AppText style={styles.label}>Gender *</AppText>
+          <AppText style={styles.label}>{t("Gender *")}</AppText>
           <View style={styles.row}>
-            {["Male", "Female", "Other"].map((g) => (
+            {[t("male"), t("female"), t("other")].map((g) => (
               <TouchableOpacity
                 key={g}
                 style={[styles.radio, gender === g && styles.radioSelected]}
@@ -247,7 +247,7 @@ const AddWorker = () => {
           </View>
 
           {/* DOB */}
-          <AppText style={styles.label}>Date of Birth *</AppText>
+          <AppText style={styles.label}>{t("Date of Birth *")}</AppText>
           <TouchableOpacity
             style={styles.inputWrapper}
             onPress={() => setShowDatePicker(true)}
@@ -271,10 +271,10 @@ const AddWorker = () => {
             />
           )}
 
-          <Input label="Age" icon="calculator"placeholder="0" value={age} editable={false} />
+          <Input label={t("Age")} icon="calculator"placeholder="0" value={age} editable={false} />
 
           <Input
-            label="Salary *"
+            label={t("Salary *")}
             icon="cash"
             placeholder="0"
             keyboardType="numeric"
@@ -283,7 +283,7 @@ const AddWorker = () => {
           />
 
           {/* JOINING DATE */}
-          <AppText style={styles.label}>Date of Joining *</AppText>
+          <AppText style={styles.label}>{t("Date of Joining *")}</AppText>
           <TouchableOpacity
             style={styles.inputWrapper}
             onPress={() => setShowJoiningPicker(true)}
@@ -315,7 +315,7 @@ const AddWorker = () => {
           </AppText>
 
           <Input
-            label="Mobile Number *"
+            label={t("Mobile Number *")}
             icon="call"
             keyboardType="phone-pad"
             placeholder="9876543210"
@@ -324,7 +324,7 @@ const AddWorker = () => {
           />
 
           <Input
-            label="Alternate Contact Number"
+            label={t("Alternate Contact Number")}
             icon="call-outline"
             keyboardType="phone-pad"
             placeholder="Optional"
@@ -333,7 +333,7 @@ const AddWorker = () => {
           />
 
           <Input
-            label="Address *"
+            label={t("Address *")}
             placeholder="Village Road,City name"
             icon="location"
             value={address}
@@ -344,13 +344,13 @@ const AddWorker = () => {
         {/* DOCUMENT UPLOAD */}
         <View style={styles.section}>
           <AppText style={styles.sectionTitle}>
-            Document Upload
+            {t("Document Upload")}
           </AppText>
 
           <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
             <Ionicons name="cloud-upload-outline" size={30} color="#16a34a" />
             <AppText style={styles.uploadText}>
-              Upload Aadhar Card Image
+              {t("Upload Aadhar Card Image")}
             </AppText>
             <AppText style={styles.uploadSub}>
               PNG, JPG up to 10MB
@@ -403,7 +403,7 @@ const AddWorker = () => {
           >
             <Ionicons name="save" size={18} color="#fff" />
             <AppText style={styles.saveText}>
-              {loading ? "Saving..." : t("Save Worker")}
+              {loading ? t("Saving...") : t("Save Worker")}
             </AppText>
           </TouchableOpacity>
         </View>
