@@ -1,5 +1,5 @@
-import DashboardScreen from "./tabs/dashboard";
+import HeatOnHeatScreen from "./tabs/heatonheat";
 
 export default function App() {
-  return <DashboardScreen />;
+  return <HeatOnHeatScreen />;
 }

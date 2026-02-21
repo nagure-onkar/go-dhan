@@ -14,10 +14,12 @@ import {
   View,
 } from 'react-native';
 
+import AppText from '../../src/components/common/AppText';
 import ScreenWrapper from '../../src/components/common/ScreenWrapper';
 import { useLanguage } from '../../src/constants/localization/useLanguage';
 import spacing from '../../src/constants/spacing';
 import { useTheme } from '../../src/theme/useTheme';
+
 
 // @ts-ignore
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -222,14 +224,14 @@ const styles = createStyles(colors);
               <MaterialCommunityIcons name="fire" size={24} color={colors.card} />
             </View>
             <View>
-              <Text style={styles.title}>Heat Life Cycle</Text>
-              <Text style={styles.subtitle}>State: On Heat</Text>
+              <AppText style={styles.title}>Heat Life Cycle</AppText>
+              <AppText style={styles.subtitle}>State: On Heat</AppText>
             </View>
           </View>
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.label}>Animal ID</Text>
+          <AppText style={styles.label}>Animal ID</AppText>
           <TextInput
             style={[styles.input, animalId === PRESET_VALUES.animalId && styles.inputPrefilled]}
             placeholder="e.g. C-001"
@@ -243,7 +245,7 @@ const styles = createStyles(colors);
          <View style={styles.sectionCard}>
 
   <View style={styles.sectionTitleContainer}>
-    <Text style={styles.sectionTitle}>Current Heat Symptoms</Text>
+    <AppText style={styles.sectionTitle}>Current Heat Symptoms</AppText>
     <View style={styles.sectionDivider} />
   </View>
 
@@ -251,7 +253,7 @@ const styles = createStyles(colors);
 
     {symptomOptions.map((s) => (
       <View key={s} style={styles.symptomField}>
-        <Text style={styles.symptomLabelSmall}>{s} *</Text>
+        <AppText style={styles.symptomLabelSmall}>{s} *</AppText>
         <TouchableOpacity
           style={styles.selectInput}
           onPress={() => openSelect(`symptom:${s}`, ['Select', 'Yes', 'No'])}
@@ -276,9 +278,9 @@ const styles = createStyles(colors);
 </View>
 
 
-          <Text style={styles.label}>Date of Symptoms Reported *</Text>
+          <AppText style={styles.label}>Date of Symptoms Reported *</AppText>
           <TouchableOpacity style={styles.selectInput} onPress={() => setShowDateReportedPicker(true)}>
-            <Text style={[styles.selectText, !dateReportedDate && styles.selectPlaceholder]}>{dateReportedDate ? formatDate(dateReportedDate) : 'dd-mm-yyyy'}</Text>
+            <AppText style={[styles.selectText, !dateReportedDate && styles.selectPlaceholder]}>{dateReportedDate ? formatDate(dateReportedDate) : 'dd-mm-yyyy'}</AppText>
             <MaterialCommunityIcons name="calendar" size={spacing.md} color={colors.text} />
           </TouchableOpacity>
 
@@ -297,20 +299,20 @@ const styles = createStyles(colors);
             />
           )}
 
-          <Text style={styles.label}>Is Cattle Lactating *</Text>
+          <AppText style={styles.label}>Is Cattle Lactating *</AppText>
           <TouchableOpacity style={styles.selectInput} onPress={() => openSelect('isLactating', ['Select', 'Yes', 'No'])}>
-            <Text style={[styles.selectText, !isLactating && styles.selectPlaceholder]}>{isLactating ? (isLactating === 'yes' ? 'Yes' : 'No') : 'Select Answer'}</Text>
+            <AppText style={[styles.selectText, !isLactating && styles.selectPlaceholder]}>{isLactating ? (isLactating === 'yes' ? 'Yes' : 'No') : 'Select Answer'}</AppText>
             <MaterialCommunityIcons name="chevron-down" size={spacing.md} color={colors.text} />
           </TouchableOpacity>
 
          <View style={styles.sectionCard}>
 
   <View style={styles.sectionTitleContainer}>
-    <Text style={styles.sectionTitle}>Vet Confirmation</Text>
+    <AppText style={styles.sectionTitle}>Vet Confirmation</AppText>
     <View style={styles.sectionDivider} />
   </View>
 
-          <Text style={styles.small}>Doctor ID</Text>
+          <AppText style={styles.small}>Doctor ID</AppText>
           <TextInput
             style={[styles.input, doctorId === PRESET_VALUES.doctorId && styles.inputPrefilled]}
             value={doctorId}
@@ -318,7 +320,7 @@ const styles = createStyles(colors);
             onFocus={() => doctorId === PRESET_VALUES.doctorId && setDoctorId('')}
             onBlur={() => doctorId.trim() === '' && setDoctorId(PRESET_VALUES.doctorId)}
           />
-          <Text style={styles.small}>Doctor Name</Text>
+          <AppText style={styles.small}>Doctor Name</AppText>
           <TextInput
             style={[styles.input, doctorName === PRESET_VALUES.doctorName && styles.inputPrefilled]}
             value={doctorName}
@@ -327,22 +329,22 @@ const styles = createStyles(colors);
             onBlur={() => doctorName.trim() === '' && setDoctorName(PRESET_VALUES.doctorName)}
           />
 
-          <Text style={styles.label}>Method of Confirmation *</Text>
+          <AppText style={styles.label}>Method of Confirmation *</AppText>
           <TouchableOpacity style={styles.selectInput} onPress={() => openSelect('methodConfirmation', methodOptions)}>
-            <Text style={[styles.selectText, !methodConfirmation && styles.selectPlaceholder]}>{methodConfirmation || 'Select'}</Text>
+            <AppText style={[styles.selectText, !methodConfirmation && styles.selectPlaceholder]}>{methodConfirmation || 'Select'}</AppText>
             <MaterialCommunityIcons name="chevron-down" size={spacing.md} color={colors.text} />
           </TouchableOpacity>
 
-          <Text style={styles.label}>Final Result *</Text>
+          <AppText style={styles.label}>Final Result *</AppText>
           <TouchableOpacity style={styles.selectInput} onPress={() => openSelect('finalResult', finalResultOptions)}>
-            <Text style={[styles.selectText, !finalResult && styles.selectPlaceholder]}>{finalResult || 'Select'}</Text>
+            <AppText style={[styles.selectText, !finalResult && styles.selectPlaceholder]}>{finalResult || 'Select'}</AppText>
             <MaterialCommunityIcons name="chevron-down" size={spacing.md} color={colors.text} />
           </TouchableOpacity>
           </View>
 
-          <Text style={styles.label}>Recommended Date & Time for AI</Text>
+          <AppText style={styles.label}>Recommended Date & Time for AI</AppText>
           <TouchableOpacity style={styles.selectInput} onPress={() => { setRecommendedPickerMode('date'); setShowRecommendedPicker(true); }}>
-            <Text style={[styles.selectText, !recommendedDateTime && styles.selectPlaceholder]}>{recommendedDateTime ? formatDateTime(recommendedDateTime) : 'dd-mm-yyyy --:--'}</Text>
+            <AppText style={[styles.selectText, !recommendedDateTime && styles.selectPlaceholder]}>{recommendedDateTime ? formatDateTime(recommendedDateTime) : 'dd-mm-yyyy --:--'}</AppText>
             <View style={styles.datetimeIcons}>
               <MaterialCommunityIcons name="calendar" size={spacing.md} color={colors.text} />
               <MaterialCommunityIcons name="clock" size={spacing.md} color={colors.text} style={{ marginLeft: 8 }} />
@@ -386,7 +388,7 @@ const styles = createStyles(colors);
             />
           )}
 
-          <Text style={styles.label}>Diagnosis Summary</Text>
+          <AppText style={styles.label}>Diagnosis Summary</AppText>
           <TextInput style={[styles.input, styles.multiline]} placeholder="Diagnosis summary..." value={diagnosisSummary} onChangeText={setDiagnosisSummary} multiline numberOfLines={3} />
 
 
@@ -394,15 +396,15 @@ const styles = createStyles(colors);
           <View style={styles.sectionCard}>
 
   <View style={styles.sectionTitleContainer}>
-    <Text style={styles.sectionTitle}>Expenses</Text>
+    <AppText style={styles.sectionTitle}>Expenses</AppText>
     <View style={styles.sectionDivider} />
   </View>
 
-          <Text style={styles.small}>Doctor Fees *</Text>
+          <AppText style={styles.small}>Doctor Fees *</AppText>
           <TextInput style={styles.inputNumeric} value={doctorFees} onChangeText={setDoctorFees} keyboardType="numeric" />
-          <Text style={styles.small}>Treatment Expenses *</Text>
+          <AppText style={styles.small}>Treatment Expenses *</AppText>
           <TextInput style={styles.inputNumeric} value={treatmentExpenses} onChangeText={setTreatmentExpenses} keyboardType="numeric" />
-          <Text style={styles.small}>Other Expenses *</Text>
+          <AppText style={styles.small}>Other Expenses *</AppText>
           <TextInput style={styles.inputNumeric} value={otherExpenses} onChangeText={setOtherExpenses} keyboardType="numeric" />
 
           </View>
@@ -412,7 +414,7 @@ const styles = createStyles(colors);
               <View style={styles.modalContent}>
                 {selectModalOptions.map((opt) => (
                   <TouchableOpacity key={opt} style={styles.modalOption} onPress={() => onSelectOption(opt)}>
-                    <Text style={styles.modalOptionText}>{opt}</Text>
+                    <AppText style={styles.modalOptionText}>{opt}</AppText>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -425,7 +427,7 @@ const styles = createStyles(colors);
               onPress={() => navigation?.goBack?.()}
               disabled={submitting}
             >
-              <Text style={styles.cancelText}>Cancel</Text>
+              <AppText style={styles.cancelText}>Cancel</AppText>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -433,7 +435,7 @@ const styles = createStyles(colors);
               onPress={onSubmit}
               disabled={submitting}
             >
-              {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>Submit Heat Form</Text>}
+              {submitting ? <ActivityIndicator color="#fff" /> : <AppText style={styles.submitText}>Submit Heat Form</AppText>}
             </TouchableOpacity>
           </View>
         </View>
