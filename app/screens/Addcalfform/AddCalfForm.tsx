@@ -4,10 +4,13 @@ import AppText from "@/components/common/AppText";
 import { useLanguage } from "@/constants/localization/useLanguage";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -143,6 +146,8 @@ const validateForm = (data, rules) => {
 };
 
 export default function AddCalfForm() {
+  const { t, setLanguage, language } = useLanguage();
+
   const [formData, setFormData] = useState({
     calfId: "",
     calfName: "",
@@ -213,6 +218,7 @@ export default function AddCalfForm() {
 
   const [errors, setErrors] = useState({});
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<any>(null);
   const [focusState, setFocusState] = useState({
     calfType: false,
     breed: false,
@@ -275,6 +281,13 @@ export default function AddCalfForm() {
       console.log("Success! All form data validated:", formData);
       setIsSaved(true);
       saveFormData(formData);
+      if (selectedImage) {
+        formData.append("calf_image", {
+          uri: selectedImage.uri,
+          name: "calf_image.jpg",
+          type: "image/jpeg",
+        } as any);
+      }
       setTimeout(() => {
         router.push("../../tabs");
         setIsSaved(false);
@@ -321,6 +334,24 @@ export default function AddCalfForm() {
   const back = () => {
     setScreen1(!screen1);
     setScreen2(!screen2);
+  };
+
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert("Permission required");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0]);
+    }
   };
 
   const handleDateChange = (event, selectedDate) => {
@@ -391,6 +422,12 @@ export default function AddCalfForm() {
                 {t.calfId}
                 {req}
               </AppText>
+              <Ionicons
+                name="pricetag-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={[styles.input, errors.calfId && styles.inputError]}
                 placeholder="e.g. CAF-001"
@@ -410,6 +447,12 @@ export default function AddCalfForm() {
                 {t.calfName}
                 {req}
               </AppText>
+              <Ionicons
+                name="paw-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={[styles.input, errors.calfName && styles.inputError]}
                 placeholder="e.g. Daisy"
@@ -461,6 +504,14 @@ export default function AddCalfForm() {
                     breed: null,
                   }));
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="git-network-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.calfType && (
                 <AppText style={styles.errorText}>{errors.calfType}</AppText>
@@ -499,6 +550,14 @@ export default function AddCalfForm() {
                   setFocus("breed", false);
                   setErrors((prev) => ({ ...prev, breed: null }));
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="logo-buffer"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
                 disable={!formData.calfType}
               />
               {errors.breed && (
@@ -512,6 +571,12 @@ export default function AddCalfForm() {
                 {t.treatment}
                 {req}
               </AppText>
+              <Ionicons
+                name="medkit-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={[styles.input, errors.treatment && styles.inputError]}
                 placeholder="e.g. Vaccination"
@@ -530,6 +595,12 @@ export default function AddCalfForm() {
               <AppText style={styles.label}>
                 {t.treatmentExpence} (₹){req}
               </AppText>
+              <Ionicons
+                name="cash-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={[
                   styles.input,
@@ -580,6 +651,14 @@ export default function AddCalfForm() {
                   setFormData({ ...formData, ColostrumIntake: item.value });
                   setFocus("colostrumIntake", false);
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="water-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.ColostrumIntake && (
                 <AppText style={styles.errorText}>
@@ -623,6 +702,14 @@ export default function AddCalfForm() {
                   });
                   setFocus("healthObservations", false);
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="heart-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.HealthObservations && (
                 <AppText style={styles.errorText}>
@@ -634,6 +721,12 @@ export default function AddCalfForm() {
             {/* NDDB Number */}
             <View style={styles.inputGroup}>
               <AppText style={styles.label}>{t.nddbNumber}</AppText>
+              <Ionicons
+                name="document-text-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={[styles.input, errors.nddbNumber && styles.inputError]}
                 placeholder="e.g. U01403DL2009NPL195142"
@@ -679,9 +772,15 @@ export default function AddCalfForm() {
             <View style={styles.inputGroup}>
               <AppText style={styles.label}>Dam (Mother calf){req}</AppText>
               <View style={styles.searchRow}>
+                <Ionicons
+                  name="search-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIconsearch}
+                />
                 <TextInput
                   style={styles.searchInput}
-                  placeholder="Search Mother calf by ID"
+                  placeholder="Search Mother by ID"
                   value={mothercalfId}
                   onChangeText={setMothercalfId}
                 />
@@ -740,6 +839,14 @@ export default function AddCalfForm() {
                   setFormData({ ...formData, calvingType: item.value });
                   setFocus("calvingType", false);
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="git-commit-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.calvingType && (
                 <AppText style={styles.errorText}>{errors.calvingType}</AppText>
@@ -752,6 +859,12 @@ export default function AddCalfForm() {
                 {t.dateOfBirth}
                 {req}
               </AppText>
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TouchableOpacity
                 style={[
                   styles.input,
@@ -783,6 +896,12 @@ export default function AddCalfForm() {
             {/* Age (auto-calculated) */}
             <View style={styles.inputGroup}>
               <AppText style={styles.label}>{t.age}</AppText>
+              <Ionicons
+                name="return-up-forward-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={[
                   styles.input,
@@ -804,6 +923,12 @@ export default function AddCalfForm() {
                 {t.weight}
                 {req}
               </AppText>
+              <Ionicons
+                name="scale-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={[styles.input, errors.weight && styles.inputError]}
                 placeholder="500"
@@ -875,6 +1000,14 @@ export default function AddCalfForm() {
                   setFormValue("status", item.value);
                   setIsStatusFocus(false);
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="analytics-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.status && (
                 <AppText style={styles.errorText}>{errors.status}</AppText>
@@ -906,6 +1039,14 @@ export default function AddCalfForm() {
                   setFormValue("workerAssigned", item.value);
                   setIsWorkerFocus(false);
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="person-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.workerAssigned && (
                 <AppText style={styles.errorText}>
@@ -939,6 +1080,14 @@ export default function AddCalfForm() {
                   setFormValue("vetAssigned", item.value);
                   setIsVetFocus(false);
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="medkit-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.vetAssigned && (
                 <AppText style={styles.errorText}>{errors.vetAssigned}</AppText>
@@ -967,6 +1116,14 @@ export default function AddCalfForm() {
                   setFormValue("state", item.value);
                   setIsStateFocus(false);
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="pulse-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.state && (
                 <AppText style={styles.errorText}>{errors.state}</AppText>
@@ -978,6 +1135,12 @@ export default function AddCalfForm() {
                 {t.currentStateDate}
                 {req}
               </AppText>
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TouchableOpacity
                 style={[
                   styles.input,
@@ -1014,6 +1177,12 @@ export default function AddCalfForm() {
 
             <View style={styles.inputGroup}>
               <AppText style={styles.label}>{t.insuranceNumber}</AppText>
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={[
                   styles.input,
@@ -1031,7 +1200,7 @@ export default function AddCalfForm() {
             </View>
           </View>
 
-          <View style={styles.sectionCard}>
+          {/* <View style={styles.sectionCard}>
             <AppText style={styles.sectionTitle}>{t.calfImages}</AppText>
             <View style={styles.separator} />
             <TouchableOpacity style={styles.uploadBox}>
@@ -1040,6 +1209,31 @@ export default function AddCalfForm() {
                 Click to upload calf images
               </AppText>
             </TouchableOpacity>
+          </View> */}
+
+          <View style={styles.sectionCard}>
+            <AppText style={styles.sectionTitle}>{t.calfImages}</AppText>
+
+            <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
+              <Ionicons name="cloud-upload-outline" size={30} color="#16a34a" />
+              <AppText style={styles.uploadText}>
+                Click to upload calf images
+              </AppText>
+              <AppText style={styles.uploadSub}>PNG, JPG up to 10MB</AppText>
+            </TouchableOpacity>
+
+            {selectedImage && (
+              <Image
+                source={{ uri: selectedImage.uri }}
+                style={{
+                  width: "100%",
+                  height: 150,
+                  marginTop: 10,
+                  borderRadius: 8,
+                }}
+                resizeMode="cover"
+              />
+            )}
           </View>
 
           <View style={styles.sectionCard}>
@@ -1048,6 +1242,12 @@ export default function AddCalfForm() {
             </AppText>
             <View style={styles.separator} />
             <AppText style={styles.label}>{t.remarks}</AppText>
+            <Ionicons
+              name="reader-outline"
+              size={20}
+              color="#666"
+              style={styles.remarkIcon}
+            />
             <TextInput
               style={styles.remarkInput}
               placeholder="Add any additional remarks here..."
@@ -1103,8 +1303,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 6,
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingLeft: 40,
     backgroundColor: "#fff",
+    height: 50,
+    justifyContent: "center",
+  },
+  inputIcon: {
+    position: "absolute",
+    left: 10,
+    top: 40,
+    zIndex: 1,
+  },
+  inputIconsearch: {
+    position: "absolute",
+    left: 10,
+    top: 15,
+    zIndex: 1,
+    color: "#666",
   },
   inputError: { borderColor: "red" },
   disabledInput: { backgroundColor: "#f0f0f0", color: "#666" },
@@ -1163,10 +1379,12 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
+    height: 50,
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 6,
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingLeft: 40,
     backgroundColor: "#fff",
   },
   searchButton: {
@@ -1174,6 +1392,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 6,
+    height: 50,
+    justifyContent: "center",
   },
   searchButtonText: {
     color: "white",
@@ -1185,24 +1405,45 @@ const styles = StyleSheet.create({
     backgroundColor: "#e9f5e9",
     borderRadius: 6,
   },
+  // uploadBox: {
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  //   height: 100,
+  //   borderWidth: 2,
+  //   borderStyle: "dashed",
+  //   borderColor: "#5fcd54",
+  //   borderRadius: 10,
+  //   backgroundColor: "#e0f5e5c3",
+  //   marginBottom: 20,
+  // },
   uploadBox: {
-    justifyContent: "center",
-    alignItems: "center",
-    height: 100,
-    borderWidth: 2,
+    borderWidth: 1,
     borderStyle: "dashed",
-    borderColor: "#5fcd54",
-    borderRadius: 10,
-    backgroundColor: "#e0f5e5c3",
-    marginBottom: 20,
+    borderColor: "#22c55e",
+    padding: 20,
+    borderRadius: 12,
+    alignItems: "center",
+    backgroundColor: "#f0fdf4",
   },
   uploadText: { marginTop: 8, color: "#333" },
+  uploadSub: {
+    fontSize: 12,
+    color: "#6b7280",
+    marginTop: 4,
+  },
+  remarkIcon: {
+    position: "absolute",
+    left: 10,
+    top: 48,
+    zIndex: 1,
+  },
   remarkInput: {
     height: 100,
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 6,
     padding: 10,
+    paddingLeft: 40,
     backgroundColor: "#fff",
     textAlignVertical: "top",
   },

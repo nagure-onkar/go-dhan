@@ -330,14 +330,27 @@ export default function AddCattleForm() {
                 {t.cattleId}
                 {req}
               </AppText>
-              <TextInput
-                style={[styles.input, errors.cattleId && styles.inputError]}
-                placeholder={`${t.egctl}`}
-                value={formData.cattleId}
-                onChangeText={(val) =>
-                  setFormData({ ...formData, cattleId: val })
-                }
-              />
+              <View
+                style={[
+                  styles.inputContainer,
+                  errors.cattleId && styles.inputError,
+                ]}
+              >
+                <Ionicons
+                  name="pricetag-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={`${t.egctl}`}
+                  value={formData.cattleId}
+                  onChangeText={(val) =>
+                    setFormData({ ...formData, cattleId: val })
+                  }
+                />
+              </View>
               {errors.cattleId && (
                 <AppText style={styles.errorAppText}>{errors.cattleId}</AppText>
               )}
@@ -349,14 +362,27 @@ export default function AddCattleForm() {
                 {t.cattleName}
                 {req}
               </AppText>
-              <TextInput
-                style={[styles.input, errors.cattleName && styles.inputError]}
-                placeholder={`${t.egdaisy}`}
-                value={formData.cattleName}
-                onChangeText={(val) =>
-                  setFormData({ ...formData, cattleName: val })
-                }
-              />
+              <View
+                style={[
+                  styles.inputContainer,
+                  errors.cattleName && styles.inputError,
+                ]}
+              >
+                <Ionicons
+                  name="person-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={`${t.egdaisy}`}
+                  value={formData.cattleName}
+                  onChangeText={(val) =>
+                    setFormData({ ...formData, cattleName: val })
+                  }
+                />
+              </View>
               {errors.cattleName && (
                 <AppText style={styles.errorAppText}>
                   {errors.cattleName}
@@ -377,7 +403,7 @@ export default function AddCattleForm() {
                   errors.cattleType && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedAppTextStyle={styles.selectedAppTextStyle}
+                selectedTextStyle={styles.selectedTextStyle}
                 data={cattleType}
                 maxHeight={300}
                 labelField="label"
@@ -395,6 +421,14 @@ export default function AddCattleForm() {
                   setIsCattleTypeFocus(false);
                   setErrors((prev) => ({ ...prev, cattleType: null }));
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="git-network-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.cattleType && (
                 <AppText style={styles.errorAppText}>
@@ -416,7 +450,7 @@ export default function AddCattleForm() {
                   errors.breed && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedAppTextStyle={styles.selectedAppTextStyle}
+                selectedTextStyle={styles.selectedTextStyle}
                 data={
                   formData.cattleType === "buffalo" ? buffaloBreeds : cowBreeds
                 }
@@ -433,6 +467,14 @@ export default function AddCattleForm() {
                   setErrors((prev) => ({ ...prev, breed: null }));
                 }}
                 disable={!formData.cattleType}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="logo-buffer"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.breed && (
                 <AppText style={styles.errorAppText}>{errors.breed}</AppText>
@@ -444,14 +486,27 @@ export default function AddCattleForm() {
               <AppText style={styles.label}>
                 Treatment Given At Purchase{req}
               </AppText>
-              <TextInput
-                style={[styles.input, errors.treatment && styles.inputError]}
-                placeholder={`${t.egdeworming}`}
-                value={formData.treatment}
-                onChangeText={(val) =>
-                  setFormData({ ...formData, treatment: val })
-                }
-              />
+              <View
+                style={[
+                  styles.inputContainer,
+                  errors.treatment && styles.inputError,
+                ]}
+              >
+                <Ionicons
+                  name="medkit-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={`${t.egdeworming}`}
+                  value={formData.treatment}
+                  onChangeText={(val) =>
+                    setFormData({ ...formData, treatment: val })
+                  }
+                />
+              </View>
               {errors.treatment && (
                 <AppText style={styles.errorAppText}>
                   {errors.treatment}
@@ -462,14 +517,27 @@ export default function AddCattleForm() {
             {/* NDDB Number */}
             <View style={styles.inputGroup}>
               <AppText style={styles.label}>{t.nddbNumber}</AppText>
-              <TextInput
-                style={[styles.input, errors.nddbNumber && styles.inputError]}
-                placeholder={`${t.egnddb}`}
-                value={formData.nddbNumber}
-                onChangeText={(val) =>
-                  setFormData({ ...formData, nddbNumber: val })
-                }
-              />
+              <View
+                style={[
+                  styles.inputContainer,
+                  errors.nddbNumber && styles.inputError,
+                ]}
+              >
+                <Ionicons
+                  name="document-text-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={`${t.egnddb}`}
+                  value={formData.nddbNumber}
+                  onChangeText={(val) =>
+                    setFormData({ ...formData, nddbNumber: val })
+                  }
+                />
+              </View>
               {errors.nddbNumber && (
                 <AppText style={styles.errorAppText}>
                   {errors.nddbNumber}
@@ -516,15 +584,28 @@ export default function AddCattleForm() {
                 {t.purchaseCost}
                 {req}
               </AppText>
-              <TextInput
-                style={[styles.input, errors.purchaseCost && styles.inputError]}
-                placeholder="50000"
-                value={formData.purchaseCost}
-                keyboardType="numeric"
-                onChangeText={(val) =>
-                  setFormData({ ...formData, purchaseCost: val })
-                }
-              />
+              <View
+                style={[
+                  styles.inputContainer,
+                  errors.purchaseCost && styles.inputError,
+                ]}
+              >
+                <Ionicons
+                  name="cash-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="50000"
+                  value={formData.purchaseCost}
+                  keyboardType="numeric"
+                  onChangeText={(val) =>
+                    setFormData({ ...formData, purchaseCost: val })
+                  }
+                />
+              </View>
               {errors.purchaseCost && (
                 <AppText style={styles.errorAppText}>
                   {errors.purchaseCost}
@@ -538,17 +619,27 @@ export default function AddCattleForm() {
                 {t.purchaseSource}
                 {req}
               </AppText>
-              <TextInput
+              <View
                 style={[
-                  styles.input,
+                  styles.inputContainer,
                   errors.purchaseSource && styles.inputError,
                 ]}
-                placeholder="e.g. Local Farm"
-                value={formData.purchaseSource}
-                onChangeText={(val) =>
-                  setFormData({ ...formData, purchaseSource: val })
-                }
-              />
+              >
+                <Ionicons
+                  name="location-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="e.g. Local Farm"
+                  value={formData.purchaseSource}
+                  onChangeText={(val) =>
+                    setFormData({ ...formData, purchaseSource: val })
+                  }
+                />
+              </View>
               {errors.purchaseSource && (
                 <AppText style={styles.errorAppText}>
                   {errors.purchaseSource}
@@ -564,13 +655,24 @@ export default function AddCattleForm() {
               </AppText>
               <TouchableOpacity
                 style={[
-                  styles.input,
+                  styles.inputContainer,
                   errors.dob && styles.inputError,
-                  { justifyContent: "center" },
+                  { justifyContent: "flex-start", alignItems: "center" },
                 ]}
                 onPress={() => setDatePickerFor("dob")}
               >
-                <AppText style={{ color: formData.dob ? "#000" : "#999" }}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <AppText
+                  style={{
+                    color: formData.dob ? "#000" : "#999",
+                    paddingVertical: 10,
+                  }}
+                >
                   {formData.dob
                     ? formData.dob.toLocaleDateString()
                     : "Select Date"}
@@ -593,16 +695,26 @@ export default function AddCattleForm() {
             {/* Age (auto-calculated) */}
             <View style={styles.inputGroup}>
               <AppText style={styles.label}>{t.age}</AppText>
-              <TextInput
+              <View
                 style={[
-                  styles.input,
+                  styles.inputContainer,
                   styles.disabledInput,
                   errors.age && styles.inputError,
                 ]}
-                placeholder="Select DOB to calculate age"
-                value={formData.age}
-                editable={false}
-              />
+              >
+                <Ionicons
+                  name="return-up-forward-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={[styles.input, styles.disabledInput]}
+                  placeholder="Select DOB to calculate age"
+                  value={formData.age}
+                  editable={false}
+                />
+              </View>
               {errors.age && (
                 <AppText style={styles.errorAppText}>{errors.age}</AppText>
               )}
@@ -614,15 +726,28 @@ export default function AddCattleForm() {
                 {t.weight}
                 {req}
               </AppText>
-              <TextInput
-                style={[styles.input, errors.weight && styles.inputError]}
-                placeholder="500"
-                value={formData.weight}
-                keyboardType="numeric"
-                onChangeText={(val) =>
-                  setFormData({ ...formData, weight: val })
-                }
-              />
+              <View
+                style={[
+                  styles.inputContainer,
+                  errors.weight && styles.inputError,
+                ]}
+              >
+                <Ionicons
+                  name="scale-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="500"
+                  value={formData.weight}
+                  keyboardType="numeric"
+                  onChangeText={(val) =>
+                    setFormData({ ...formData, weight: val })
+                  }
+                />
+              </View>
               {errors.weight && (
                 <AppText style={styles.errorAppText}>{errors.weight}</AppText>
               )}
@@ -674,7 +799,7 @@ export default function AddCattleForm() {
                   errors.status && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedAppTextStyle={styles.selectedAppTextStyle}
+                selectedTextStyle={styles.selectedTextStyle}
                 data={cattleStatuses}
                 maxHeight={300}
                 labelField="label"
@@ -687,10 +812,18 @@ export default function AddCattleForm() {
                   setFormValue("status", item.value);
                   setIsStatusFocus(false);
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="analytics-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {/* {errors.status && (
-              <AppText style={styles.errorAppText}>{errors.status}</AppText>
-            )} */}
+                <AppText style={styles.errorAppText}>{errors.status}</AppText>
+              )} */}
             </View>
 
             <View style={styles.inputGroup}>
@@ -705,15 +838,12 @@ export default function AddCattleForm() {
                   errors.workerAssigned && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedAppTextStyle={styles.selectedAppTextStyle}
-                // inputSearchStyle={styles.inputSearchStyle}
+                selectedTextStyle={styles.selectedTextStyle}
                 data={workers}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={!isWorkerFocus ? "Select worker" : "..."}
-                // searchPlaceholder="Search worker..."
                 value={formData.workerAssigned}
                 onFocus={() => setIsWorkerFocus(true)}
                 onBlur={() => setIsWorkerFocus(false)}
@@ -721,6 +851,14 @@ export default function AddCattleForm() {
                   setFormValue("workerAssigned", item.value);
                   setIsWorkerFocus(false);
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="person-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.workerAssigned && (
                 <AppText style={styles.errorAppText}>
@@ -741,15 +879,12 @@ export default function AddCattleForm() {
                   errors.vetAssigned && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedAppTextStyle={styles.selectedAppTextStyle}
-                // inputSearchStyle={styles.inputSearchStyle}
+                selectedTextStyle={styles.selectedTextStyle}
                 data={vets}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={!isVetFocus ? "Select vet" : "..."}
-                // searchPlaceholder="Search vet..."
                 value={formData.vetAssigned}
                 onFocus={() => setIsVetFocus(true)}
                 onBlur={() => setIsVetFocus(false)}
@@ -757,6 +892,14 @@ export default function AddCattleForm() {
                   setFormValue("vetAssigned", item.value);
                   setIsVetFocus(false);
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="medkit-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.vetAssigned && (
                 <AppText style={styles.errorAppText}>
@@ -777,15 +920,12 @@ export default function AddCattleForm() {
                   errors.state && { borderColor: "red" },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedAppTextStyle={styles.selectedAppTextStyle}
-                // inputSearchStyle={styles.inputSearchStyle}
+                selectedTextStyle={styles.selectedTextStyle}
                 data={cattleStates}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={!isStateFocus ? "Select State" : "..."}
-                // searchPlaceholder="Search state..."
                 value={formData.state}
                 onFocus={() => setIsStateFocus(true)}
                 onBlur={() => setIsStateFocus(false)}
@@ -793,6 +933,14 @@ export default function AddCattleForm() {
                   setFormValue("state", item.value);
                   setIsStateFocus(false);
                 }}
+                renderLeftIcon={() => (
+                  <Ionicons
+                    name="pulse-outline"
+                    size={20}
+                    color="#666"
+                    style={styles.icon}
+                  />
+                )}
               />
               {errors.state && (
                 <AppText style={styles.errorAppText}>{errors.state}</AppText>
@@ -806,14 +954,23 @@ export default function AddCattleForm() {
               </AppText>
               <TouchableOpacity
                 style={[
-                  styles.input,
+                  styles.inputContainer,
                   errors.currentStateDate && styles.inputError,
-                  { justifyContent: "center" },
+                  { justifyContent: "flex-start", alignItems: "center" },
                 ]}
                 onPress={() => setDatePickerFor("currentState")}
               >
+                <Ionicons
+                  name="calendar-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
                 <AppText
-                  style={{ color: formData.currentStateDate ? "#000" : "#999" }}
+                  style={{
+                    color: formData.currentStateDate ? "#000" : "#999",
+                    paddingVertical: 10,
+                  }}
                 >
                   {formData.currentStateDate
                     ? formData.currentStateDate.toLocaleDateString()
@@ -838,11 +995,24 @@ export default function AddCattleForm() {
 
             <View style={styles.inputGroup}>
               <AppText style={styles.label}>{t.bloodLine}</AppText>
-              <TextInput
-                style={[styles.input, errors.bloodLine && styles.inputError]}
-                value={formData.bloodLine}
-                onChangeText={(val) => setFormValue("bloodLine", val)}
-              />
+              <View
+                style={[
+                  styles.inputContainer,
+                  errors.bloodLine && styles.inputError,
+                ]}
+              >
+                <Ionicons
+                  name="water-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  value={formData.bloodLine}
+                  onChangeText={(val) => setFormValue("bloodLine", val)}
+                />
+              </View>
               {errors.bloodLine && (
                 <AppText style={styles.errorAppText}>
                   {errors.bloodLine}
@@ -852,15 +1022,25 @@ export default function AddCattleForm() {
 
             <View style={styles.inputGroup}>
               <AppText style={styles.label}>{t.insuranceNumber}</AppText>
-              <TextInput
+              <View
                 style={[
-                  styles.input,
+                  styles.inputContainer,
                   errors.insuranceNumber && styles.inputError,
                 ]}
-                placeholder={`${t.egins}`}
-                value={formData.insuranceNumber}
-                onChangeText={(val) => setFormValue("insuranceNumber", val)}
-              />
+              >
+                <Ionicons
+                  name="shield-checkmark-outline"
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={`${t.egins}`}
+                  value={formData.insuranceNumber}
+                  onChangeText={(val) => setFormValue("insuranceNumber", val)}
+                />
+              </View>
               {errors.insuranceNumber && (
                 <AppText style={styles.errorAppText}>
                   {errors.insuranceNumber}
@@ -873,16 +1053,26 @@ export default function AddCattleForm() {
                 {t.lactationNumber}
                 {req}
               </AppText>
-              <TextInput
+              <View
                 style={[
-                  styles.input,
+                  styles.inputContainer,
                   errors.lactationNumber && styles.inputError,
                 ]}
-                placeholder={`${t.eglactationnumber}`}
-                value={formData.lactationNumber}
-                keyboardType="numeric"
-                onChangeText={(val) => setFormValue("lactationNumber", val)}
-              />
+              >
+                <Ionicons
+                  name=""
+                  size={20}
+                  color="#666"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={`${t.eglactationnumber}`}
+                  value={formData.lactationNumber}
+                  keyboardType="numeric"
+                  onChangeText={(val) => setFormValue("lactationNumber", val)}
+                />
+              </View>
               {errors.lactationNumber && (
                 <AppText style={styles.errorAppText}>
                   {errors.lactationNumber}
@@ -908,14 +1098,27 @@ export default function AddCattleForm() {
             </AppText>
             <View style={styles.separator} />
             <AppText style={styles.label}>{t.remarks}</AppText>
-            <TextInput
-              style={styles.remarkInput}
-              placeholder="Add any additional remarks here..."
-              multiline={true}
-              numberOfLines={4}
-              value={formData.remark}
-              onChangeText={(val) => setFormValue("remark", val)}
-            />
+            <View
+              style={[
+                styles.inputContainer,
+                { minHeight: 100, alignItems: "flex-start" },
+              ]}
+            >
+              <Ionicons
+                name="reader-outline"
+                size={20}
+                color="#666"
+                style={[styles.inputIcon, { paddingTop: 10 }]}
+              />
+              <TextInput
+                style={styles.remarkInput}
+                placeholder="Add any additional remarks here..."
+                multiline={true}
+                numberOfLines={4}
+                value={formData.remark}
+                onChangeText={(val) => setFormValue("remark", val)}
+              />
+            </View>
           </View>
 
           <View style={styles.buttonRow}>
@@ -960,11 +1163,23 @@ const styles = StyleSheet.create({
   inputGroup: { marginBottom: 15 },
   label: { fontSize: 14, fontWeight: "500", marginBottom: 5, color: "#444" },
   input: {
+    flex: 1,
+    borderWidth: 0,
+    padding: 10,
+    backgroundColor: "transparent",
+    minHeight: 40,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 6,
-    padding: 10,
     backgroundColor: "#fff",
+    paddingHorizontal: 10,
+  },
+  inputIcon: {
+    marginRight: 10,
   },
   inputError: { borderColor: "red" },
   disabledInput: { backgroundColor: "#f0f0f0", color: "#666" },
@@ -977,9 +1192,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     backgroundColor: "white",
   },
-  icon: { marginRight: 8 },
+  icon: { marginRight: 6, marginTop: 3 },
   placeholderStyle: { fontSize: 14, color: "#999" },
-  selectedAppTextStyle: { fontSize: 14 },
+  selectedTextStyle: { fontSize: 14 },
   // inputSearchStyle: { height: 40, fontSize: 14 },
   genderRow: { flexDirection: "row", gap: 10, marginTop: 5 },
   genderBtn: {
@@ -1036,12 +1251,10 @@ const styles = StyleSheet.create({
   },
   backBtnAppText: { color: "#666", fontWeight: "bold" },
   remarkInput: {
+    flex: 1,
     height: 100,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 6,
     padding: 10,
     backgroundColor: "#fff",
-    AppTextAlignVertical: "top",
+    textAlignVertical: "top",
   },
 });
