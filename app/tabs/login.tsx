@@ -62,7 +62,7 @@ export default function Login() {
 
       setLoading(false);
 
-      router.replace("/screens/addWorker");
+      router.replace("/screens/addVet");
 
     } catch (err) {
       console.log("LOGIN ERROR ", err);
