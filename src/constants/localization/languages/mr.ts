@@ -139,4 +139,6 @@ export default {
   egpurchasesource: "उदा. स्थानिक बाजार",
   egins: "उदा. INS-123456",
   eglactationnumber: "उदा. 2",
+  egtreatmentcost: "उपचाराचा खर्च लिहा",
+  egautocalculated: "वय मोजण्यासाठी जन्म तारीख निवडा",
 };

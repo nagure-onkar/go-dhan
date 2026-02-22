@@ -2,7 +2,8 @@ import { ENDPOINTS } from "@/api/endpoints";
 import { GET } from "@/api/methods";
 import AppText from "@/components/common/AppText";
 import { useLanguage } from "@/constants/localization/useLanguage";
-import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/theme/useTheme";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -147,6 +148,7 @@ const validateForm = (data, rules) => {
 
 export default function AddCalfForm() {
   const { t, setLanguage, language } = useLanguage();
+  const { colors } = useTheme();
 
   const [formData, setFormData] = useState({
     calfId: "",
@@ -157,7 +159,7 @@ export default function AddCalfForm() {
     HealthObservations: null,
     gender: "Female",
     calvingType: "",
-    treatment: "",
+    // treatment: "",
     nddbNumber: "",
     treatmentExpence: "",
     dob: null,
@@ -181,7 +183,7 @@ export default function AddCalfForm() {
     HealthObservations: null,
     gender: "Female",
     calvingType: "",
-    treatment: "",
+    // treatment: "",
     nddbNumber: "",
     treatmentExpence: "",
     dob: null,
@@ -301,7 +303,7 @@ export default function AddCalfForm() {
 
   const handleCancel = () => {
     router.back();
-    // setFormData(reset);
+    setFormData(reset);
   };
 
   const [screen1, setScreen1] = useState(true);
@@ -395,30 +397,36 @@ export default function AddCalfForm() {
   };
 
   if (isSaved) {
-    return <Success style={{ flex: 1, backgroundColor: "#bbffc4" }} />;
+    return <Success style={{ flex: 1, backgroundColor: colors.background }} />;
   }
 
   if (screen1) {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
       >
         <View style={styles.header}>
-          <AppText style={styles.headerTitle}>{t.addNewCalf}</AppText>
-          <AppText style={styles.headerSub}>{t.registerCalfDetails}</AppText>
+          <AppText style={[styles.headerTitle, { color: colors.text }]}>
+            {t.addNewCalf}
+          </AppText>
+          <AppText style={[styles.headerSub, { color: colors.text }]}>
+            {t.registerCalfDetails}
+          </AppText>
         </View>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled" // CRITICAL: Allows dropdown to click while keyboard is open
         >
-          <View style={styles.sectionCard}>
-            <AppText style={styles.sectionTitle}>{t.basicInformation}</AppText>
+          <View style={[styles.sectionCard, { backgroundColor: colors.card }]}>
+            <AppText style={[styles.sectionTitle, { color: colors.primary }]}>
+              {t.basicInformation}
+            </AppText>
             <View style={styles.separator} />
 
             {/* calf ID */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.calfId}
                 {req}
               </AppText>
@@ -429,8 +437,12 @@ export default function AddCalfForm() {
                 style={styles.inputIcon}
               />
               <TextInput
-                style={[styles.input, errors.calfId && styles.inputError]}
-                placeholder="e.g. CAF-001"
+                style={[
+                  styles.input,
+                  errors.calfId && styles.inputError,
+                  { color: colors.text, borderColor: colors.border },
+                ]}
+                placeholder={`${t.egcalf}`}
                 value={formData.calfId}
                 onChangeText={(val) =>
                   setFormData({ ...formData, calfId: val })
@@ -443,19 +455,23 @@ export default function AddCalfForm() {
 
             {/* calf Name */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.calfName}
                 {req}
               </AppText>
-              <Ionicons
-                name="paw-outline"
+              <MaterialCommunityIcons
+                name="cow"
                 size={20}
                 color="#666"
                 style={styles.inputIcon}
               />
               <TextInput
-                style={[styles.input, errors.calfName && styles.inputError]}
-                placeholder="e.g. Daisy"
+                style={[
+                  styles.input,
+                  errors.calfName && styles.inputError,
+                  { color: colors.text, borderColor: colors.border },
+                ]}
+                placeholder={`${t.egdaisy}`}
                 value={formData.calfName}
                 onChangeText={(val) =>
                   setFormData({ ...formData, calfName: val })
@@ -468,7 +484,7 @@ export default function AddCalfForm() {
 
             {/* Dropdown: calf Type Selection */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.calfType}
                 {req}
               </AppText>
@@ -477,9 +493,13 @@ export default function AddCalfForm() {
                   styles.dropdown,
                   focusState.calfType && { borderColor: "#2D6A4F" },
                   errors.calfType && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 // inputSearchStyle={styles.inputSearchStyle}
                 data={breed}
                 // search
@@ -520,7 +540,7 @@ export default function AddCalfForm() {
 
             {/* Dropdown: Breed Selection */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.breed}
                 {req}
               </AppText>
@@ -529,9 +549,13 @@ export default function AddCalfForm() {
                   styles.dropdown,
                   focusState.breed && { borderColor: "#2D6A4F" },
                   errors.breed && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 // inputSearchStyle={styles.inputSearchStyle}
                 data={
                   formData.calfType === "buffalo" ? buffaloBreeds : cowBreeds
@@ -565,9 +589,9 @@ export default function AddCalfForm() {
               )}
             </View>
 
-            {/* Treatment */}
+            {/* Treatment
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.treatment}
                 {req}
               </AppText>
@@ -578,7 +602,11 @@ export default function AddCalfForm() {
                 style={styles.inputIcon}
               />
               <TextInput
-                style={[styles.input, errors.treatment && styles.inputError]}
+                style={[
+                  styles.input,
+                  errors.treatment && styles.inputError,
+                  { color: colors.text, borderColor: colors.border },
+                ]}
                 placeholder="e.g. Vaccination"
                 value={formData.treatment}
                 onChangeText={(val) =>
@@ -588,11 +616,11 @@ export default function AddCalfForm() {
               {errors.treatment && (
                 <AppText style={styles.errorText}>{errors.treatment}</AppText>
               )}
-            </View>
+            </View> */}
 
             {/* Treatment Expence */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.treatmentExpence} (₹){req}
               </AppText>
               <Ionicons
@@ -605,8 +633,9 @@ export default function AddCalfForm() {
                 style={[
                   styles.input,
                   errors.treatmentExpence && styles.inputError,
+                  { color: colors.text, borderColor: colors.border },
                 ]}
-                placeholder="Enter treatment cost"
+                placeholder={`${t.egtreatmentcost}`}
                 value={formData.treatmentExpence}
                 keyboardType="numeric"
                 onChangeText={(val) =>
@@ -622,7 +651,7 @@ export default function AddCalfForm() {
 
             {/* Colostrum Intake */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.colostrumIntake}
                 {req}
               </AppText>
@@ -631,9 +660,13 @@ export default function AddCalfForm() {
                   styles.dropdown,
                   focusState.colostrumIntake && { borderColor: "#2D6A4F" },
                   errors.ColostrumIntake && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 // inputSearchStyle={styles.inputSearchStyle}
                 data={ColostrumIntakes}
                 // search
@@ -669,7 +702,7 @@ export default function AddCalfForm() {
 
             {/* Health Observations */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.healthObservations} {req}
               </AppText>
               <Dropdown
@@ -677,9 +710,13 @@ export default function AddCalfForm() {
                   styles.dropdown,
                   focusState.healthObservations && { borderColor: "#2D6A4F" },
                   errors.HealthObservations && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 // inputSearchStyle={styles.inputSearchStyle}
                 data={HealthObservations}
                 // search
@@ -720,7 +757,9 @@ export default function AddCalfForm() {
 
             {/* NDDB Number */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>{t.nddbNumber}</AppText>
+              <AppText style={[styles.label, { color: colors.text }]}>
+                {t.nddbNumber}
+              </AppText>
               <Ionicons
                 name="document-text-outline"
                 size={20}
@@ -728,8 +767,12 @@ export default function AddCalfForm() {
                 style={styles.inputIcon}
               />
               <TextInput
-                style={[styles.input, errors.nddbNumber && styles.inputError]}
-                placeholder="e.g. U01403DL2009NPL195142"
+                style={[
+                  styles.input,
+                  errors.nddbNumber && styles.inputError,
+                  { color: colors.text, borderColor: colors.border },
+                ]}
+                placeholder={`${t.egnddb}`}
                 value={formData.nddbNumber}
                 onChangeText={(val) =>
                   setFormData({ ...formData, nddbNumber: val })
@@ -741,7 +784,9 @@ export default function AddCalfForm() {
             </View>
 
             {/* Gender Selector */}
-            <AppText style={styles.label}>Gender{req}</AppText>
+            <AppText style={[styles.label, { color: colors.text }]}>
+              Gender{req}
+            </AppText>
             <View style={styles.genderRow}>
               {["Male", "Female"].map((gender) => (
                 <TouchableOpacity
@@ -766,11 +811,15 @@ export default function AddCalfForm() {
             </View>
           </View>
 
-          <View style={styles.sectionCard}>
-            <AppText style={styles.sectionTitle}>{t.basicInformation}</AppText>
+          <View style={[styles.sectionCard, { backgroundColor: colors.card }]}>
+            <AppText style={[styles.sectionTitle, { color: colors.primary }]}>
+              {t.basicInformation}
+            </AppText>
             <View style={styles.separator} />
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>Dam (Mother calf){req}</AppText>
+              <AppText style={[styles.label, { color: colors.text }]}>
+                Dam (Mother calf){req}
+              </AppText>
               <View style={styles.searchRow}>
                 <Ionicons
                   name="search-outline"
@@ -779,7 +828,10 @@ export default function AddCalfForm() {
                   style={styles.inputIconsearch}
                 />
                 <TextInput
-                  style={styles.searchInput}
+                  style={[
+                    styles.searchInput,
+                    { color: colors.text, borderColor: colors.border },
+                  ]}
                   placeholder="Search Mother by ID"
                   value={mothercalfId}
                   onChangeText={setMothercalfId}
@@ -811,7 +863,7 @@ export default function AddCalfForm() {
 
             {/* Calving Type */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.calvingType} {req}
               </AppText>
               <Dropdown
@@ -819,9 +871,13 @@ export default function AddCalfForm() {
                   styles.dropdown,
                   focusState.calvingType && { borderColor: "#2D6A4F" },
                   errors.calvingType && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 // inputSearchStyle={styles.inputSearchStyle}
                 data={calvingTypes}
                 // search
@@ -855,7 +911,7 @@ export default function AddCalfForm() {
 
             {/* DOB */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.dateOfBirth}
                 {req}
               </AppText>
@@ -869,11 +925,15 @@ export default function AddCalfForm() {
                 style={[
                   styles.input,
                   errors.dob && styles.inputError,
-                  { justifyContent: "center" },
+                  {
+                    justifyContent: "center",
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                  },
                 ]}
                 onPress={() => setShowDatePicker(true)}
               >
-                <AppText style={{ color: formData.dob ? "#000" : "#999" }}>
+                <AppText style={{ color: formData.dob ? colors.text : "#999" }}>
                   {formData.dob
                     ? formData.dob.toLocaleDateString()
                     : "Select Date"}
@@ -895,7 +955,9 @@ export default function AddCalfForm() {
 
             {/* Age (auto-calculated) */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>{t.age}</AppText>
+              <AppText style={[styles.label, { color: colors.text }]}>
+                {t.age}
+              </AppText>
               <Ionicons
                 name="return-up-forward-outline"
                 size={20}
@@ -907,8 +969,9 @@ export default function AddCalfForm() {
                   styles.input,
                   styles.disabledInput,
                   errors.age && styles.inputError,
+                  { color: colors.text, borderColor: colors.border },
                 ]}
-                placeholder="Select DOB to calculate age"
+                placeholder={`${t.egautocalculated}`}
                 value={formData.age}
                 editable={false}
               />
@@ -919,7 +982,7 @@ export default function AddCalfForm() {
 
             {/* Weight */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.weight}
                 {req}
               </AppText>
@@ -930,7 +993,11 @@ export default function AddCalfForm() {
                 style={styles.inputIcon}
               />
               <TextInput
-                style={[styles.input, errors.weight && styles.inputError]}
+                style={[
+                  styles.input,
+                  errors.weight && styles.inputError,
+                  { color: colors.text, borderColor: colors.border },
+                ]}
                 placeholder="500"
                 value={formData.weight}
                 keyboardType="numeric"
@@ -961,22 +1028,28 @@ export default function AddCalfForm() {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
       >
         <View style={styles.header}>
-          <AppText style={styles.headerTitle}>{t.addNewCalf}</AppText>
-          <AppText style={styles.headerSub}>{t.registerCalfDetails}</AppText>
+          <AppText style={[styles.headerTitle, { color: colors.text }]}>
+            {t.addNewCalf}
+          </AppText>
+          <AppText style={[styles.headerSub, { color: colors.text }]}>
+            {t.registerCalfDetails}
+          </AppText>
         </View>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.sectionCard}>
-            <AppText style={styles.sectionTitle}>{t.healthmanagement}</AppText>
+          <View style={[styles.sectionCard, { backgroundColor: colors.card }]}>
+            <AppText style={[styles.sectionTitle, { color: colors.primary }]}>
+              {t.healthmanagement}
+            </AppText>
             <View style={styles.separator} />
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.status}
                 {req}
               </AppText>
@@ -985,9 +1058,13 @@ export default function AddCalfForm() {
                   styles.dropdown,
                   isStatusFocus && { borderColor: "#2D6A4F" },
                   errors.status && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 data={calfStatuses}
                 maxHeight={300}
                 labelField="label"
@@ -1015,7 +1092,7 @@ export default function AddCalfForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.workerAssigned}
                 {req}
               </AppText>
@@ -1024,9 +1101,13 @@ export default function AddCalfForm() {
                   styles.dropdown,
                   isWorkerFocus && { borderColor: "#2D6A4F" },
                   errors.workerAssigned && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 data={workers}
                 maxHeight={300}
                 labelField="label"
@@ -1056,7 +1137,7 @@ export default function AddCalfForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.vetAssigned}
                 {req}
               </AppText>
@@ -1065,9 +1146,13 @@ export default function AddCalfForm() {
                   styles.dropdown,
                   isVetFocus && { borderColor: "#2D6A4F" },
                   errors.vetAssigned && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 data={vets}
                 maxHeight={300}
                 labelField="label"
@@ -1095,15 +1180,21 @@ export default function AddCalfForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>State{req}</AppText>
+              <AppText style={[styles.label, { color: colors.text }]}>
+                State{req}
+              </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
                   isStateFocus && { borderColor: "#2D6A4F" },
                   errors.state && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 data={calfStates}
                 maxHeight={300}
                 labelField="label"
@@ -1131,7 +1222,7 @@ export default function AddCalfForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.currentStateDate}
                 {req}
               </AppText>
@@ -1145,13 +1236,17 @@ export default function AddCalfForm() {
                 style={[
                   styles.input,
                   errors.currentStateDate && styles.inputError,
-                  { justifyContent: "center" },
+                  {
+                    justifyContent: "center",
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                  },
                 ]}
                 onPress={() => setShowHealthManagementDatePicker(true)}
               >
                 <AppText
                   style={{
-                    color: formData.currentStateDate ? "#000" : "#999",
+                    color: formData.currentStateDate ? colors.text : "#999",
                   }}
                 >
                   {formData.currentStateDate
@@ -1176,7 +1271,9 @@ export default function AddCalfForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>{t.insuranceNumber}</AppText>
+              <AppText style={[styles.label, { color: colors.text }]}>
+                {t.insuranceNumber}
+              </AppText>
               <Ionicons
                 name="shield-checkmark-outline"
                 size={20}
@@ -1187,8 +1284,9 @@ export default function AddCalfForm() {
                 style={[
                   styles.input,
                   errors.insuranceNumber && styles.inputError,
+                  { color: colors.text, borderColor: colors.border },
                 ]}
-                placeholder="e.g. INS-2024-001"
+                placeholder={`${t.egins}`}
                 value={formData.insuranceNumber}
                 onChangeText={(val) => setFormValue("insuranceNumber", val)}
               />
@@ -1212,7 +1310,9 @@ export default function AddCalfForm() {
           </View> */}
 
           <View style={styles.sectionCard}>
-            <AppText style={styles.sectionTitle}>{t.calfImages}</AppText>
+            <AppText style={[styles.sectionTitle, { color: colors.primary }]}>
+              {t.calfImages}
+            </AppText>
 
             <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
               <Ionicons name="cloud-upload-outline" size={30} color="#16a34a" />
@@ -1237,11 +1337,13 @@ export default function AddCalfForm() {
           </View>
 
           <View style={styles.sectionCard}>
-            <AppText style={styles.sectionTitle}>
+            <AppText style={[styles.sectionTitle, { color: colors.primary }]}>
               {t.additionalInformation}
             </AppText>
             <View style={styles.separator} />
-            <AppText style={styles.label}>{t.remarks}</AppText>
+            <AppText style={[styles.label, { color: colors.text }]}>
+              {t.remarks}
+            </AppText>
             <Ionicons
               name="reader-outline"
               size={20}
@@ -1249,7 +1351,14 @@ export default function AddCalfForm() {
               style={styles.remarkIcon}
             />
             <TextInput
-              style={styles.remarkInput}
+              style={[
+                styles.remarkInput,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  color: colors.text,
+                },
+              ]}
               placeholder="Add any additional remarks here..."
               multiline={true}
               numberOfLines={4}
@@ -1275,13 +1384,12 @@ export default function AddCalfForm() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f8f9fa" },
+  container: { flex: 1 },
   scrollContent: { padding: 20 },
   header: { paddingBottom: 8, marginLeft: 20, paddingTop: 30 },
-  headerTitle: { fontSize: 24, fontWeight: "bold", color: "#333" },
-  headerSub: { fontSize: 14, color: "#666" },
+  headerTitle: { fontSize: 24, fontWeight: "bold" },
+  headerSub: { fontSize: 14 },
   sectionCard: {
-    backgroundColor: "white",
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
@@ -1293,19 +1401,16 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#2D6A4F",
     marginBottom: 5,
   },
   separator: { height: 1, backgroundColor: "#eee", marginBottom: 15 },
   inputGroup: { marginBottom: 15 },
-  label: { fontSize: 14, fontWeight: "500", marginBottom: 5, color: "#444" },
+  label: { fontSize: 14, fontWeight: "500", marginBottom: 5 },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 6,
     paddingHorizontal: 10,
     paddingLeft: 40,
-    backgroundColor: "#fff",
     height: 50,
     justifyContent: "center",
   },
@@ -1323,15 +1428,13 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   inputError: { borderColor: "red" },
-  disabledInput: { backgroundColor: "#f0f0f0", color: "#666" },
+  disabledInput: { backgroundColor: "#f0f0f0" },
   errorText: { color: "red", fontSize: 11, marginTop: 4 },
   dropdown: {
     height: 50,
-    borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 6,
     paddingHorizontal: 8,
-    backgroundColor: "white",
   },
   icon: { marginRight: 8 },
   placeholderStyle: { fontSize: 14, color: "#999" },
@@ -1381,11 +1484,9 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 6,
     paddingHorizontal: 10,
     paddingLeft: 40,
-    backgroundColor: "#fff",
   },
   searchButton: {
     backgroundColor: "#2D6A4F",
@@ -1440,11 +1541,9 @@ const styles = StyleSheet.create({
   remarkInput: {
     height: 100,
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 6,
     padding: 10,
     paddingLeft: 40,
-    backgroundColor: "#fff",
     textAlignVertical: "top",
   },
 });

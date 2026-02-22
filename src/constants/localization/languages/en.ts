@@ -139,4 +139,6 @@ export default {
   egpurchasesource: "e.g. Local Market",
   egins: "e.g. INS-123456",
   eglactationnumber: "e.g. 2",
+  egtreatmentcost: "Enter treatment cost",
+  egautocalculated: "Select DOB to calculate age",
 };

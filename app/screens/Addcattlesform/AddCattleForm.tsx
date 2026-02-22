@@ -1,6 +1,7 @@
 import AppText from "@/components/common/AppText";
 import { useLanguage } from "@/constants/localization/useLanguage";
-import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/theme/useTheme";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -119,6 +120,7 @@ const reset = {
 
 export default function AddCattleForm() {
   const { t, setLanguage, language } = useLanguage();
+  const { colors } = useTheme();
   const [isSaved, setIsSaved] = useState(false);
   const [formData, setFormData] = useState({
     cattleId: "",
@@ -303,30 +305,36 @@ export default function AddCattleForm() {
   };
 
   if (isSaved) {
-    return <Success style={{ flex: 1, backgroundColor: "#bbffc4" }} />;
+    return <Success style={{ flex: 1, backgroundColor: colors.background }} />;
   }
 
   if (screen1) {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
       >
         <View style={styles.header}>
-          <AppText style={styles.headerTitle}>{t.addNewCattle}</AppText>
-          <AppText style={styles.headerSub}>{t.registerCattleDetails} </AppText>
+          <AppText style={[styles.headerTitle, { color: colors.text }]}>
+            {t.addNewCattle}
+          </AppText>
+          <AppText style={[styles.headerSub, { color: colors.text }]}>
+            {t.registerCattleDetails}{" "}
+          </AppText>
         </View>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled" // CRITICAL: Allows dropdown to click while keyboard is open
         >
-          <View style={styles.sectionCard}>
-            <AppText style={styles.sectionTitle}>{t.basicInformation}</AppText>
+          <View style={[styles.sectionCard, { backgroundColor: colors.card }]}>
+            <AppText style={[styles.sectionTitle, { color: colors.primary }]}>
+              {t.basicInformation}
+            </AppText>
             <View style={styles.separator} />
 
             {/* Cattle ID */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.cattleId}
                 {req}
               </AppText>
@@ -334,6 +342,7 @@ export default function AddCattleForm() {
                 style={[
                   styles.inputContainer,
                   errors.cattleId && styles.inputError,
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
                 <Ionicons
@@ -343,7 +352,7 @@ export default function AddCattleForm() {
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder={`${t.egctl}`}
                   value={formData.cattleId}
                   onChangeText={(val) =>
@@ -358,7 +367,7 @@ export default function AddCattleForm() {
 
             {/* Cattle Name */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.cattleName}
                 {req}
               </AppText>
@@ -366,16 +375,17 @@ export default function AddCattleForm() {
                 style={[
                   styles.inputContainer,
                   errors.cattleName && styles.inputError,
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
-                <Ionicons
-                  name="person-outline"
+                <MaterialCommunityIcons
+                  name="cow"
                   size={20}
                   color="#666"
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder={`${t.egdaisy}`}
                   value={formData.cattleName}
                   onChangeText={(val) =>
@@ -392,7 +402,7 @@ export default function AddCattleForm() {
 
             {/* Dropdown: Cattle Type Selection */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.cattleType}
                 {req}
               </AppText>
@@ -401,9 +411,13 @@ export default function AddCattleForm() {
                   styles.dropdown,
                   isCattleTypeFocus && { borderColor: "#2D6A4F" },
                   errors.cattleType && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 data={cattleType}
                 maxHeight={300}
                 labelField="label"
@@ -439,7 +453,7 @@ export default function AddCattleForm() {
 
             {/* Dropdown: Breed Selection */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.breed}
                 {req}
               </AppText>
@@ -448,9 +462,13 @@ export default function AddCattleForm() {
                   styles.dropdown,
                   isBreedFocus && { borderColor: "#2D6A4F" },
                   errors.breed && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 data={
                   formData.cattleType === "buffalo" ? buffaloBreeds : cowBreeds
                 }
@@ -483,13 +501,14 @@ export default function AddCattleForm() {
 
             {/* Treatment given */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 Treatment Given At Purchase{req}
               </AppText>
               <View
                 style={[
                   styles.inputContainer,
                   errors.treatment && styles.inputError,
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
                 <Ionicons
@@ -499,7 +518,7 @@ export default function AddCattleForm() {
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder={`${t.egdeworming}`}
                   value={formData.treatment}
                   onChangeText={(val) =>
@@ -516,11 +535,14 @@ export default function AddCattleForm() {
 
             {/* NDDB Number */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>{t.nddbNumber}</AppText>
+              <AppText style={[styles.label, { color: colors.text }]}>
+                {t.nddbNumber}
+              </AppText>
               <View
                 style={[
                   styles.inputContainer,
                   errors.nddbNumber && styles.inputError,
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
                 <Ionicons
@@ -530,7 +552,7 @@ export default function AddCattleForm() {
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder={`${t.egnddb}`}
                   value={formData.nddbNumber}
                   onChangeText={(val) =>
@@ -546,7 +568,7 @@ export default function AddCattleForm() {
             </View>
 
             {/* Gender Selector */}
-            <AppText style={styles.label}>
+            <AppText style={[styles.label, { color: colors.text }]}>
               {t.gender}
               {req}
             </AppText>
@@ -574,13 +596,15 @@ export default function AddCattleForm() {
             </View>
           </View>
 
-          <View style={styles.sectionCard}>
-            <AppText style={styles.sectionTitle}>{t.purchaseDetails}</AppText>
+          <View style={[styles.sectionCard, { backgroundColor: colors.card }]}>
+            <AppText style={[styles.sectionTitle, { color: colors.primary }]}>
+              {t.purchaseDetails}
+            </AppText>
             <View style={styles.separator} />
 
             {/* Cattle ID */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.purchaseCost}
                 {req}
               </AppText>
@@ -588,6 +612,7 @@ export default function AddCattleForm() {
                 style={[
                   styles.inputContainer,
                   errors.purchaseCost && styles.inputError,
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
                 <Ionicons
@@ -597,7 +622,7 @@ export default function AddCattleForm() {
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder="50000"
                   value={formData.purchaseCost}
                   keyboardType="numeric"
@@ -615,7 +640,7 @@ export default function AddCattleForm() {
 
             {/* Cattle Name */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.purchaseSource}
                 {req}
               </AppText>
@@ -623,6 +648,7 @@ export default function AddCattleForm() {
                 style={[
                   styles.inputContainer,
                   errors.purchaseSource && styles.inputError,
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
                 <Ionicons
@@ -632,7 +658,7 @@ export default function AddCattleForm() {
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder="e.g. Local Farm"
                   value={formData.purchaseSource}
                   onChangeText={(val) =>
@@ -649,7 +675,7 @@ export default function AddCattleForm() {
 
             {/* Cattle ID */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.dateOfBirth}
                 {req}
               </AppText>
@@ -657,7 +683,12 @@ export default function AddCattleForm() {
                 style={[
                   styles.inputContainer,
                   errors.dob && styles.inputError,
-                  { justifyContent: "flex-start", alignItems: "center" },
+                  {
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                  },
                 ]}
                 onPress={() => setDatePickerFor("dob")}
               >
@@ -669,7 +700,7 @@ export default function AddCattleForm() {
                 />
                 <AppText
                   style={{
-                    color: formData.dob ? "#000" : "#999",
+                    color: formData.dob ? colors.text : "#999",
                     paddingVertical: 10,
                   }}
                 >
@@ -694,12 +725,15 @@ export default function AddCattleForm() {
 
             {/* Age (auto-calculated) */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>{t.age}</AppText>
+              <AppText style={[styles.label, { color: colors.text }]}>
+                {t.age}
+              </AppText>
               <View
                 style={[
                   styles.inputContainer,
                   styles.disabledInput,
                   errors.age && styles.inputError,
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
                 <Ionicons
@@ -709,7 +743,11 @@ export default function AddCattleForm() {
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={[styles.input, styles.disabledInput]}
+                  style={[
+                    styles.input,
+                    styles.disabledInput,
+                    { color: colors.text },
+                  ]}
                   placeholder="Select DOB to calculate age"
                   value={formData.age}
                   editable={false}
@@ -722,7 +760,7 @@ export default function AddCattleForm() {
 
             {/* Cattle ID */}
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.weight}
                 {req}
               </AppText>
@@ -730,6 +768,7 @@ export default function AddCattleForm() {
                 style={[
                   styles.inputContainer,
                   errors.weight && styles.inputError,
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
                 <Ionicons
@@ -739,7 +778,7 @@ export default function AddCattleForm() {
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder="500"
                   value={formData.weight}
                   keyboardType="numeric"
@@ -771,11 +810,13 @@ export default function AddCattleForm() {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
       >
         <View style={styles.header}>
-          <AppText style={styles.headerTitle}>{t.addCattle}</AppText>
-          <AppText style={styles.headerSub}>
+          <AppText style={[styles.headerTitle, { color: colors.text }]}>
+            {t.addCattle}
+          </AppText>
+          <AppText style={[styles.headerSub, { color: colors.text }]}>
             Register a Cattle with details
           </AppText>
         </View>
@@ -783,12 +824,14 @@ export default function AddCattleForm() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.sectionCard}>
-            <AppText style={styles.sectionTitle}>{t.healthmanagement}</AppText>
+          <View style={[styles.sectionCard, { backgroundColor: colors.card }]}>
+            <AppText style={[styles.sectionTitle, { color: colors.primary }]}>
+              {t.healthmanagement}
+            </AppText>
             <View style={styles.separator} />
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.status}
                 {req}
               </AppText>
@@ -797,9 +840,13 @@ export default function AddCattleForm() {
                   styles.dropdown,
                   isStatusFocus && { borderColor: "#2D6A4F" },
                   errors.status && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 data={cattleStatuses}
                 maxHeight={300}
                 labelField="label"
@@ -827,7 +874,7 @@ export default function AddCattleForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.workerAssigned}
                 {req}
               </AppText>
@@ -836,9 +883,13 @@ export default function AddCattleForm() {
                   styles.dropdown,
                   isWorkerFocus && { borderColor: "#2D6A4F" },
                   errors.workerAssigned && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 data={workers}
                 maxHeight={300}
                 labelField="label"
@@ -868,7 +919,7 @@ export default function AddCattleForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.vetAssigned}
                 {req}
               </AppText>
@@ -877,9 +928,13 @@ export default function AddCattleForm() {
                   styles.dropdown,
                   isVetFocus && { borderColor: "#2D6A4F" },
                   errors.vetAssigned && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 data={vets}
                 maxHeight={300}
                 labelField="label"
@@ -909,7 +964,7 @@ export default function AddCattleForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.state}
                 {req}
               </AppText>
@@ -918,9 +973,13 @@ export default function AddCattleForm() {
                   styles.dropdown,
                   isStateFocus && { borderColor: "#2D6A4F" },
                   errors.state && { borderColor: "red" },
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: colors.text },
+                ]}
                 data={cattleStates}
                 maxHeight={300}
                 labelField="label"
@@ -948,7 +1007,7 @@ export default function AddCattleForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.currentStateDate}
                 {req}
               </AppText>
@@ -956,7 +1015,12 @@ export default function AddCattleForm() {
                 style={[
                   styles.inputContainer,
                   errors.currentStateDate && styles.inputError,
-                  { justifyContent: "flex-start", alignItems: "center" },
+                  {
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                  },
                 ]}
                 onPress={() => setDatePickerFor("currentState")}
               >
@@ -968,7 +1032,7 @@ export default function AddCattleForm() {
                 />
                 <AppText
                   style={{
-                    color: formData.currentStateDate ? "#000" : "#999",
+                    color: formData.currentStateDate ? colors.text : "#999",
                     paddingVertical: 10,
                   }}
                 >
@@ -994,11 +1058,14 @@ export default function AddCattleForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>{t.bloodLine}</AppText>
+              <AppText style={[styles.label, { color: colors.text }]}>
+                {t.bloodLine}
+              </AppText>
               <View
                 style={[
                   styles.inputContainer,
                   errors.bloodLine && styles.inputError,
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
                 <Ionicons
@@ -1008,7 +1075,7 @@ export default function AddCattleForm() {
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   value={formData.bloodLine}
                   onChangeText={(val) => setFormValue("bloodLine", val)}
                 />
@@ -1021,11 +1088,14 @@ export default function AddCattleForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>{t.insuranceNumber}</AppText>
+              <AppText style={[styles.label, { color: colors.text }]}>
+                {t.insuranceNumber}
+              </AppText>
               <View
                 style={[
                   styles.inputContainer,
                   errors.insuranceNumber && styles.inputError,
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
                 <Ionicons
@@ -1035,7 +1105,7 @@ export default function AddCattleForm() {
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder={`${t.egins}`}
                   value={formData.insuranceNumber}
                   onChangeText={(val) => setFormValue("insuranceNumber", val)}
@@ -1049,7 +1119,7 @@ export default function AddCattleForm() {
             </View>
 
             <View style={styles.inputGroup}>
-              <AppText style={styles.label}>
+              <AppText style={[styles.label, { color: colors.text }]}>
                 {t.lactationNumber}
                 {req}
               </AppText>
@@ -1057,6 +1127,7 @@ export default function AddCattleForm() {
                 style={[
                   styles.inputContainer,
                   errors.lactationNumber && styles.inputError,
+                  { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
                 <Ionicons
@@ -1066,7 +1137,7 @@ export default function AddCattleForm() {
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder={`${t.eglactationnumber}`}
                   value={formData.lactationNumber}
                   keyboardType="numeric"
@@ -1082,7 +1153,9 @@ export default function AddCattleForm() {
           </View>
 
           <View style={styles.sectionCard}>
-            <AppText style={styles.sectionTitle}>{t.cattleImages}</AppText>
+            <AppText style={[styles.sectionTitle, { color: colors.text }]}>
+              {t.cattleImages}
+            </AppText>
             <View style={styles.separator} />
             <TouchableOpacity style={styles.uploadBox}>
               <Ionicons name="cloud-upload-outline" size={40} color="#000000" />
@@ -1093,15 +1166,22 @@ export default function AddCattleForm() {
           </View>
 
           <View style={styles.sectionCard}>
-            <AppText style={styles.sectionTitle}>
+            <AppText style={[styles.sectionTitle, { color: colors.text }]}>
               {t.additionalInformation}
             </AppText>
             <View style={styles.separator} />
-            <AppText style={styles.label}>{t.remarks}</AppText>
+            <AppText style={[styles.label, { color: colors.text }]}>
+              {t.remarks}
+            </AppText>
             <View
               style={[
                 styles.inputContainer,
-                { minHeight: 100, alignItems: "flex-start" },
+                {
+                  minHeight: 100,
+                  alignItems: "flex-start",
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                },
               ]}
             >
               <Ionicons
@@ -1111,7 +1191,7 @@ export default function AddCattleForm() {
                 style={[styles.inputIcon, { paddingTop: 10 }]}
               />
               <TextInput
-                style={styles.remarkInput}
+                style={[styles.remarkInput, { color: colors.text }]}
                 placeholder="Add any additional remarks here..."
                 multiline={true}
                 numberOfLines={4}
@@ -1138,13 +1218,12 @@ export default function AddCattleForm() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f8f9fa" },
+  container: { flex: 1 },
   scrollContent: { padding: 20 },
   header: { paddingBottom: 8, marginLeft: 20, paddingTop: 30 },
-  headerTitle: { fontSize: 24, fontWeight: "bold", color: "#333" },
-  headerSub: { fontSize: 14, color: "#666" },
+  headerTitle: { fontSize: 24, fontWeight: "bold" },
+  headerSub: { fontSize: 14 },
   sectionCard: {
-    backgroundColor: "white",
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
@@ -1156,12 +1235,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#2D6A4F",
     marginBottom: 5,
   },
   separator: { height: 1, backgroundColor: "#eee", marginBottom: 15 },
   inputGroup: { marginBottom: 15 },
-  label: { fontSize: 14, fontWeight: "500", marginBottom: 5, color: "#444" },
+  label: { fontSize: 14, fontWeight: "500", marginBottom: 5 },
   input: {
     flex: 1,
     borderWidth: 0,
@@ -1173,24 +1251,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 6,
-    backgroundColor: "#fff",
     paddingHorizontal: 10,
   },
   inputIcon: {
     marginRight: 10,
   },
   inputError: { borderColor: "red" },
-  disabledInput: { backgroundColor: "#f0f0f0", color: "#666" },
+  disabledInput: { backgroundColor: "#f0f0f0" },
   errorAppText: { color: "red", fontSize: 11, marginTop: 4 },
   dropdown: {
     height: 50,
-    borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 6,
     paddingHorizontal: 8,
-    backgroundColor: "white",
   },
   icon: { marginRight: 6, marginTop: 3 },
   placeholderStyle: { fontSize: 14, color: "#999" },
@@ -1254,7 +1328,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 100,
     padding: 10,
-    backgroundColor: "#fff",
     textAlignVertical: "top",
   },
 });
