@@ -3,15 +3,16 @@ import { POST } from "@/api/methods";
 import { Ionicons } from "@expo/vector-icons";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 import { session } from "@/store/session";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Redirect } from "expo-router";
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function Index() {
@@ -36,7 +37,7 @@ export default function Index() {
       });
 
       // ✅ Store token
-      //   await AsyncStorage.setItem("access_token", response.access_token);
+      await AsyncStorage.setItem("access_token", response.access_token);
       session.setToken(response.access_token);
 
       setLoggedIn(true);
@@ -50,7 +51,7 @@ export default function Index() {
 
   // ✅ Redirect after login
   if (loggedIn) {
-    return <Redirect href="/tabs" />;
+    return <Redirect href="/tabs/dashboard" />;
   }
 
   return (

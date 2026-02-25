@@ -1,32 +1,27 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState } from "react";
 
-import AppText from '../../src/components/common/AppText';
-import ScreenWrapper from '../../src/components/common/ScreenWrapper';
-import { useLanguage } from '../../src/constants/localization/useLanguage';
-import spacing from '../../src/constants/spacing';
-import { useTheme } from '../../src/theme/useTheme';
+import AppText from "../../src/components/common/AppText";
+import ScreenWrapper from "../../src/components/common/ScreenWrapper";
+import { useLanguage } from "../../src/constants/localization/useLanguage";
+import spacing from "../../src/constants/spacing";
+import { useTheme } from "../../src/theme/useTheme";
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
   Dimensions,
   RefreshControl,
-
   ScrollView,
   StyleSheet,
-
   TouchableOpacity,
   View,
-} from 'react-native';
-
-
+} from "react-native";
 
 const BASE_URL = "https://astrabytte-ai.onrender.com/api/v1";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const ICON_SIZES = {
   header: 28,
@@ -34,10 +29,6 @@ const ICON_SIZES = {
   stat: 22,
   expense: 20,
 };
-
-
-
-
 
 interface StatsData {
   totalAnimals: number;
@@ -55,79 +46,77 @@ interface Activity {
   id: number;
   message: string;
   time: string;
-  type: 'treatment' | 'milking' | 'health' | 'general';
+  type: "treatment" | "milking" | "health" | "general";
 }
 
 const DashboardScreen: React.FC = () => {
-
-  const { colors } = useTheme();     
-  const { t } = useLanguage();      
+  const { colors } = useTheme();
+  const { t } = useLanguage();
   const styles = createStyles(colors);
   const [stats, setStats] = useState<StatsData | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [farmName] = useState('Dairy Farm');
+  const [farmName] = useState("Dairy Farm");
 
   const fetchDashboardData = async () => {
-  try {
-    const token = await AsyncStorage.getItem("authToken");
+    try {
+      const token = await AsyncStorage.getItem("access_token");
 
-    if (!token) {
-      console.log("No token found");
-      return;
-    }
+      console.log("Auth Token: ", token);
 
-    const response = await fetch(
-      "https://astrabytte-ai.onrender.com/api/v1/dashboard/stats",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+      if (!token) {
+        console.log("No token found");
+        return;
       }
-    );
 
-    const data = await response.json();
+      const response = await fetch(
+        "https://astrabytte-ai.onrender.com/api/v1/dashboard/stats",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch dashboard");
+      const data = await response.json();
+
+      console.log("\n📦 Pretty Response:\n", JSON.stringify(data, null, 2));
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch dashboard");
+      }
+
+      setStats(data.stats);
+      setActivities(data.activities);
+    } catch (error) {
+      console.log("Dashboard error:", error);
+    } finally {
+      setLoading(false);
     }
-
-    setStats(data.stats);
-    setActivities(data.activities);
-
-  } catch (error) {
-    console.log("Dashboard error:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
   useEffect(() => {
-  setLoading(true);
-  fetchDashboardData();
-}, []);
+    setLoading(true);
+    fetchDashboardData();
+  }, []);
 
-  
-
-const getStoredToken = async () => {
-  return await AsyncStorage.getItem('authToken');
-};
+  const getStoredToken = async () => {
+    return await AsyncStorage.getItem("access_token");
+  };
 
   const onRefresh = async () => {
-  setRefreshing(true);
-  await fetchDashboardData();
-  setRefreshing(false);
-};
+    setRefreshing(true);
+    await fetchDashboardData();
+    setRefreshing(false);
+  };
 
   return (
     <ScreenWrapper>
-  <LinearGradient
-    colors={[colors.background, colors.card]}
-
+      <LinearGradient
+        colors={[colors.background, colors.card]}
         style={styles.gradient}
-        
       >
         <ScrollView
           style={styles.container}
@@ -139,7 +128,6 @@ const getStoredToken = async () => {
               tintColor={colors.primary}
             />
           }
-          
         >
           <HeaderSection farmName={farmName} />
 
@@ -198,10 +186,7 @@ const getStoredToken = async () => {
                   subtext="Appointments today"
                 />
                 <StatCard
-                  containerStyle={[
-                    styles.statCardTwo,
-                    styles.statCardTwoLast,
-                  ]}
+                  containerStyle={[styles.statCardTwo, styles.statCardTwoLast]}
                   label="Upcoming Treatment"
                   value={stats.upcomingTreatments.toString()}
                   icon="calendar-clock"
@@ -230,7 +215,7 @@ const getStoredToken = async () => {
                 </AppText>
               </View>
 
-             <SectionTitle title={t.staff} />
+              <SectionTitle title={t.staff} />
               <View style={styles.cardRowTwo}>
                 <StatCard
                   containerStyle={styles.statCardTwo}
@@ -243,10 +228,7 @@ const getStoredToken = async () => {
                   compact
                 />
                 <StatCard
-                  containerStyle={[
-                    styles.statCardTwo,
-                    styles.statCardTwoLast,
-                  ]}
+                  containerStyle={[styles.statCardTwo, styles.statCardTwoLast]}
                   label="Veterinarians"
                   value={stats.veterinarians.toString()}
                   icon="doctor"
@@ -273,8 +255,6 @@ const getStoredToken = async () => {
    UNCHANGED FROM YOUR ORIGINAL FILE
 -------------------------------------------------- */
 
-
-
 interface HeaderSectionProps {
   farmName: string;
 }
@@ -284,35 +264,32 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({ farmName }) => {
   const styles = createStyles(colors);
 
   return (
-
-  <View style={styles.headerContainer}>
-    <View style={styles.headerContent}>
-      <View style={styles.headerIconContainer}>
+    <View style={styles.headerContainer}>
+      <View style={styles.headerContent}>
+        <View style={styles.headerIconContainer}>
+          <MaterialCommunityIcons
+            name="home"
+            size={ICON_SIZES.header}
+            color={colors.card}
+          />
+        </View>
+        <View style={styles.headerTextContainer}>
+          <AppText style={styles.farmName}>{farmName}</AppText>
+          <AppText style={styles.headerSubtext}>Dairy Farm Dashboard</AppText>
+        </View>
+      </View>
+      <TouchableOpacity style={styles.notificationButton}>
         <MaterialCommunityIcons
-          name="home"
-          size={ICON_SIZES.header}
+          name="bell"
+          size={ICON_SIZES.notification}
           color={colors.card}
         />
-      </View>
-      <View style={styles.headerTextContainer}>
-        <AppText style={styles.farmName}>{farmName}</AppText>
-        <AppText style={styles.headerSubtext}>
-          Dairy Farm Dashboard
-        </AppText>
-      </View>
+        <View style={styles.notificationBadge}>
+          <AppText style={styles.notificationCount}>3</AppText>
+        </View>
+      </TouchableOpacity>
     </View>
-    <TouchableOpacity style={styles.notificationButton}>
-      <MaterialCommunityIcons
-        name="bell"
-        size={ICON_SIZES.notification}
-        color={colors.card}
-      />
-      <View style={styles.notificationBadge}>
-        <AppText style={styles.notificationCount}>3</AppText>
-      </View>
-    </TouchableOpacity>
-  </View>
-);
+  );
 };
 
 interface StatCardProps {
@@ -367,7 +344,6 @@ const StatCard: React.FC<StatCardProps> = ({
   );
 };
 
-
 interface SectionTitleProps {
   title: string;
 }
@@ -384,7 +360,6 @@ const SectionTitle: React.FC<SectionTitleProps> = ({ title }) => {
   );
 };
 
-
 interface ActivityListProps {
   activities: Activity[];
 }
@@ -399,12 +374,8 @@ const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
         <View key={activity.id} style={styles.activityItem}>
           <View style={styles.activityDot} />
           <View style={styles.activityContent}>
-            <AppText style={styles.activityMessage}>
-              {activity.message}
-            </AppText>
-            <AppText style={styles.activityTime}>
-              {activity.time}
-            </AppText>
+            <AppText style={styles.activityMessage}>{activity.message}</AppText>
+            <AppText style={styles.activityTime}>{activity.time}</AppText>
           </View>
         </View>
       ))}
@@ -413,243 +384,242 @@ const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
 };
 const createStyles = (colors: any) =>
   StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    gradient: {
+      flex: 1,
+    },
+    container: {
+      flex: 1,
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.md,
+    },
 
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  gradient: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-  },
+    headerContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 24,
+      paddingVertical: spacing.md,
+    },
+    headerContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      flex: 1,
+    },
+    headerIconContainer: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: colors.primary,
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: 12,
+    },
+    headerTextContainer: {
+      flex: 1,
+    },
+    farmName: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: 4,
+    },
+    headerSubtext: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    notificationButton: {
+      position: "relative",
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colors.primary,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    notificationBadge: {
+      position: "absolute",
+      top: -6,
+      right: -6,
+      backgroundColor: colors.primary,
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    notificationCount: {
+      color: colors.card,
+      fontSize: 12,
+      fontWeight: "700",
+    },
 
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-    paddingVertical: spacing.md,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  headerIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  headerTextContainer: {
-    flex: 1,
-  },
-  farmName: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  headerSubtext: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  notificationButton: {
-    position: 'relative',
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  notificationBadge: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    backgroundColor: colors.primary,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  notificationCount: {
-    color: colors.card,
-    fontSize: 12,
-    fontWeight: '700',
-  },
+    cardGrid: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 12,
+    },
+    statCard: {
+      width: "32%",
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      padding: spacing.sm,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+      flexDirection: "column",
+    },
+    statCardCompact: {
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      borderRadius: 12,
+    },
 
-  cardGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  statCard: {
-    width: '32%',
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: spacing.sm,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    flexDirection: 'column',
-  },
-  statCardCompact: {
-  paddingVertical: spacing.xs,
-  paddingHorizontal: spacing.sm,
-  borderRadius: 12,
-},
+    statCardFullWidth: {
+      width: "100%",
+      marginRight: 0,
+    },
+    iconContainer: {
+      width: 42,
+      height: 42,
+      borderRadius: 221,
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 12,
+    },
+    statContent: {
+      flex: 1,
+    },
+    statLabel: {
+      fontSize: 11,
+      color: colors.textSecondary,
+      marginBottom: 6,
+      fontWeight: "500",
+    },
+    statValue: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: 8,
+    },
+    statSubtext: {
+      fontSize: 10,
+      color: colors.primary,
+      fontWeight: "600",
+    },
 
-  statCardFullWidth: {
-    width: '100%',
-    marginRight: 0,
-  },
-  iconContainer: {
-    width: 42,
-    height: 42,
-    borderRadius: 221,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  statContent: {
-    flex: 1,
-  },
-  statLabel: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    marginBottom: 6,
-    fontWeight: '500',
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 8,
-  },
-  statSubtext: {
-    fontSize: 10,
-    color: colors.primary,
-    fontWeight: '600',
-  },
+    cardRowTwo: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 12,
+    },
+    statCardTwo: {
+      width: "49%",
+    },
+    statCardTwoLast: {
+      marginRight: 0,
+    },
 
-  cardRowTwo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  statCardTwo: {
-    width: '49%',
-  },
-  statCardTwoLast: {
-    marginRight: 0,
-  },
+    expenseCard: {
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      padding: spacing.lg,
+      marginBottom: spacing.xl,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.primary,
+    },
+    expenseHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: spacing.sm,
+    },
+    expenseLabel: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginLeft: spacing.sm,
+      fontWeight: "600",
+    },
+    expenseAmount: {
+      fontSize: 32,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: 4,
+    },
+    expenseSubtext: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
 
-  expenseCard: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: spacing.lg,
-    marginBottom: spacing.xl,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.primary,
-  },
-  expenseHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  expenseLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginLeft: spacing.sm,
-    fontWeight: '600',
-  },
-  expenseAmount: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  expenseSubtext: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
+    sectionTitleContainer: {
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: spacing.xs,
+    },
+    sectionDivider: {
+      height: 3,
+      backgroundColor: colors.primary,
+      width: 40,
+      borderRadius: 1.5,
+    },
 
-  sectionTitleContainer: {
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  sectionDivider: {
-    height: 3,
-    backgroundColor: colors.primary,
-    width: 40,
-    borderRadius: 1.5,
-  },
+    activityContainer: {
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      padding: spacing.md,
+      marginBottom: spacing.xl,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    activityItem: {
+      flexDirection: "row",
+      paddingVertical: spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: "#f0f0f0",
+    },
+    activityDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: colors.primary,
+      marginTop: 6,
+      marginRight: spacing.sm,
+    },
+    activityContent: {
+      flex: 1,
+    },
+    activityMessage: {
+      fontSize: 14,
+      color: colors.text,
+      fontWeight: "500",
+      marginBottom: 4,
+    },
+    activityTime: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
 
-  activityContainer: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: spacing.md,
-    marginBottom: spacing.xl,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  activityItem: {
-    flexDirection: 'row',
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  activityDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.primary,
-    marginTop: 6,
-    marginRight: spacing.sm,
-  },
-  activityContent: {
-    flex: 1,
-  },
-  activityMessage: {
-    fontSize: 14,
-    color: colors.text,
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  activityTime: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-
-  bottomSpacing: {
-    height: 40,
-  },
-});
+    bottomSpacing: {
+      height: 40,
+    },
+  });
 
 export default DashboardScreen;
