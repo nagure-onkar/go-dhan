@@ -12,6 +12,8 @@ import {
 import AppText from '../../src/components/common/AppText';
 import ScreenWrapper from '../../src/components/common/ScreenWrapper';
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
@@ -34,20 +36,61 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
   if (selectedDate) setDate(selectedDate);
 };
 
+const BASE_URL = "https://astrabytte-ai.onrender.com/api/v1/milk/profit/daily";
+
   const [form, setForm] = useState({
-    cattleType: "cow",
-    date: "10-02-2026",
-    recordType: "",
-     forCalf: "",
-  inHouseUtility: "",
   totalMilkProduced: "",
   forWorkers: "",
+  forCalf: "",
+  inHouseUtility: "",
   wastage: "",
   actualProduced: "",
   fat: "",
   snf: "",
+  expectedRate: "",
   expectedTotal: "",
-  });
+  salesLitres: "",
+  salesFat: "",
+  salesSnf: "",
+  orgRate: "",
+  orgTotal: "",
+});
+
+const handleSave = async () => {
+  try {
+    const token = await AsyncStorage.getItem("token");
+
+    const payload = {
+      cattleType,
+      date: date.toISOString(),
+      recordType,
+      ...form,
+    };
+
+    const response = await fetch(
+      "https://astrabytte-ai.onrender.com/api/v1/milk/profit/daily",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      Alert.alert("Success", "Record saved successfully");
+    } else {
+      Alert.alert("Error", data.message || "Something went wrong");
+    }
+  } catch (error) {
+    console.log(error);
+    Alert.alert("Error", "Server error");
+  }
+};
 
   const [cattleType, setCattleType] = React.useState("cow");
   const [recordType, setRecordType] = React.useState("");
@@ -165,40 +208,89 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
         <View style={styles.row}>
           <View style={styles.col}>
             <AppText style={styles.label}>Total Milk Produced</AppText>
-            <TextInput style={styles.input}  keyboardType="numeric" />
+            <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.totalMilkProduced}
+  onChangeText={(text) =>
+    setForm({ ...form, totalMilkProduced: text })
+  }
+/>
           </View>
           <View style={styles.col}>
             <AppText style={styles.label}>For Workers</AppText>
-            <TextInput style={styles.input}  keyboardType="numeric" />
+            <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.forWorkers}
+  onChangeText={(text) =>
+    setForm({ ...form, forWorkers: text })
+  }
+/>
           </View>
         </View>
 
         <View style={styles.row}>
           <View style={styles.col}>
             <AppText style={styles.label}>For Calf</AppText>
-            <TextInput style={styles.input}  keyboardType="numeric" />
+            <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.forCalf}
+  onChangeText={(text) =>
+    setForm({ ...form, forCalf: text })
+  }
+/>
           </View>
           <View style={styles.col}>
             <AppText style={styles.label}>In House Utility</AppText>
-            <TextInput style={styles.input}  keyboardType="numeric" />
+            <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.inHouseUtility}
+  onChangeText={(text) =>
+    setForm({ ...form, inHouseUtility: text })
+  }
+/>
           </View>
         </View>
 
         <View style={styles.row}>
           <View style={styles.col}>
             <AppText style={styles.label}>Wastage</AppText>
-            <TextInput style={styles.input}  keyboardType="numeric" />
+            <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.wastage}
+  onChangeText={(text) =>
+    setForm({ ...form, wastage: text })
+  }
+/>
           </View>
           <View style={styles.col}>
             <AppText style={styles.label}>Actual Produced</AppText>
-            <TextInput style={styles.input}  keyboardType="numeric" />
+            <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.actualProduced}
+  onChangeText={(text) =>
+    setForm({ ...form, actualProduced: text })
+  }
+/>
           </View>
         </View>
 
         <View style={styles.row}>
           <View style={styles.col}>
             <AppText style={styles.label}>FAT %</AppText>
-            <TextInput style={styles.input}  keyboardType="numeric" />
+            <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.fat}
+  onChangeText={(text) =>
+    setForm({ ...form, fat: text })
+  }
+/>
           </View>
           <View style={styles.col}>
             <AppText style={styles.label}>SNF %</AppText>
@@ -214,7 +306,14 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
 
   <View style={styles.col}>
     <AppText style={styles.label}>Expected Total</AppText>
-    <TextInput style={styles.input}  keyboardType="numeric" />
+    <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.expectedTotal}
+  onChangeText={(text) =>
+    setForm({ ...form, expectedTotal: text })
+  }
+/>
   </View>
 </View>
         {/* Milk Sales Details */}
@@ -227,7 +326,14 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
           </View>
           <View style={styles.col}>
             <AppText style={styles.label}>Sales FAT %</AppText>
-            <TextInput style={styles.input}  keyboardType="numeric" />
+            <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.salesFat}
+  onChangeText={(text) =>
+    setForm({ ...form, salesFat: text })
+  }
+/>
           </View>
         </View>
 
@@ -245,7 +351,14 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
         <View style={styles.row}>
   <View style={styles.col}>
     <AppText style={styles.label}>Organization Total</AppText>
-    <TextInput style={styles.input} keyboardType="numeric" />
+    <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.orgTotal}
+  onChangeText={(text) =>
+    setForm({ ...form, orgTotal: text })
+  }
+/>
   </View>
 
   <View style={styles.col}>
@@ -259,7 +372,7 @@ const onChangeDate = (_: any, selectedDate?: Date) => {
           <Text style={styles.profitValue}>₹ 0.00</Text>
         </View>
 
-        <TouchableOpacity style={styles.saveBtn}>
+        <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
           <Text style={styles.saveText}>Save Record</Text>
         </TouchableOpacity>
       </ScrollView>

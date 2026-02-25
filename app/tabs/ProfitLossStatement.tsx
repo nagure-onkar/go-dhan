@@ -14,6 +14,8 @@ import ScreenWrapper from "../../src/components/common/ScreenWrapper";
 import spacing from "../../src/constants/spacing";
 import { useTheme } from "../../src/theme/useTheme";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
 
 import { useLanguage } from "@/constants/localization/useLanguage";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -30,7 +32,72 @@ const { colors } = useTheme();
 const [date, setDate] = React.useState(new Date());
 const [showPicker, setShowPicker] = React.useState(false);
 
+const BASE_URL = "https://astrabytte-ai.onrender.com";
 
+const [sales, setSales] = React.useState({
+  dailyMilkSales: "",
+  calfSales: "",
+  cattleSales: "",
+  slurrySales: "",
+  otherIncome: "",
+  feedExpenses: "",
+  workerSalary: "",
+  medicalExpenses: "",
+  farmId: "",
+});
+
+const handleSubmit = async () => {
+  try {
+    const token = await AsyncStorage.getItem("authToken");
+    const farmId = await AsyncStorage.getItem("farmId");
+
+const safeNumber = (value: string) =>
+  value && value.trim() !== "" ? Number(value) : 0;
+
+const payload = {
+  date: date.toISOString().split("T")[0],
+  session: "Morning",
+
+  for_workers_litre: safeNumber(sales.workerSalary),
+  for_calf_litre: safeNumber(sales.calfSales),
+  for_utility_litre: safeNumber(sales.otherIncome),
+  wastage_litre: 0,
+
+  expected_fat_percent: 0,
+  expected_snf_percent: 0,
+  expected_price_per_litre: 0,
+
+  total_sales_litre: safeNumber(sales.dailyMilkSales),
+  sales_fat_percent: 0,
+  sales_snf_percent: 0,
+  org_price_per_litre: 0,
+
+  farm_id: farmId, // must be defined
+};
+    const response = await fetch(
+      "/api/v1/milk/profit/daily",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      Alert.alert("Success", "Profit & Loss saved successfully");
+    } else {
+      Alert.alert("Error", data.message || "Something went wrong");
+    }
+  } catch (error) {
+    console.log(error);
+    Alert.alert("Error", "Server error");
+  }
+};
 
 const [expenses, setExpenses] = React.useState({
   water: false,
@@ -185,19 +252,49 @@ const Input = ({
         <Section title="Sales / Income" />
 
         <Row>
-          <Input label="Daily Milk Sales" />
-          <Input label="Calf Sales" />
-          <Input label="Cattle Sales" />
+          <Input
+  label="Daily Milk Sales"
+  value={sales.dailyMilkSales}
+  onChangeText={(text) =>
+    setSales({ ...sales, dailyMilkSales: text })
+  }
+/>
+          <Input
+  label="Calf Sales"
+  value={sales.calfSales}
+  onChangeText={(text) =>
+    setSales({ ...sales, calfSales: text })
+  }
+/>
+          <Input
+  label="Cattle Sales"
+  value={sales.cattleSales}
+  onChangeText={(text) =>
+    setSales({ ...sales, cattleSales: text })
+  }
+/>
         </Row>
 
         {/* Slurry + Other Income (Half Half) */}
 <Row>
   <View style={{ flex: 1 }}>
-    <Input label="Slurry/Compost Sales" />
+    <Input
+      label="Slurry/Compost Sales"
+      value={sales.slurrySales}
+      onChangeText={(text) =>
+        setSales({ ...sales, slurrySales: text })
+      }
+    />
   </View>
 
   <View style={{ flex: 1 }}>
-    <Input label="Other Income" />
+   <Input
+  label="Other Income"
+  value={sales.otherIncome}
+  onChangeText={(text) =>
+    setSales({ ...sales, otherIncome: text })
+  }
+/>
   </View>
 </Row>
 
@@ -268,9 +365,27 @@ const Input = ({
        {/* Dynamic Expense Inputs – 3 per row */}
 {/* Fixed Expense Fields - Always Visible */}
 <Row>
-  <Input label="Feed Expenses" />
-  <Input label="Worker Salary *" />
-  <Input label="Medical Expenses" />
+  <Input
+  label="Feed Expenses *"
+  value={sales.feedExpenses}
+  onChangeText={(text) =>
+    setSales({ ...sales, feedExpenses: text })
+  }
+/>
+  <Input
+  label="Worker Salary *"
+  value={sales.workerSalary}
+  onChangeText={(text) =>
+    setSales({ ...sales, workerSalary: text })
+  }
+/>
+  <Input
+  label="Medical Expenses *"
+  value={sales.medicalExpenses}
+  onChangeText={(text) =>
+    setSales({ ...sales, medicalExpenses: text })
+  }
+/>
 </Row>
 
 {/* Dynamic Expense Inputs - Below Fixed Fields */}
@@ -332,7 +447,10 @@ const Input = ({
 
         {/* Submit */}
       <View style={styles.submitContainer}>
-  <TouchableOpacity style={styles.submitButton}>
+  <TouchableOpacity
+  style={styles.submitButton}
+  onPress={handleSubmit}
+>
     <AppText style={styles.submitText}>Submit</AppText>
   </TouchableOpacity>
 </View>

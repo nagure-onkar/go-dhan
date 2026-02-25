@@ -1,16 +1,68 @@
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { ENDPOINTS } from "@/api/endpoints";
+import { POST } from "@/api/methods";
+import { session } from "@/store/session";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Redirect } from "expo-router";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Index() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [secure, setSecure] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const handleLogin = async () => {
+    if (!username || !password) {
+      Alert.alert("Error", "Username and password are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await POST<any>(ENDPOINTS.auth.login, {
+        username,
+        password,
+      });
+
+      // ✅ Store token
+      await AsyncStorage.setItem("access_token", response.data.access_token);
+      session.setToken(response.data.access_token);
+      console.log(response.data.access_token);
+
+      setLoggedIn(true);
+    } catch (error: any) {
+      console.log("Login error:", error?.response || error?.message);
+      Alert.alert("Login Failed", "Invalid credentials or server error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Redirect after login
+  if (loggedIn) {
+    return <Redirect href="/tabs" />;
+  }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff", padding: 24, justifyContent: "center" }}>
-      
-      {/* Heading */}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "#fff",
+        padding: 24,
+        justifyContent: "center",
+      }}
+    >
       <Text style={{ fontSize: 28, fontWeight: "700", color: "#00B87C" }}>
         Welcome Back!
       </Text>
@@ -18,7 +70,6 @@ export default function Index() {
         Please enter your details
       </Text>
 
-      {/* Username */}
       <Text style={{ marginBottom: 6, fontWeight: "500" }}>
         Username <Text style={{ color: "red" }}>*</Text>
       </Text>
@@ -35,10 +86,10 @@ export default function Index() {
         }}
       />
 
-      {/* Password */}
       <Text style={{ marginBottom: 6, fontWeight: "500" }}>
         Password <Text style={{ color: "red" }}>*</Text>
       </Text>
+
       <View
         style={{
           flexDirection: "row",
@@ -66,18 +117,24 @@ export default function Index() {
         </TouchableOpacity>
       </View>
 
-      {/* Login Button */}
       <TouchableOpacity
+        onPress={handleLogin}
+        disabled={loading}
         style={{
           backgroundColor: "#00B87C",
           padding: 16,
           borderRadius: 12,
           alignItems: "center",
+          opacity: loading ? 0.7 : 1,
         }}
       >
-        <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>
-          Login
-        </Text>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>
+            Login
+          </Text>
+        )}
       </TouchableOpacity>
     </View>
   );

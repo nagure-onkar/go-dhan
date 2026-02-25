@@ -1,5 +1,6 @@
-import HeatOnHeatScreen from "./tabs/heatonheat";
+import { Redirect } from "expo-router";
 
-export default function App() {
-  return <HeatOnHeatScreen />;
+export default function Index() {
+  // return <Redirect href="/tabs" />;
+  return <Redirect href="/screens/login" />;
 }

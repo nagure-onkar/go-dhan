@@ -8,6 +8,7 @@ import { useLanguage } from '../../src/constants/localization/useLanguage';
 import spacing from '../../src/constants/spacing';
 import { useTheme } from '../../src/theme/useTheme';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 import {
@@ -23,6 +24,7 @@ import {
 
 
 
+const BASE_URL = "https://astrabytte-ai.onrender.com/api/v1";
 
 const { width } = Dimensions.get('window');
 
@@ -35,48 +37,7 @@ const ICON_SIZES = {
 
 
 
-/* -------------------- DUMMY DATA -------------------- */
 
-const DUMMY_STATS = {
-  totalAnimals: 120,
-  totalCattle: 80,
-  totalCalves: 40,
-  todayMilking: 65,
-  todayTreatments: 4,
-  upcomingTreatments: 7,
-  treatmentExpenses: 18500,
-  workers: 12,
-  veterinarians: 2,
-};
-
-const DUMMY_ACTIVITIES: Activity[] = [
-  {
-    id: 1,
-    message: 'Cow #23 vaccinated',
-    time: '10 minutes ago',
-    type: 'treatment',
-  },
-  {
-    id: 2,
-    message: 'Morning milking completed',
-    time: '1 hour ago',
-    type: 'milking',
-  },
-  {
-    id: 3,
-    message: 'Calf health check scheduled',
-    time: '3 hours ago',
-    type: 'health',
-  },
-  {
-    id: 4,
-    message: 'Feed stock updated',
-    time: 'Yesterday',
-    type: 'general',
-  },
-];
-
-/* --------------------------------------------------- */
 
 interface StatsData {
   totalAnimals: number;
@@ -108,23 +69,57 @@ const DashboardScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [farmName] = useState('Dairy Farm');
 
-  useEffect(() => {
-    loadDummyData();
-  }, []);
+  const fetchDashboardData = async () => {
+  try {
+    const token = await AsyncStorage.getItem("authToken");
 
-  const loadDummyData = async () => {
-    setLoading(true);
-    await new Promise(res => setTimeout(res, 500));
-    setStats(DUMMY_STATS);
-    setActivities(DUMMY_ACTIVITIES);
+    if (!token) {
+      console.log("No token found");
+      return;
+    }
+
+    const response = await fetch(
+      "https://astrabytte-ai.onrender.com/api/v1/dashboard/stats",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to fetch dashboard");
+    }
+
+    setStats(data.stats);
+    setActivities(data.activities);
+
+  } catch (error) {
+    console.log("Dashboard error:", error);
+  } finally {
     setLoading(false);
-  };
+  }
+};
+  useEffect(() => {
+  setLoading(true);
+  fetchDashboardData();
+}, []);
+
+  
+
+const getStoredToken = async () => {
+  return await AsyncStorage.getItem('authToken');
+};
 
   const onRefresh = async () => {
-    setRefreshing(true);
-    await loadDummyData();
-    setRefreshing(false);
-  };
+  setRefreshing(true);
+  await fetchDashboardData();
+  setRefreshing(false);
+};
 
   return (
     <ScreenWrapper>

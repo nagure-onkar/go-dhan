@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppText from '../../src/components/common/AppText';
 import ScreenWrapper from '../../src/components/common/ScreenWrapper';
 import { useLanguage } from '../../src/constants/localization/useLanguage';
@@ -29,11 +30,17 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 // Preset values used as initial defaults — displayed faintly until edited
 const PRESET_VALUES = {
-  animalId: 'C-001',
+  animalId: 'C-001', 
   doctorId: 'V4',
   doctorName: 'Dr.Shreya Desai',
 };
 
+const BASE_URL = "https://astrabytte-ai.onrender.com";
+
+const getStoredToken = async () => {
+  const token = await AsyncStorage.getItem("access_token");
+  return token;
+};
 export default function HeatOnHeatScreen({ navigation }: any = {}) {
   
   const [animalId, setAnimalId] = useState('C-001');
@@ -103,8 +110,8 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
   const [otherExpenses, setOtherExpenses] = useState('');
 
   const { colors } = useTheme();
-const { t } = useLanguage();
-const styles = createStyles(colors);
+  const { t } = useLanguage();
+  const styles = createStyles(colors);
 
 
   // Date picker states
@@ -171,49 +178,75 @@ const styles = createStyles(colors);
     return true;
   }; 
 
-  const getStoredToken = async () => {
-    return null;
-  };
+ 
 
   const onSubmit = async () => {
-    if (!validate()) return;
-    setSubmitting(true);
-    try {
-      const token = await getStoredToken();
-      const payload = {
-        animal_id: animalId.trim(),
-        symptoms: symptomsMap,
-        date_reported: dateReportedDate ? dateReportedDate.toISOString() : null,
-        is_lactating: isLactating,
-        vet_confirmation: {
-          doctor_id: doctorId.trim() || null,
-          doctor_name: doctorName.trim() || null,
-          method: methodConfirmation.trim() || null,
-          final_result: finalResult.trim() || null,
-        },
-        recommended_ai: recommendedDateTime ? recommendedDateTime.toISOString() : null,
-        diagnosis_summary: diagnosisSummary.trim() || null,
-        expenses: {
-          doctor_fees: parseFloat(doctorFees) || 0,
-          treatment_expenses: parseFloat(treatmentExpenses) || 0,
-          other_expenses: parseFloat(otherExpenses) || 0,
-        },
-        recommend_insemination: recommendInsemination,
-        status: 'on_heat',
-      }; 
+  if (!validate()) return;
 
-      
-      await new Promise((res) => setTimeout(res, 900));
-      console.log('Payload (dummy):', payload, 'token:', token);
-      Alert.alert('Success', 'Dummy heat record saved (no real network request).');
-      navigation?.goBack?.();
-    } catch (err: any) {
-      Alert.alert('Error', err.message || 'Submission failed');
-    } finally {
-      setSubmitting(false);
+  setSubmitting(true);
+
+  try {
+    const token = await getStoredToken();
+
+    console.log("Retrieved Token:", token);
+
+    if (!token) {
+      Alert.alert("Error", "User not authenticated");
+      return;
     }
-  };
 
+    const payload = {
+
+  animalId: animalId.trim(), 
+  isCattleLactating: isLactating === "yes",
+  symptomsReportedDate: dateReportedDate
+    ? dateReportedDate.toISOString().split("T")[0]
+    : null,
+  methodOfConfirmation: methodConfirmation,
+  finalResult: finalResult,
+  recommendedAiDate: recommendedDateTime
+    ? recommendedDateTime.toISOString().split("T")[0]
+    : null,
+
+  diagnosisSummary: diagnosisSummary.trim() || "",
+  doctorFees: Number(doctorFees),
+  treatmentExpenses: Number(treatmentExpenses),
+  otherExpenses: Number(otherExpenses),
+};
+    console.log("Sending Heat Payload:", payload); 
+    console.log("API URL:", `${BASE_URL}/heat-/api/v1/heat-confirmation/`);
+
+    const response = await fetch(`${BASE_URL}/heat-/api/v1/heat-confirmation/`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log("API Response Status:", response.status);
+
+    const data = await response.json();
+
+    console.log("Heat API Response Data:", data);
+
+    if (!response.ok) {
+  Alert.alert("Error", JSON.stringify(data.detail || data.message));
+  return;
+}
+
+    Alert.alert("Success", "Heat record saved successfully!");
+    navigation?.goBack?.();
+
+  } catch (error: any) {
+    console.log("API Error:", error);
+    Alert.alert("Error", error.message || "Submission failed");
+  } finally {
+    setSubmitting(false);
+  }
+};
   return (
     <ScreenWrapper>
       <View style={styles.safeArea}>
@@ -231,7 +264,7 @@ const styles = createStyles(colors);
         </View>
 
         <View style={styles.card}>
-          <AppText style={styles.label}>Animal ID</AppText>
+          <AppText style={styles.label}>{"Animal ID"}</AppText>
           <TextInput
             style={[styles.input, animalId === PRESET_VALUES.animalId && styles.inputPrefilled]}
             placeholder="e.g. C-001"
@@ -245,7 +278,7 @@ const styles = createStyles(colors);
          <View style={styles.sectionCard}>
 
   <View style={styles.sectionTitleContainer}>
-    <AppText style={styles.sectionTitle}>Current Heat Symptoms</AppText>
+    <AppText style={styles.sectionTitle}>{"Current Heat Symptoms"}</AppText>
     <View style={styles.sectionDivider} />
   </View>
 
@@ -587,7 +620,7 @@ const createStyles = (colors: any) =>
   shadowOpacity: 0.08,
   shadowRadius: 4,
 
-  elevation: 3, // Android separation
+  
 },
 
 }); 
