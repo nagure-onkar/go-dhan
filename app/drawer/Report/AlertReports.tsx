@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import {
@@ -14,6 +15,25 @@ const AlertsReportScreen = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [alertType, setAlertType] = useState("All");
+  // ... inside your component
+const [showPicker, setShowPicker] = useState(false);
+const [currentMode, setCurrentMode] = useState('from');
+
+const onDateChange = (
+  event: any,
+  selectedDate?: Date
+) => {
+  setShowPicker(false);
+
+  if (selectedDate) {
+    const formatted = selectedDate
+      .toLocaleDateString("en-GB")
+      .replace(/\//g, "-");
+
+    if (currentMode === "from") setFromDate(formatted);
+    else setToDate(formatted);
+  }
+};
 
   const handleClear = () => {
     setFromDate("");
@@ -39,21 +59,47 @@ const AlertsReportScreen = () => {
         <Text style={styles.label}>Date Range</Text>
 
         <View style={styles.dateRow}>
-          <TextInput
-            style={styles.dateInput}
-            placeholder="dd-mm-yyyy"
-            value={fromDate}
-            onChangeText={setFromDate}
-          />
+          {/* From Date */}
+<View style={styles.inputIconWrapper}>
+  <TextInput
+    style={styles.dateInputWithIcon}
+    placeholder="dd-mm-yyyy"
+    value={fromDate}
+    onChangeText={setFromDate}
+  />
+
+  <TouchableOpacity
+    onPress={() => {
+      setCurrentMode("from");
+      setShowPicker(true);
+    }}
+    style={styles.inputIcon}
+  >
+    <Ionicons name="calendar-outline" size={18} color="#666" />
+  </TouchableOpacity>
+</View>
 
           <Text style={styles.toText}>to</Text>
 
-          <TextInput
-            style={styles.dateInput}
-            placeholder="dd-mm-yyyy"
-            value={toDate}
-            onChangeText={setToDate}
-          />
+          {/* To Date */}
+<View style={styles.inputIconWrapper}>
+  <TextInput
+    style={styles.dateInputWithIcon}
+    placeholder="dd-mm-yyyy"
+    value={toDate}
+    onChangeText={setToDate}
+  />
+
+  <TouchableOpacity
+    onPress={() => {
+      setCurrentMode("to");
+      setShowPicker(true);
+    }}
+    style={styles.inputIcon}
+  >
+    <Ionicons name="calendar-outline" size={18} color="#666" />
+  </TouchableOpacity>
+</View>
 
           {/* Dropdown */}
           <View style={styles.pickerContainer}>
@@ -105,9 +151,23 @@ const AlertsReportScreen = () => {
           </Text>
         </View>
 
-        
+        {showPicker && (
+  <DateTimePicker
+    value={
+  currentMode === "from" && fromDate
+    ? new Date(fromDate.split("-").reverse().join("-"))
+    : currentMode === "to" && toDate
+    ? new Date(toDate.split("-").reverse().join("-"))
+    : new Date()
+}
+    mode="date"
+    display="default"
+    onChange={onDateChange}
+  />
+)}
 
       </View>
+
     </ScrollView>
   );
 };
@@ -163,15 +223,28 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     marginBottom: 10,
   },
-  dateInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 8,
-    width: 110,
+  // --- NEW STYLES ADDED HERE ---
+  inputIconWrapper: {
+    position: 'relative',
+    flexDirection: 'row',
+    alignItems: 'center',
     marginRight: 6,
     marginBottom: 6,
   },
+  dateInputWithIcon: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingLeft: 8,
+    paddingRight: 35, // Space for the icon
+    width: 120,
+  },
+  inputIcon: {
+    position: 'absolute',
+    right: 10,
+  },
+  // -----------------------------
   toText: {
     marginHorizontal: 4,
   },
