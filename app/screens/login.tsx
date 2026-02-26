@@ -1,7 +1,7 @@
 import { ENDPOINTS } from "@/api/endpoints";
 import { POST } from "@/api/methods";
 import { Ionicons } from "@expo/vector-icons";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { session } from "@/store/session";
 import { Redirect } from "expo-router";
 import { useState } from "react";
@@ -36,7 +36,7 @@ export default function Index() {
       });
 
       // ✅ Store token
-      //   await AsyncStorage.setItem("access_token", response.access_token);
+       await AsyncStorage.setItem("User", JSON.stringify(response));
       session.setToken(response.access_token);
 
       setLoggedIn(true);
@@ -50,7 +50,8 @@ export default function Index() {
 
   // ✅ Redirect after login
   if (loggedIn) {
-    return <Redirect href="/tabs" />;
+    // Reference: app/tabs/Rate/RateMatrixScreen.tsx
+    return <Redirect href="/tabs/lactation" />;
   }
 
   return (

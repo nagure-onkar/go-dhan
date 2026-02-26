@@ -1,225 +1,371 @@
+import AppText from "@/components/common/AppText";
+import ScreenWrapper from "@/components/common/ScreenWrapper";
+import { useLanguage } from "@/constants/localization/useLanguage";
+import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
   FlatList,
+  Platform,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
-const cattleList = [
-  { id: "2", status: "Calved & Lactating" },
-  { id: "4", status: "Calved & Lactating" },
-];
+const cattleList = Array.from({ length: 12 }, (_, i) => ({
+  id: `${i + 1}`,
+  status: [
+    "Calved & Lactating",
+    "On Heat & Lactating",
+    "Inseminated & Lactating",
+    "Pregnant & Lactating",
+  ][i % 4],
+}));
 
 export default function RecordLactation() {
+  const { t } = useLanguage();
   const { workerId } = useLocalSearchParams();
 
   const [recordType, setRecordType] = useState<"Morning" | "Evening">("Morning");
-  const [date, setDate] = useState("31-01-2026");
-
+  const [date, setDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
+  const [focusedId, setFocusedId] = useState<string | null>(null);
   const [milkData, setMilkData] = useState<{ [key: string]: string }>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
 
-  /** Handle Morning / Evening change */
+  const formattedDate = `${date
+    .getDate()
+    .toString()
+    .padStart(2, "0")}-${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}-${date.getFullYear()}`;
+
   const handleRecordTypeChange = (type: "Morning" | "Evening") => {
     setRecordType(type);
-    setMilkData({});      // clear values
+    setMilkData({});
     setIsSubmitted(false);
     setEditId(null);
+    setFocusedId(null);
   };
 
   const renderItem = ({ item }: any) => {
     const isEditing = editId === item.id;
+    const isFocused = focusedId === item.id;
 
     return (
       <View style={styles.row}>
-        <View>
-          <Text style={styles.cattleId}>{item.id}</Text>
-          <Text style={styles.cattleType}>cattle</Text>
+        {/* LEFT */}
+        <View style={styles.leftSection}>
+          <AppText style={styles.cattleId}>A{item.id}</AppText>
+          <AppText style={styles.cattleType}>{t.cattle}</AppText>
         </View>
 
-        {(!isSubmitted || isEditing) ? (
-          <TextInput
-            placeholder="Milk (L)"
-            style={styles.input}
-            keyboardType="decimal-pad"
-            value={milkData[item.id] || ""}
-            onChangeText={(value) =>
-              setMilkData({ ...milkData, [item.id]: value })
-            }
-          />
-        ) : (
-          <Text style={styles.milkText}>{milkData[item.id]} L</Text>
-        )}
+        {/* MILK INPUT */}
+        <View style={styles.centerSection}>
+          {!isSubmitted || isEditing ? (
+            <TextInput
+              placeholder={t.milkPlaceholder}
+              placeholderTextColor="#9CA3AF"
+              style={[
+                styles.input,
+                isEditing && styles.inputSmall,
+                isFocused && styles.inputFocused,
+              ]}
+              value={milkData[item.id] || ""}
+              keyboardType="decimal-pad"
+              onFocus={() => setFocusedId(item.id)}
+              onBlur={() => setFocusedId(null)}
+              onChangeText={(value) =>
+                setMilkData({ ...milkData, [item.id]: value })
+              }
+            />
+          ) : (
+            <AppText style={styles.milkText}>
+              {milkData[item.id]} L
+            </AppText>
+          )}
+        </View>
 
+        {/* ACTION BUTTONS */}
         {isSubmitted && (
-          <TouchableOpacity
-            style={styles.editBtn}
-            onPress={() => setEditId(item.id)}
-          >
-            <Text style={styles.editText}>Edit</Text>
-          </TouchableOpacity>
+          <View style={styles.actionArea}>
+            {!isEditing ? (
+              <TouchableOpacity
+                style={styles.editBtn}
+                onPress={() => setEditId(item.id)}
+              >
+                <AppText style={styles.editText}>{t.edit}</AppText>
+              </TouchableOpacity>
+            ) : (
+              <>
+                <TouchableOpacity
+                  style={styles.saveBtn}
+                  onPress={() => setEditId(null)}
+                >
+                  <AppText style={styles.saveText}>{t.save}</AppText>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.cancelBtn}
+                  onPress={() => setEditId(null)}
+                >
+                  <AppText style={styles.cancelText}>{t.cancel}</AppText>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
         )}
 
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{item.status}</Text>
+        {/* STATUS BADGE */}
+        <View style={styles.rightSection}>
+          <View style={styles.badge}>
+            <AppText style={styles.badgeText}>
+              {item.status.replace(" & ", "\n& ")}
+            </AppText>
+          </View>
         </View>
       </View>
     );
   };
 
-  const isEditingAny = editId !== null;
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Record Lactation</Text>
+    <ScreenWrapper>
+      <View style={styles.container}>
+        <AppText style={styles.title}>{t.recordLactation}</AppText>
 
-      {/* Record Type */}
-      <Text style={styles.label}>Record Type *</Text>
-      <View style={styles.typeRow}>
-        {["Morning", "Evening"].map((type) => (
+        <View style={styles.card}>
+          <AppText style={styles.label}>{t.recordType} *</AppText>
+
+          <View style={styles.segment}>
+            {(["Morning", "Evening"] as const).map((type) => (
+              <TouchableOpacity
+                key={type}
+                style={[
+                  styles.segmentBtn,
+                  recordType === type && styles.segmentActive,
+                ]}
+                onPress={() => handleRecordTypeChange(type)}
+              >
+                <AppText
+                  style={[
+                    styles.segmentText,
+                    recordType === type && styles.segmentTextActive,
+                  ]}
+                >
+                  {type === "Morning" ? t.morning : t.evening}
+                </AppText>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <AppText style={styles.label}>{t.date}</AppText>
+
           <TouchableOpacity
-            key={type}
-            style={[
-              styles.typeBtn,
-              recordType === type && styles.typeActive,
-            ]}
-            onPress={() => handleRecordTypeChange(type as any)}
+            style={styles.dateInput}
+            onPress={() => setShowPicker(true)}
           >
-            <Text
-              style={[
-                styles.typeText,
-                recordType === type && styles.typeTextActive,
-              ]}
-            >
-              {type}
-            </Text>
+            <AppText style={styles.dateText}>{formattedDate}</AppText>
+            <Ionicons name="calendar-outline" size={20} color="#0A8F47" />
           </TouchableOpacity>
-        ))}
-      </View>
 
-      {/* Date */}
-      <Text style={styles.label}>Date</Text>
-      <TextInput
-        style={styles.dateInput}
-        value={date}
-        onChangeText={setDate}
-      />
+          {showPicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              onChange={(e, d) => {
+                setShowPicker(false);
+                if (d) setDate(d);
+              }}
+            />
+          )}
+        </View>
 
-      {/* Animals */}
-      <Text style={styles.label}>Animals</Text>
-      <FlatList
-        data={cattleList}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-      />
+        <FlatList
+          data={cattleList}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          extraData={t}
+          contentContainerStyle={{ paddingBottom: 120 }}
+          showsVerticalScrollIndicator={false}
+        />
 
-      {/* Submit / Update */}
-      {!isSubmitted && (
         <TouchableOpacity
           style={styles.submit}
           onPress={() => setIsSubmitted(true)}
         >
-          <Text style={styles.submitText}>Save Record</Text>
+          <AppText style={styles.submitText}>{t.saveRecord}</AppText>
         </TouchableOpacity>
-      )}
-
-      {isSubmitted && isEditingAny && (
-        <TouchableOpacity
-          style={styles.submit}
-          onPress={() => setEditId(null)}
-        >
-          <Text style={styles.submitText}>Update Record</Text>
-        </TouchableOpacity>
-      )}
-    </View>
+      </View>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#F4FFF8" },
-  title: { fontSize: 22, fontWeight: "700", marginBottom: 10 },
+  container: { flex: 1, backgroundColor: "#F2FBF6", padding: 16 },
 
-  label: { marginTop: 14, fontWeight: "600" },
+  title: {
+    fontSize: 26,
+    fontWeight: "700",
+    marginBottom: 12,
+    color: "#064E3B",
+  },
 
-  typeRow: { flexDirection: "row", marginTop: 8 },
-  typeBtn: {
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 12,
+    elevation: 4,
+  },
+
+  label: { marginTop: 10, fontWeight: "600", color: "#374151" },
+
+  segment: {
+    flexDirection: "row",
+    backgroundColor: "#F1F5F9",
+    borderRadius: 14,
+    padding: 4,
+    marginTop: 8,
+  },
+
+  segmentBtn: {
     flex: 1,
-    padding: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#BFEBD4",
-    marginRight: 8,
+    padding: 12,
+    borderRadius: 12,
     alignItems: "center",
   },
-  typeActive: { backgroundColor: "#0A8F47" },
-  typeText: { color: "#0A8F47", fontWeight: "600" },
-  typeTextActive: { color: "#fff" },
+
+  segmentActive: { backgroundColor: "#0A8F47" },
+
+  segmentText: { fontWeight: "600", color: "#0A8F47" },
+
+  segmentTextActive: { color: "#fff" },
 
   dateInput: {
     marginTop: 8,
-    padding: 10,
-    backgroundColor: "#fff",
-    borderRadius: 10,
+    padding: 15,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#C9D6D0",
+    borderColor: "#E5E7EB",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#F9FAFB",
   },
+
+  dateText: { fontSize: 15, fontWeight: "600" },
 
   row: {
-    backgroundColor: "#ECFFF4",
-    padding: 14,
-    borderRadius: 12,
-    marginVertical: 6,
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 18,
+    paddingHorizontal: 14,
+    borderRadius: 18,
+    marginBottom: 14,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    elevation: 2,
   },
 
-  cattleId: { fontWeight: "700", fontSize: 16 },
-  cattleType: { color: "#4A8F6A", fontSize: 12 },
+  leftSection: { width: 60 },
+
+  cattleId: { fontWeight: "700", fontSize: 17, color: "#047857" },
+
+  cattleType: { fontSize: 12, color: "#9CA3AF", marginTop: 2 },
+
+  centerSection: { width: 110, alignItems: "center" },
 
   input: {
-  width: 120,
-  height: 42,
-  borderRadius: 12,
-  borderWidth: 1,
-  borderColor: "#C9D6D0",
-  backgroundColor: "#fff",
-  textAlign: "center",      // 👈 THIS IS THE KEY
-  fontSize: 16,
-  fontWeight: "600",
-},
+    width: 110,
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    backgroundColor: "#F9FAFB",
+    textAlign: "center",
+    fontWeight: "600",
+  },
 
+  inputSmall: { width: 90 },
 
-  milkText: { fontWeight: "600" },
+  inputFocused: {
+    borderColor: "#0A8F47",
+    backgroundColor: "#FFFFFF",
+  },
+
+  milkText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#047857",
+  },
+
+  actionArea: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginRight: 6,
+  },
 
   editBtn: {
     borderWidth: 1,
-    borderColor: "#4D8DFF",
+    borderColor: "#60A5FA",
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 5,
     borderRadius: 8,
   },
-  editText: { color: "#4D8DFF", fontWeight: "600" },
+
+  editText: { color: "#2563EB", fontWeight: "600", fontSize: 12 },
+
+  saveBtn: {
+    backgroundColor: "#DCFCE7",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+
+  saveText: { color: "#047857", fontWeight: "600", fontSize: 12 },
+
+  cancelBtn: {
+    backgroundColor: "#E5E7EB",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+
+  cancelText: { color: "#374151", fontWeight: "600", fontSize: 12 },
+
+  rightSection: { flex: 1, alignItems: "flex-end" },
 
   badge: {
-    backgroundColor: "#D9FFE6",
+    backgroundColor: "#ECFDF5",
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingVertical: 7,
+    borderRadius: 999,
+    maxWidth: 140,
+    alignItems: "center",
   },
-  badgeText: { color: "#0A8F47", fontWeight: "600", fontSize: 12 },
+
+  badgeText: {
+    color: "#047857",
+    fontWeight: "600",
+    fontSize: 11.5,
+    textAlign: "center",
+    lineHeight: 14,
+  },
 
   submit: {
+    position: "absolute",
+    bottom: 20,
+    left: 16,
+    right: 16,
     backgroundColor: "#0A8F47",
-    padding: 14,
-    borderRadius: 12,
+    padding: 18,
+    borderRadius: 16,
     alignItems: "center",
-    marginTop: 20,
+    elevation: 6,
   },
-  submitText: { color: "#fff", fontWeight: "700" },
+
+  submitText: { color: "#fff", fontWeight: "700", fontSize: 16 },
 });

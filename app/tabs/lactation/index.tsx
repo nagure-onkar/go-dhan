@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
+//import api from "@/services/api";
 import {
   ActivityIndicator,
   FlatList,
@@ -27,13 +28,18 @@ export default function LactationDashboard() {
     fetchWorkers();
   }, []);
 
+//   const fetchWorkers = async () => {
+//   const res = await api.get("/api/v1/lactation/worker-records");
+//   return res.data;
+// };
+
   const fetchWorkers = async () => {
     try {
       setLoading(true);
       const data = await getWorkers();
       setWorkers(data);
     } catch (err) {
-      setError("Failed to load workers");
+      setError(t.failedToLoadWorkers);
     } finally {
       setLoading(false);
     }
@@ -69,6 +75,7 @@ export default function LactationDashboard() {
         <FlatList
           data={workers}
           keyExtractor={(item) => item.id}
+          extraData={t}   // ⭐ important for live language change
           renderItem={({ item }) => (
             <View
               style={{
@@ -82,9 +89,18 @@ export default function LactationDashboard() {
               <AppText style={{ fontWeight: "600" }}>
                 {item.name}
               </AppText>
-              <AppText>ID: {item.id}</AppText>
-              <AppText>Assigned Cattle: {item.cattle}</AppText>
-              <AppText>Mobile: {item.mobile}</AppText>
+
+              <AppText>
+                {t.workerId}: {item.id}
+              </AppText>
+
+              <AppText>
+                {t.assignedCattle}: {item.cattle}
+              </AppText>
+
+              <AppText>
+                {t.mobile}: {item.mobile}
+              </AppText>
 
               <TouchableOpacity
                 style={{
@@ -97,16 +113,15 @@ export default function LactationDashboard() {
                 onPress={() =>
                   router.push({
                     pathname: "/tabs/lactation/record",
-                     params: {
-                        workerId: item.id,
-                        name: item.name,
-                },
-              })
-            }
-
+                    params: {
+                      workerId: item.id,
+                      name: item.name,
+                    },
+                  })
+                }
               >
                 <AppText style={{ color: "#0A8F47", fontWeight: "600" }}>
-                  Record Milking
+                  {t.recordMilking}
                 </AppText>
               </TouchableOpacity>
             </View>
