@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 const HealthManagementReports = () => {
   return (
@@ -61,6 +62,7 @@ const ReportCard = ({ title, children }: any) => (
       <Text style={styles.cardTitle}>{title}</Text>
 
       <TouchableOpacity style={styles.downloadBtn}>
+        <Ionicons name="download-outline" size={18} color="#fff" />
         <Text style={styles.downloadText}>Download</Text>
       </TouchableOpacity>
     </View>
@@ -68,10 +70,6 @@ const ReportCard = ({ title, children }: any) => (
     {children}
 
     <Text style={styles.showingText}>Showing 1 - 0</Text>
-
-    <View style={styles.emptyBox}>
-      <Text style={styles.emptyText}>No data for selected range</Text>
-    </View>
 
     <View style={styles.pagination}>
       <TouchableOpacity style={styles.pageBtnDisabled}>
@@ -81,6 +79,12 @@ const ReportCard = ({ title, children }: any) => (
         <Text style={styles.pageTextDisabled}>Next</Text>
       </TouchableOpacity>
     </View>
+
+    <View style={styles.emptyBox}>
+      <Text style={styles.emptyText}>No data for selected range</Text>
+    </View>
+
+    
   </View>
 );
 

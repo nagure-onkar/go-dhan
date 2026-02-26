@@ -1,16 +1,21 @@
 import React, { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 const LactationReports = () => {
   return (
     <ScrollView style={styles.container}>
+      
+      {/* Page Title */}
+      <Text style={styles.pageTitle}>Lactation Reports</Text>
+
       {/* Report 1 */}
       <ReportCard title="Report 1 — Per Cattle Daily / Range">
         <DateRange rowsText="Showing 0 rows" />
@@ -56,13 +61,14 @@ const LactationReports = () => {
         <TableHeader
           headers={[
             "Worker Name",
-            "Total Morning Milk (L)",
-            "Avg Morning Milk (L)",
-            "Total Evening Milk (L)",
-            "Avg Evening Milk (L)",
+            "Total Morning (L)",
+            "Avg Morning (L)",
+            "Total Evening (L)",
+            "Avg Evening (L)",
           ]}
         />
       </ReportCard>
+
     </ScrollView>
   );
 };
@@ -75,17 +81,16 @@ const ReportCard = ({ title, children }: any) => (
       <Text style={styles.cardTitle}>{title}</Text>
 
       <TouchableOpacity style={styles.downloadBtn}>
-        <Text style={styles.downloadText}>Download</Text>
+        <Ionicons name="download-outline" size={18} color="#fff" />
+        <Text style={styles.downloadText}> Download</Text>
       </TouchableOpacity>
     </View>
 
     {children}
 
-    <Text style={styles.showingText}>Showing 1 - 0</Text>
-
-    <View style={styles.emptyBox}>
-      <Text style={styles.emptyText}>No data for selected range</Text>
-    </View>
+    <Text style={styles.showingText}>
+      Showing <Text style={{ fontWeight: "700" }}>1 - 0</Text>
+    </Text>
 
     <View style={styles.pagination}>
       <TouchableOpacity style={styles.pageBtnDisabled}>
@@ -95,12 +100,21 @@ const ReportCard = ({ title, children }: any) => (
         <Text style={styles.pageTextDisabled}>Next</Text>
       </TouchableOpacity>
     </View>
+
+    <View style={styles.emptyBox}>
+      <Text style={styles.emptyText}>No data for selected range</Text>
+    </View>
   </View>
 );
 
 const DateRange = ({ rowsText }: any) => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+
+  const handleClear = () => {
+    setFromDate("");
+    setToDate("");
+  };
 
   return (
     <>
@@ -123,7 +137,7 @@ const DateRange = ({ rowsText }: any) => {
           onChangeText={setToDate}
         />
 
-        <TouchableOpacity style={styles.clearBtn}>
+        <TouchableOpacity style={styles.clearBtn} onPress={handleClear}>
           <Text style={styles.clearText}>Clear</Text>
         </TouchableOpacity>
 
@@ -148,15 +162,22 @@ const TableHeader = ({ headers }: any) => (
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#F2FFF7",
-    padding: 12,
+    padding: 14,
+  },
+  pageTitle: {
+    fontSize: 22,
+    fontWeight: "800",
+    marginBottom: 16,
+    color: "#1a1a1a",
   },
   card: {
     backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 12,
+    borderRadius: 12,
+    padding: 14,
     marginBottom: 18,
     borderWidth: 1,
     borderColor: "#E0F2EA",
+    elevation: 2,
   },
   headerRow: {
     flexDirection: "row",
@@ -165,19 +186,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "700",
-    color: "#222",
+    flex: 1,
+    marginRight: 10,
   },
   downloadBtn: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#2E8B57",
     paddingVertical: 6,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     borderRadius: 6,
   },
   downloadText: {
     color: "#fff",
-    fontWeight: "700",
+    fontWeight: "600",
     fontSize: 13,
   },
   sectionTitle: {
@@ -189,7 +213,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     flexWrap: "wrap",
-    marginBottom: 10,
+    marginBottom: 8,
   },
   dateInput: {
     borderWidth: 1,
@@ -198,6 +222,7 @@ const styles = StyleSheet.create({
     padding: 8,
     width: 110,
     marginRight: 6,
+    marginBottom: 6,
   },
   toText: {
     marginHorizontal: 4,
@@ -207,6 +232,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 6,
     marginLeft: 6,
+    marginBottom: 6,
   },
   clearText: {
     fontSize: 12,
@@ -245,6 +271,7 @@ const styles = StyleSheet.create({
   pagination: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: 6,
   },
   pageBtnDisabled: {
     backgroundColor: "#f0f0f0",

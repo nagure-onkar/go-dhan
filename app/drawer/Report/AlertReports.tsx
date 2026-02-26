@@ -1,167 +1,244 @@
-import { useLanguage } from "@/constants/localization/useLanguage";
-import { useTheme } from "@/theme/useTheme";
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
-const AlertReportForm = () => {
-  const { colors } = useTheme();
-  const { t } = useLanguage();
-
+const AlertsReportScreen = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [alertSource, setAlertSource] = useState("System");
+  const [alertType, setAlertType] = useState("All");
 
   const handleClear = () => {
     setFromDate("");
     setToDate("");
-    setAlertSource("System");
-  };
-
-  const handleDownload = () => {
-    console.log("Download Alert Report");
+    setAlertType("All");
   };
 
   return (
     <ScrollView style={styles.container}>
-      {/* Alert Report */}
-      <Section title="Alerts Report">
-        <Label text="Date Range" />
+      <View style={styles.card}>
 
-        <Label text="From Date *" />
-        <TextInput
-          style={styles.input}
-          placeholder="dd mm yyyy"
-          value={fromDate}
-          onChangeText={setFromDate}
-        />
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>Alerts Report</Text>
 
-        <Label text="To Date *" />
-        <TextInput
-          style={styles.input}
-          placeholder="dd mm yyyy"
-          value={toDate}
-          onChangeText={setToDate}
-        />
+          <TouchableOpacity style={styles.downloadBtn}>
+            <Ionicons name="download-outline" size={18} color="#fff" />
+            <Text style={styles.downloadText}> Download</Text>
+          </TouchableOpacity>
+        </View>
 
-        <Label text="Alert Source *" />
-        <PickerField value={alertSource} onChange={setAlertSource}>
-          <Picker.Item label="System" value="System" />
-          <Picker.Item label="Manual" value="Manual" />
-        </PickerField>
-      </Section>
+        {/* Date Range */}
+        <Text style={styles.label}>Date Range</Text>
 
-      {/* Buttons */}
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.clearBtn} onPress={handleClear}>
-          <Text style={styles.clearText}>Clear</Text>
-        </TouchableOpacity>
+        <View style={styles.dateRow}>
+          <TextInput
+            style={styles.dateInput}
+            placeholder="dd-mm-yyyy"
+            value={fromDate}
+            onChangeText={setFromDate}
+          />
 
-        <TouchableOpacity style={styles.downloadBtn} onPress={handleDownload}>
-          <Text style={styles.downloadText}>Download</Text>
-        </TouchableOpacity>
+          <Text style={styles.toText}>to</Text>
+
+          <TextInput
+            style={styles.dateInput}
+            placeholder="dd-mm-yyyy"
+            value={toDate}
+            onChangeText={setToDate}
+          />
+
+          {/* Dropdown */}
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={alertType}
+              onValueChange={(itemValue) => setAlertType(itemValue)}
+              style={styles.picker}
+            >
+              <Picker.Item label="All" value="All" />
+              <Picker.Item label="System" value="System" />
+              <Picker.Item label="Feed" value="Feed" />
+            </Picker>
+          </View>
+
+          <TouchableOpacity style={styles.clearBtn} onPress={handleClear}>
+            <Text style={styles.clearText}>Clear</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.rowsText}>Showing 0 rows</Text>
+
+        <Text style={styles.rangeText}>
+          Showing <Text style={{ fontWeight: "700" }}>1 - 0</Text>
+        </Text>
+
+
+{/* Pagination */}
+        <View style={styles.pagination}>
+          <TouchableOpacity style={styles.pageBtnDisabled}>
+            <Text style={styles.pageTextDisabled}>Previous</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.pageBtnDisabled}>
+            <Text style={styles.pageTextDisabled}>Next</Text>
+          </TouchableOpacity>
+        </View>
+        
+        {/* Table Header */}
+        <View style={styles.tableHeader}>
+          <Text style={styles.headerCell}>Date</Text>
+          <Text style={styles.headerCell}>Alert Type</Text>
+          <Text style={styles.headerCell}>Message</Text>
+        </View>
+
+        {/* Empty State */}
+        <View style={styles.emptyBox}>
+          <Text style={styles.emptyText}>
+            No data for selected range
+          </Text>
+        </View>
+
+        
+
       </View>
     </ScrollView>
   );
 };
 
-/* ---------- Reusable Components ---------- */
-
-const Section = ({ title, children }: any) => (
-  <View style={styles.section}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    {children}
-  </View>
-);
-
-const Label = ({ text }: any) => (
-  <Text style={styles.label}>{text}</Text>
-);
-
-const PickerField = ({ children, value, onChange }: any) => (
-  <View style={styles.pickerWrapper}>
-    <Picker selectedValue={value} onValueChange={onChange}>
-      {children}
-    </Picker>
-  </View>
-);
+export default AlertsReportScreen;
 
 /* ---------- Styles ---------- */
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#F2FFF7",
-    padding: 12,
+    flex: 1,
+    backgroundColor: "#E6F4EC",
+    padding: 14,
   },
-  section: {
+  card: {
     backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 14,
+    borderRadius: 12,
+    padding: 16,
     borderWidth: 1,
-    borderColor: "#3CB371",
+    borderColor: "#E0F2EA",
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#2E8B57",
-    marginBottom: 10,
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 4,
-    color: "#333",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: "#fff",
-  },
-  pickerWrapper: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    marginBottom: 10,
-    overflow: "hidden",
-  },
-  buttonRow: {
+  headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 20,
-  },
-  clearBtn: {
-    backgroundColor: "#ddd",
-    padding: 14,
-    borderRadius: 6,
-    width: "48%",
     alignItems: "center",
+    marginBottom: 14,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "800",
   },
   downloadBtn: {
-    backgroundColor: "#2E8B57",
-    padding: 14,
-    borderRadius: 6,
-    width: "48%",
+    flexDirection: "row",
     alignItems: "center",
-  },
-  clearText: {
-    color: "#333",
-    fontWeight: "600",
+    backgroundColor: "#1A8F5A",
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
   },
   downloadText: {
     color: "#fff",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  label: {
+    fontSize: 15,
+    fontWeight: "600",
+    marginBottom: 6,
+  },
+  dateRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    marginBottom: 10,
+  },
+  dateInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 8,
+    width: 110,
+    marginRight: 6,
+    marginBottom: 6,
+  },
+  toText: {
+    marginHorizontal: 4,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    width: 120,
+    marginRight: 6,
+    marginBottom: 6,
+  },
+  picker: {
+    height: 40,
+  },
+  clearBtn: {
+    backgroundColor: "#f0f0f0",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 6,
+  },
+  clearText: {
+    fontSize: 13,
+  },
+  rowsText: {
+    fontSize: 12,
+    color: "#555",
+    marginTop: 4,
+  },
+  rangeText: {
+    marginTop: 8,
+    fontSize: 13,
+  },
+  tableHeader: {
+    flexDirection: "row",
+    backgroundColor: "#E8F8F1",
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 12,
+  },
+  headerCell: {
+    flex: 1,
     fontWeight: "700",
+    fontSize: 13,
+  },
+  emptyBox: {
+    alignItems: "center",
+    paddingVertical: 18,
+  },
+  emptyText: {
+    color: "#777",
+    fontSize: 13,
+  },
+  pagination: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  pageBtnDisabled: {
+    backgroundColor: "#f0f0f0",
+    padding: 10,
+    borderRadius: 8,
+    width: "48%",
+    alignItems: "center",
+  },
+  pageTextDisabled: {
+    color: "#aaa",
+    fontWeight: "600",
   },
 });
-
-export default AlertReportForm;
-

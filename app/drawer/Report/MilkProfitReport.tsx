@@ -1,136 +1,98 @@
-import { useLanguage } from "@/constants/localization/useLanguage";
-import { useTheme } from "@/theme/useTheme";
-import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-const MilkProfitReportForm = () => {
-  const { colors } = useTheme();
-  const { t } = useLanguage();
-
+const MilkProfitLossReport = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [orgPrice, setOrgPrice] = useState("");
-  const [expectedPrice, setExpectedPrice] = useState("");
-  const [difference, setDifference] = useState("");
-  const [status, setStatus] = useState("");
-  const [remarks, setRemarks] = useState("");
+
+  const handleClear = () => {
+    setFromDate("");
+    setToDate("");
+  };
 
   return (
     <ScrollView style={styles.container}>
-      {/* Date Range */}
-      <Section title="Date Range">
-        <Label text="From Date *" />
-        <TextInput
-          style={styles.input}
-          placeholder="dd mm yyyy"
-          value={fromDate}
-          onChangeText={setFromDate}
-        />
+      {/* Page Title */}
+      <Text style={styles.pageTitle}>
+        Milk Profit / Loss Report
+      </Text>
 
-        <Label text="To Date *" />
-        <TextInput
-          style={styles.input}
-          placeholder="dd mm yyyy"
-          value={toDate}
-          onChangeText={setToDate}
-        />
-      </Section>
+      {/* Date Range Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Date Range</Text>
 
-      {/* Price Details */}
-      <Section title="Milk Price Details">
-        <Label text="Organization Total Price (₹) *" />
-        <TextInput
-          style={styles.input}
-          placeholder="Enter organization price"
-          keyboardType="numeric"
-          value={orgPrice}
-          onChangeText={setOrgPrice}
-        />
+        <View style={styles.dateRow}>
+          <TextInput
+            style={styles.dateInput}
+            placeholder="dd-mm-yyyy"
+            value={fromDate}
+            onChangeText={setFromDate}
+          />
 
-        <Label text="Expected Price (₹) *" />
-        <TextInput
-          style={styles.input}
-          placeholder="Enter expected price"
-          keyboardType="numeric"
-          value={expectedPrice}
-          onChangeText={setExpectedPrice}
-        />
+          <Text style={styles.toText}>to</Text>
 
-        <Label text="Difference Amount (₹) *" />
-        <TextInput
-          style={styles.input}
-          placeholder="Profit / Loss amount"
-          keyboardType="numeric"
-          value={difference}
-          onChangeText={setDifference}
-        />
-      </Section>
+          <TextInput
+            style={styles.dateInput}
+            placeholder="dd-mm-yyyy"
+            value={toDate}
+            onChangeText={setToDate}
+          />
 
-      {/* Status */}
-      <Section title="Profit Status">
-        <Label text="Status *" />
-        <PickerField value={status} onChange={setStatus}>
-          <Picker.Item label="Select status" value="" />
-          <Picker.Item label="Profit" value="Profit" />
-          <Picker.Item label="Loss" value="Loss" />
-          <Picker.Item label="Neutral" value="Neutral" />
-        </PickerField>
-      </Section>
+          <TouchableOpacity style={styles.clearBtn} onPress={handleClear}>
+            <Text style={styles.clearText}>Clear</Text>
+          </TouchableOpacity>
 
-      {/* Remarks */}
-      <Section title="Additional Notes">
-        <Label text="Remarks" />
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="Any additional notes..."
-          multiline
-          value={remarks}
-          onChangeText={setRemarks}
-        />
-      </Section>
+          <Text style={styles.rowsText}>Showing 0 rows</Text>
+        </View>
 
-      {/* Buttons */}
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.cancelBtn}>
-          <Text style={styles.cancelText}>Cancel</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.submitBtn}>
-          <Text style={styles.submitText}>Submit Report</Text>
+        <TouchableOpacity style={styles.downloadBtn}>
+          <Ionicons name="download-outline" size={18} color="#fff" />
+          <Text style={styles.downloadText}>Download</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Showing Info */}
+      <Text style={styles.showingText}>Showing 1 - 0</Text>
+
+      {/* Pagination */}
+      <View style={styles.pagination}>
+        <TouchableOpacity style={styles.pageBtnDisabled}>
+          <Text style={styles.pageTextDisabled}>Previous</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.pageBtnDisabled}>
+          <Text style={styles.pageTextDisabled}>Next</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Table Header */}
+      <View style={styles.tableHeader}>
+        <Text style={styles.col}>Date</Text>
+        <Text style={styles.col}>Organization Total Price(₹)</Text>
+        <Text style={styles.col}>Expected Price (₹)</Text>
+  
+        <Text style={styles.col}>Difference (₹)</Text>
+        <Text style={styles.col}>Status</Text>
+      </View>
+
+      {/* Empty State */}
+      <View style={styles.emptyBox}>
+        <Text style={styles.emptyText}>
+          No data for selected range
+        </Text>
+      </View>
+
     </ScrollView>
   );
 };
-
-/* ---------- Reusable Components ---------- */
-
-const Section = ({ title, children }: any) => (
-  <View style={styles.section}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    {children}
-  </View>
-);
-
-const Label = ({ text }: any) => (
-  <Text style={styles.label}>{text}</Text>
-);
-
-const PickerField = ({ children, value, onChange }: any) => (
-  <View style={styles.pickerWrapper}>
-    <Picker selectedValue={value} onValueChange={onChange}>
-      {children}
-    </Picker>
-  </View>
-);
 
 /* ---------- Styles ---------- */
 
@@ -139,71 +101,114 @@ const styles = StyleSheet.create({
     backgroundColor: "#F2FFF7",
     padding: 12,
   },
+  pageTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 14,
+    color: "#000",
+  },
   section: {
     backgroundColor: "#fff",
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 12,
-    marginBottom: 14,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#3CB371",
+    borderColor: "#E0F2EA",
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#2E8B57",
-    marginBottom: 10,
-  },
-  label: {
     fontSize: 14,
-    marginBottom: 4,
+    fontWeight: "600",
+    marginBottom: 6,
+  },
+  dateRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
+  dateInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 6,
+    padding: 8,
+    width: 110,
+    marginRight: 6,
+  },
+  toText: {
+    marginHorizontal: 4,
+  },
+  clearBtn: {
+    backgroundColor: "#f0f0f0",
+    padding: 8,
+    borderRadius: 6,
+    marginLeft: 6,
+  },
+  clearText: {
+    fontSize: 12,
     color: "#333",
   },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
+  rowsText: {
+    marginLeft: 10,
+    fontSize: 12,
+    color: "#555",
+  },
+  downloadBtn: {
+    alignSelf: "flex-end",
+    backgroundColor: "#2E8B57",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 6,
-    padding: 10,
-    marginBottom: 10,
+    marginTop: 10,
+  },
+  downloadText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 13,
+  },
+  showingText: {
+    marginBottom: 6,
+    fontSize: 13,
+    color: "#555",
+  },
+  tableHeader: {
+    flexDirection: "row",
+    backgroundColor: "#E8F8F1",
+    padding: 12,
+    borderRadius: 6,
+    flexWrap: "wrap",
+  },
+  col: {
+    width: "33%",   // adjusted for 6 columns
+    fontWeight: "700",
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  emptyBox: {
     backgroundColor: "#fff",
-  },
-  textArea: {
-    height: 80,
-    textAlignVertical: "top",
-  },
-  pickerWrapper: {
-    borderWidth: 1,
-    borderColor: "#ccc",
+    paddingVertical: 20,
+    alignItems: "center",
     borderRadius: 6,
-    marginBottom: 10,
-    overflow: "hidden",
+    marginTop: 10,
   },
-  buttonRow: {
+  emptyText: {
+    color: "#777",
+    fontSize: 14,
+  },
+  pagination: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginVertical: 20,
   },
-  cancelBtn: {
-    backgroundColor: "#ddd",
-    padding: 14,
+  pageBtnDisabled: {
+    backgroundColor: "#f0f0f0",
+    padding: 12,
     borderRadius: 6,
     width: "48%",
     alignItems: "center",
   },
-  submitBtn: {
-    backgroundColor: "#2E8B57",
-    padding: 14,
-    borderRadius: 6,
-    width: "48%",
-    alignItems: "center",
-  },
-  cancelText: {
-    color: "#333",
+  pageTextDisabled: {
+    color: "#aaa",
     fontWeight: "600",
-  },
-  submitText: {
-    color: "#fff",
-    fontWeight: "700",
   },
 });
 
-export default MilkProfitReportForm;
+export default MilkProfitLossReport;

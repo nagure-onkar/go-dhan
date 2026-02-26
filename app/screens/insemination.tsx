@@ -1,20 +1,19 @@
-import { POST } from "@/api/methods";
 import { ENDPOINTS } from "@/api/endpoints";
+import { POST } from "@/api/methods";
 import React, { useState } from "react";
 import {
-  View,
+  Alert,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
-  Button,
+  View
 } from "react-native";
 
 
-import { useTheme } from "@/theme/useTheme";
 import { useLanguage } from '@/constants/localization/useLanguage';
+import { useTheme } from "@/theme/useTheme";
 import { useNavigation } from "@react-navigation/native";
 
 
@@ -42,6 +41,12 @@ const InseminationForm = () => {
   const [inseminationExpenses, setInseminationExpenses] = useState("");
   const [nextHeatDateString, setNextHeatDateString] = useState("");
   const [pdDateString, setPdDateString] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState<
+  null | "insemination" | "nextHeat" | "pd"
+>(null);
+
+const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
   const [remarks, setRemarks] = useState("");
 
 
@@ -125,6 +130,32 @@ const [password, setPassword] = useState("");
 const [loading, setLoading] = useState(false);
 const [loggedIn, setLoggedIn] = useState(false);
 
+const handleDateChange = (event: any, date?: Date) => {
+  if (event.type === "dismissed") {
+    setShowDatePicker(null);
+    return;
+  }
+
+  setShowDatePicker(null);
+
+  if (!date) return;
+
+  const formattedDate = date.toLocaleDateString();
+
+  if (showDatePicker === "insemination") {
+    setInseminationDateString(formattedDate);
+  }
+
+  if (showDatePicker === "nextHeat") {
+    setNextHeatDateString(formattedDate);
+  }
+
+  if (showDatePicker === "pd") {
+    setPdDateString(formattedDate);
+  }
+};
+
+
 
   return (
     <ScrollView style={styles.container}>
@@ -140,13 +171,15 @@ const [loggedIn, setLoggedIn] = useState(false);
       <Text style={styles.sectionTitle}>Animal Body Metrics</Text>
       <View style={styles.sectionBox}>
         <Text style={styles.label}>Body Temperature *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="37.5 – 39"
-          keyboardType="numeric"
-          value={bodyTemp}
-          onChangeText={setBodyTemp}
-        />
+        <TouchableOpacity
+  style={styles.input}
+  onPress={() => setShowDatePicker("insemination")}
+>
+  <Text>
+    {inseminationDateString || "Select Insemination Date"}
+  </Text>
+</TouchableOpacity>
+
 
         <Text style={styles.label}>Is Cattle Lactating *</Text>
         <RadioButtonGroup

@@ -1,174 +1,205 @@
-import { useLanguage } from "@/constants/localization/useLanguage";
-import { useTheme } from "@/theme/useTheme";
 import React, { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  View,
+  Text,
+  TextInput,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-const FeedReportForm = () => {
-  const { colors } = useTheme();
-  const { t } = useLanguage();
-
+const FeedReportScreen = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
+  const handleClear = () => {
+    setFromDate("");
+    setToDate("");
+  };
+
   return (
     <ScrollView style={styles.container}>
-      {/* Header */}
-      <Text style={styles.pageTitle}>Feed Report</Text>
-
-      {/* Date Range Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Date Range</Text>
-
-        <Text style={styles.label}>From Date *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="dd-mm-yyyy"
-          value={fromDate}
-          onChangeText={setFromDate}
-        />
-
-        <Text style={styles.label}>To Date *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="dd-mm-yyyy"
-          value={toDate}
-          onChangeText={setToDate}
-        />
-
-        <View style={styles.actionRow}>
-          <TouchableOpacity style={styles.clearBtn}>
-            <Text style={styles.clearText}>Clear</Text>
-          </TouchableOpacity>
+      <View style={styles.card}>
+        
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>Feed Report</Text>
 
           <TouchableOpacity style={styles.downloadBtn}>
-            <Text style={styles.downloadText}>Download</Text>
+            <Ionicons name="download-outline" size={18} color="#fff" />
+            <Text style={styles.downloadText}> Download</Text>
           </TouchableOpacity>
         </View>
-      </View>
 
-      {/* Report Table Header */}
-      <View style={styles.tableHeader}>
-        <Text style={styles.colSmall}>Date</Text>
-        <Text style={styles.col}>Feed Name</Text>
-        <Text style={styles.col}>Feed Type</Text>
-        <Text style={styles.col}>Transaction</Text>
-        <Text style={styles.col}>In (Kg)</Text>
-        <Text style={styles.col}>Out (Kg)</Text>
-        <Text style={styles.col}>Wastage</Text>
-      </View>
+        {/* Date Range */}
+        <Text style={styles.label}>Date Range</Text>
 
-      {/* Empty State */}
-      <View style={styles.emptyBox}>
-        <Text style={styles.emptyText}>
-          No data for selected range
-        </Text>
+        <View style={styles.dateRow}>
+          <TextInput
+            placeholder="dd-mm-yyyy"
+            value={fromDate}
+            onChangeText={setFromDate}
+            style={styles.dateInput}
+          />
+
+          <Text style={styles.toText}>to</Text>
+
+          <TextInput
+            placeholder="dd-mm-yyyy"
+            value={toDate}
+            onChangeText={setToDate}
+            style={styles.dateInput}
+          />
+
+          <TouchableOpacity style={styles.clearBtn} onPress={handleClear}>
+            <Text style={styles.clearText}>Clear</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.showingText}>Showing 0 rows</Text>
+
+        {/* Showing Info */}
+              <Text style={styles.showingText}>Showing <b>1 - 0</b></Text>
+
+              {/* Pagination */}
+        <View style={styles.paginationRow}>
+          <TouchableOpacity style={styles.pageBtnDisabled}>
+            <Text style={styles.pageTextDisabled}>Previous</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.pageBtnDisabled}>
+            <Text style={styles.pageTextDisabled}>Next</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Table Header */}
+        <View style={styles.tableHeader}>
+          <Text style={styles.headerCell}>Date</Text>
+          <Text style={styles.headerCell}>Feed Name</Text>
+          <Text style={styles.headerCell}>Transaction Type</Text>
+          <Text style={styles.headerCell}>Quantity In (Kg)</Text>
+          <Text style={styles.headerCell}>Quantity Out (Kg)</Text>
+          <Text style={styles.headerCell}>Wastage Quantity  (Kg)</Text>
+        </View>
+
+        {/* Empty State */}
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            No data for selected range
+          </Text>
+        </View>
+
+      
       </View>
     </ScrollView>
   );
 };
 
-/* ---------- Styles ---------- */
+export default FeedReportScreen;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#F2FFF7",
-    padding: 12,
+    flex: 1,
+    backgroundColor: "#e6f0ec",
   },
-  pageTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#2E8B57",
-    marginBottom: 14,
-  },
-  section: {
+  card: {
     backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#3CB371",
+    margin: 15,
+    borderRadius: 12,
+    padding: 15,
+    elevation: 3,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#2E8B57",
-    marginBottom: 10,
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 4,
-    color: "#333",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: "#fff",
-  },
-  actionRow: {
+  headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
-  },
-  clearBtn: {
-    backgroundColor: "#ddd",
-    padding: 12,
-    borderRadius: 6,
-    width: "48%",
     alignItems: "center",
   },
-  clearText: {
-    fontWeight: "600",
-    color: "#333",
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
   downloadBtn: {
-    backgroundColor: "#2E8B57",
-    padding: 12,
-    borderRadius: 6,
-    width: "48%",
+    flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#1a8f5a",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
   },
   downloadText: {
-    fontWeight: "700",
     color: "#fff",
+    fontSize: 14,
+  },
+  label: {
+    marginTop: 15,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  dateRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    flexWrap: "wrap",
+  },
+  dateInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginRight: 8,
+    width: 110,
+  },
+  toText: {
+    marginRight: 8,
+  },
+  clearBtn: {
+    backgroundColor: "#eee",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  clearText: {
+    fontSize: 12,
+  },
+  showingText: {
+    marginTop: 10,
+    fontSize: 12,
+    color: "gray",
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#E8F8F1",
-    paddingVertical: 10,
-    paddingHorizontal: 6,
-    borderRadius: 6,
+    marginTop: 15,
+    borderBottomWidth: 1,
+    borderColor: "#ddd",
+    paddingBottom: 8,
   },
-  colSmall: {
-    width: 70,
+  headerCell: {
+    flex: 1,
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: "600",
   },
-  col: {
-    width: 90,
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  emptyBox: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 6,
-    marginTop: 10,
-    alignItems: "center",
+  emptyContainer: {
+    paddingVertical: 20,
   },
   emptyText: {
-    color: "#777",
-    fontSize: 14,
+    textAlign: "center",
+    color: "#888",
+  },
+  paginationRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 15,
+  },
+  pageBtnDisabled: {
+    backgroundColor: "#eee",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  pageTextDisabled: {
+    color: "#aaa",
   },
 });
-
-export default FeedReportForm;
