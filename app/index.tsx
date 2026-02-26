@@ -3,5 +3,5 @@ import { Redirect } from "expo-router";
 export default function Index() {
   // return <Redirect href="/tabs" />;
   // return <Redirect href="/screens/cattleReproductionCycle" />;
-  return <Redirect href="/drawer/Report/AlertReports" />;
+  return <Redirect href="/screens/insemination" />
 }

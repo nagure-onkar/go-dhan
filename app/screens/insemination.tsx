@@ -170,15 +170,13 @@ const handleDateChange = (event: any, date?: Date) => {
       {/* Section 1 */}
       <Text style={styles.sectionTitle}>Animal Body Metrics</Text>
       <View style={styles.sectionBox}>
-        <Text style={styles.label}>Body Temperature *</Text>
-        <TouchableOpacity
+        <TextInput
   style={styles.input}
-  onPress={() => setShowDatePicker("insemination")}
->
-  <Text>
-    {inseminationDateString || "Select Insemination Date"}
-  </Text>
-</TouchableOpacity>
+  placeholder="Enter Body Temperature"
+  keyboardType="numeric"
+  value={bodyTemp}
+  onChangeText={setBodyTemp}
+/>
 
 
         <Text style={styles.label}>Is Cattle Lactating *</Text>
