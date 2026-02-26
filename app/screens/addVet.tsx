@@ -14,6 +14,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useTheme } from "../../src/theme/useTheme";
 import AppText from "../../src/components/common/AppText";
 import { useLanguage } from "../../src/constants/localization/useLanguage";
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
+const BASE_URL = "https://astrabytte-ai.onrender.com";
 
 const AddVeterinarian = () => {
   const { t } = useLanguage();
@@ -76,47 +78,108 @@ const AddVeterinarian = () => {
   };
 
   // ================= SAVE =================
-  const handleSave = () => {
-    if (!vetId.trim()) {
-      Alert.alert("Validation Error", "Please enter Veterinarian ID");
-      return;
-    }
-    if (!firstName.trim()) {
-      Alert.alert("Validation Error", "Please enter First Name");
-      return;
-    }
-    if (!fathersName.trim()) {
-      Alert.alert("Validation Error", "Please enter Father's Name");
-      return;
-    }
-    if (!surname.trim()) {
-      Alert.alert("Validation Error", "Please enter Surname");
-      return;
-    }
-    if (!gender) {
-      Alert.alert("Validation Error", "Please select Gender");
-      return;
-    }
-    if (!dob) {
-      Alert.alert("Validation Error", "Please select Date of Birth");
-      return;
-    }
-    if (!joiningDate) {
-      Alert.alert("Validation Error", "Please select Date of Joining");
-      return;
-    }
-    if (!mobile || mobile.length < 10) {
-      Alert.alert("Validation Error", "Please enter a valid Mobile Number");
-      return;
-    }
-    if (!address.trim()) {
-      Alert.alert("Validation Error", "Please enter Address");
+const handleSave = async () => {
+  try {
+    const token = await AsyncStorage.getItem("access_token");
+
+    if (!token) {
+      Alert.alert("Error", "User not logged in");
       return;
     }
 
-    // All validations passed → navigate
+    if (!vetId.trim()) return Alert.alert("Validation Error", "Enter Veterinarian ID");
+    if (!firstName.trim()) return Alert.alert("Validation Error", "Enter First Name");
+    if (!fathersName.trim()) return Alert.alert("Validation Error", "Enter Father's Name");
+    if (!surname.trim()) return Alert.alert("Validation Error", "Enter Surname");
+    if (!gender) return Alert.alert("Validation Error", "Select Gender");
+    if (!dob) return Alert.alert("Validation Error", "Select Date of Birth");
+    if (!joiningDate) return Alert.alert("Validation Error", "Select Date of Joining");
+    if (!mobile || mobile.length !== 10)
+      return Alert.alert("Validation Error", "Enter valid 10 digit mobile number");
+    if (!address.trim())
+      return Alert.alert("Validation Error", "Enter Address");
+
+    // FORMAT DATE
+    const formatDate = (dateString: string) => {
+      const parts = dateString.split("/");
+      if (parts.length !== 3) return null;
+
+      const month = parts[0].padStart(2, "0");
+      const day = parts[1].padStart(2, "0");
+      const year = parts[2];
+
+      return `${year}-${month}-${day}`;
+    };
+
+    const formattedDOB = formatDate(dob);
+    const formattedJoining = formatDate(joiningDate);
+
+    if (!formattedDOB || !formattedJoining) {
+      Alert.alert("Error", "Invalid date format");
+      return;
+    }
+
+    const formattedGender =
+      gender === "Male" ? "Male" :
+      gender === "Female" ? "Female" : "";
+
+    if (!formattedGender) {
+      Alert.alert("Error", "Gender must be Male or Female");
+      return;
+    }
+
+    const payload = {
+      vetId: vetId.trim(),
+      firstName: firstName.trim(),
+      fathersName: fathersName.trim(),
+      surname: surname.trim(),
+      gender: formattedGender,
+      dateOfBirth: formattedDOB,
+      age: Number(age) || 0,
+      address: address.trim(),
+      dateOfJoining: formattedJoining,
+      mobileNumber: mobile,
+      alternateContactNumber: alternateMobile || null,
+      remarks: specialization || "",
+    };
+
+    console.log("Sending Payload:", payload);
+
+    // ✅ CORRECT ENDPOINT
+    const response = await fetch(
+      `${BASE_URL}/api/v1/vet-registry/`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const result = await response.json();
+    console.log("Veterinarian API Response:", result);
+
+    if (!response.ok) {
+      Alert.alert(
+        "Error",
+        result?.detail?.[0]?.msg ||
+        result?.detail ||
+        "Something went wrong"
+      );
+      return;
+    }
+
+    Alert.alert("Success", "Veterinarian Added Successfully");
     router.replace("/tabs");
-  };
+
+  } catch (error) {
+    console.log("SAVE ERROR:", error);
+    Alert.alert("Error", "Server Error");
+  }
+};
 
   return (
     <View style={styles.screen}>
