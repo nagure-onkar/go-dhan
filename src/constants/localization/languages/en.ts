@@ -139,7 +139,7 @@ export default {
   premature: "Premature",
   normal_delivery: "Normal Delivery",
   treatment_required: "Treatment Required",
-  ully_fit_calf: "Fully fit Calf",
+  fully_fit_calf: "Fully fit Calf",
   //-----------------------------------------------------------------
 
   //this for examples section
