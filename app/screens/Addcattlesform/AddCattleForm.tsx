@@ -2,9 +2,10 @@ import AppText from "@/components/common/AppText";
 import { useLanguage } from "@/constants/localization/useLanguage";
 import { useTheme } from "@/theme/useTheme";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   KeyboardAvoidingView,
@@ -16,11 +17,13 @@ import {
   View,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import Success from "../success";
+import Success from "../../../src/components/common/success";
 
-const { t, setLanguage, language } = useLanguage();
+const { t } = useLanguage();
 
-const buffaloBreeds = [
+const BASE_URL = "https://astrabytte-ai.onrender.com";
+
+const BuffaloBreeds = [
   { label: `${t.murrah}`, value: "murrah" },
   { label: `${t.nili_ravi}`, value: "nili_ravi" },
   { label: `${t.bhadawari}`, value: "bhadawari" },
@@ -33,7 +36,7 @@ const buffaloBreeds = [
   { label: `${t.toda}`, value: "toda" },
 ];
 
-const cowBreeds = [
+const CowBreeds = [
   { label: `${t.hf}`, value: "hf" },
   { label: `${t.jersey}`, value: "jersey" },
   { label: `${t.brown_swiss}`, value: "brown swiss" },
@@ -53,8 +56,8 @@ const cowBreeds = [
 ];
 
 const cattleType = [
-  { label: "Buffalo", value: "buffalo" },
-  { label: "Cow", value: "cow" },
+  { label: `${t.Buffalo}`, value: "Buffalo" },
+  { label: `${t.Cow}`, value: "Cow" },
 ];
 
 const cattleStates = [
@@ -84,72 +87,63 @@ const cattleStatuses = [
   { label: `${t.inactive}`, value: "inactive" },
 ];
 
-// Mock data - replace with your actual data source (e.g., API call)
-const workers = [
-  { label: "Ram", value: "ram" },
-  { label: "Sham", value: "sham" },
-];
-const vets = [
-  { label: "Dr. Patil", value: "dr_patil" },
-  { label: "Dr. Shinde", value: "dr_shinde" },
-];
-
-const reset = {
-  cattleId: "",
-  cattleName: "",
-  breed: null,
-  cattleType: "buffalo",
-  gender: "Female",
-  treatment: "",
-  nddbNumber: "",
-  purchaseCost: "",
-  purchaseSource: "",
-  dob: null,
-  age: "",
-  weight: "",
-  status: "active",
-  workerAssigned: null,
-  vetAssigned: null,
-  state: null,
-  currentStateDate: null,
-  bloodLine: "",
-  insuranceNumber: "",
-  lactationNumber: "",
-  remark: "",
-};
-
 export default function AddCattleForm() {
   const { t, setLanguage, language } = useLanguage();
   const { colors } = useTheme();
   const [isSaved, setIsSaved] = useState(false);
   const [formData, setFormData] = useState({
     cattleId: "",
-    cattleName: "",
-    breed: null,
-    cattleType: "buffalo",
+    nameOfCattle: "",
+    breed: "",
+    cattleType: "Buffalo",
     gender: "Female",
-    treatment: "",
-    nddbNumber: "",
-    purchaseCost: "",
+    treatmentGivenAtPurchase: "",
+    nddbRegistrationNumber: "",
+    purchasingCost: "",
     purchaseSource: "",
-    dob: null,
-    age: "",
-    weight: "",
+    dateOfBirth: "",
+    weightKg: "",
     status: "active",
-    workerAssigned: null,
-    vetAssigned: null,
-    state: null,
-    currentStateDate: null,
+    workerAssigned: "",
+    veterinarianAssigned: "",
+    state: "",
+    stateDate: "",
     bloodLine: "",
     insuranceNumber: "",
     lactationNumber: "",
     remark: "",
+    images: [],
   });
 
+  const reset = {
+    cattleId: "",
+    nameOfCattle: "",
+    breed: null,
+    cattleType: "Buffalo",
+    gender: "Female",
+    treatmentGivenAtPurchase: "",
+    nddbRegistrationNumber: "",
+    purchasingCost: "",
+    purchaseSource: "",
+    dateOfBirth: null,
+    age: "",
+    weightKg: "",
+    status: "active",
+    workerAssigned: null,
+    veterinarianAssigned: null,
+    state: null,
+    stateDate: null,
+    bloodLine: "",
+    insuranceNumber: "",
+    lactationNumber: "",
+    remark: "",
+    images: [],
+  };
+
   const [errors, setErrors] = useState({});
-  // track which date field opened the picker: 'dob' or 'currentState'
+  // track which date field opened the picker: 'dateOfBirth' or 'currentState'
   const [datePickerFor, setDatePickerFor] = useState<
-    null | "dob" | "currentState"
+    null | "dateOfBirth" | "currentState"
   >(null);
   const [isCattleTypeFocus, setIsCattleTypeFocus] = useState(false);
   const [isBreedFocus, setIsBreedFocus] = useState(false);
@@ -164,24 +158,110 @@ export default function AddCattleForm() {
   const [screen2, setScreen2] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const saveFormData = async (formData) => {
+  // 1. States for the dropdown lists
+  const [workerList, setWorkerList] = useState([]);
+  const [vetList, setVetList] = useState([]);
+
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  const fetchAllData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      // Fetch both Workers and Vets at the same time
+      const [workerRes, vetRes] = await Promise.all([
+        fetch(`${BASE_URL}/api/v1/worker-registry/`, { headers }),
+        fetch(`${BASE_URL}/api/v1/vet-registry/`, { headers }),
+      ]);
+
+      const workers = await workerRes.json();
+      const vets = await vetRes.json();
+
+      // Transform data for the Dropdown component
+      setWorkerList(
+        workers.map((w) => ({ label: w.full_name, value: w.worker_id })),
+      );
+      setVetList(vets.map((v) => ({ label: v.full_name, value: v.vet_id })));
+    } catch (error) {
+      console.error("Error loading dropdown data:", error);
+    }
+  };
+
+  const getStoredToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      return token; // Returns the string or null
+    } catch (error) {
+      console.error("Error retrieving the token:", error);
+      return null;
+    }
+  };
+
+  const saveFormData = async () => {
     try {
       setIsLoading(true);
-      const url = "http://10.124.247.84:3000/cattlestock";
+      const token = await getStoredToken();
+      const url = `${BASE_URL}/api/v1/cattle/`;
+
+      // 1. Improved Formatter: Handles Undefined, Strings, and Date Objects
+      const formatDate = (dateValue) => {
+        if (!dateValue) return null; // If empty, don't try to split
+
+        // If it's a Date object, convert to ISO string first
+        const isoString =
+          typeof dateValue === "string" ? dateValue : dateValue.toISOString();
+        return isoString.split("T")[0];
+      };
+
+      // 2. Prepare the clean object
+      const cleanData = {
+        ...formData,
+        // Use the safer formatter
+        dateOfBirth: formatDate(formData.dateOfBirth),
+        stateDate: formatDate(formData.stateDate),
+
+        // Fix the naming mismatch from your previous error
+        remarks: formData.remark || "",
+
+        // Convert numbers to actual Integers if they are strings
+        purchasingCost: formData.purchasingCost
+          ? Number(formData.purchasingCost)
+          : 0,
+        weightKg: formData.weightKg ? Number(formData.weightKg) : 0,
+        lactationNumber: formData.lactationNumber
+          ? Number(formData.lactationNumber)
+          : 0,
+        age: formData.age ? Number(formData.age) : 0,
+      };
+
+      // Remove the key the backend doesn't like
+      delete cleanData.remark;
+
+      // console.log("Sending clean data:", cleanData);
+
       const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(cleanData),
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        console.log(
+          "BACKEND VALIDATION ERROR:",
+          JSON.stringify(errorData, null, 2),
+        );
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      console.log("Form data saved successfully:", result);
+      console.log("Success:", result);
       return result;
     } catch (error) {
       console.error("Error saving form data:", error);
@@ -196,23 +276,27 @@ export default function AddCattleForm() {
     // Added .trim() to prevent empty spaces from passing
     if (!formData.cattleId || !formData.cattleId.trim())
       newErrors.cattleId = `${t.cattleIdrequired}`;
-    if (!formData.cattleName || !formData.cattleName.trim())
-      newErrors.cattleName = `${t.cattleNamerequired}`;
+    if (!formData.nameOfCattle || !formData.nameOfCattle.trim())
+      newErrors.nameOfCattle = `${t.nameOfCattlerequired}`;
     if (!formData.cattleType) newErrors.cattleType = `${t.cattleTyperequired}`;
     if (!formData.breed) newErrors.breed = `${t.breedrequired}`;
-    if (!formData.treatment || !formData.treatment.trim())
-      newErrors.treatment = `${t.treatmentrequired}`;
-    // if (!formData.nddbNumber || !formData.nddbNumber.trim())
-    //   newErrors.nddbNumber = "NDDB Number is required";
-    if (!formData.purchaseCost || !formData.purchaseCost.trim())
-      newErrors.purchaseCost = `${t.purchaseCostrequired}`;
+    if (
+      !formData.treatmentGivenAtPurchase ||
+      !formData.treatmentGivenAtPurchase.trim()
+    )
+      newErrors.treatmentGivenAtPurchase = `${t.treatmentGivenAtPurchaserequired}`;
+    // if (!formData.nddbRegistrationNumber || !formData.nddbRegistrationNumber.trim())
+    //   newErrors.nddbRegistrationNumber = "NDDB Number is required";
+    if (!formData.purchasingCost || !formData.purchasingCost.trim())
+      newErrors.purchasingCost = `${t.purchasingCostrequired}`;
     if (!formData.purchaseSource || !formData.purchaseSource.trim())
       newErrors.purchaseSource = `${t.purchaseSourcerequired}`;
-    if (!formData.dob) newErrors.dob = `${t.dobrequired}`;
+    if (!formData.dateOfBirth)
+      newErrors.dateOfBirth = `${t.dateOfBirthrequired}`;
     if (!formData.age || !formData.age.trim())
       newErrors.age = `${t.agerequired}`;
-    if (!formData.weight || !formData.weight.trim())
-      newErrors.weight = `${t.weightrequired}`;
+    if (!formData.weightKg || !formData.weightKg.trim())
+      newErrors.weightKg = `${t.weightKgrequired}`;
 
     setErrors(newErrors);
 
@@ -232,11 +316,10 @@ export default function AddCattleForm() {
     // if (!formData.status) newErrors.status = "Status is required";
     if (!formData.workerAssigned)
       newErrors.workerAssigned = `${t.workerAssignedrequired}`;
-    if (!formData.vetAssigned)
-      newErrors.vetAssigned = `${t.vetAssignedrequired}`;
+    if (!formData.veterinarianAssigned)
+      newErrors.veterinarianAssigned = `${t.veterinarianAssignedrequired}`;
     if (!formData.state) newErrors.state = `${t.staterequired}`;
-    if (!formData.currentStateDate)
-      newErrors.currentStateDate = `${t.currentStateDaterequired}`;
+    if (!formData.stateDate) newErrors.stateDate = `${t.stateDaterequired}`;
     // if (!formData.bloodLine || !formData.bloodLine.trim())
     //   newErrors.bloodLine = "Blood Line is required";
     // if (!formData.insuranceNumber || !formData.insuranceNumber.trim())
@@ -275,7 +358,7 @@ export default function AddCattleForm() {
     setDatePickerFor(null);
     if (!selectedDate) return;
 
-    if (datePickerFor === "dob") {
+    if (datePickerFor === "dateOfBirth") {
       const today = new Date();
       let ageYears = today.getFullYear() - selectedDate.getFullYear();
       const monthDifference = today.getMonth() - selectedDate.getMonth();
@@ -287,15 +370,15 @@ export default function AddCattleForm() {
       }
       setFormData({
         ...formData,
-        dob: selectedDate,
+        dateOfBirth: selectedDate,
         age: ageYears.toString(),
       });
-      setErrors((prev) => ({ ...prev, dob: null }));
+      setErrors((prev) => ({ ...prev, dateOfBirth: null }));
     }
 
     if (datePickerFor === "currentState") {
-      setFormData({ ...formData, currentStateDate: selectedDate });
-      setErrors((prev) => ({ ...prev, currentStateDate: null }));
+      setFormData({ ...formData, stateDate: selectedDate });
+      setErrors((prev) => ({ ...prev, stateDate: null }));
     }
   };
 
@@ -305,7 +388,22 @@ export default function AddCattleForm() {
   };
 
   if (isSaved) {
-    return <Success style={{ flex: 1, backgroundColor: colors.background }} />;
+    return (
+      <>
+        <Success style={{ flex: 1, backgroundColor: colors.background }} />
+        <AppText
+          style={{
+            textAlign: "center",
+            fontSize: 24,
+            fontWeight: "bold",
+            marginBottom: 170,
+            backgroundColor: colors.background,
+          }}
+        >
+          Cattle Added Successfully!
+        </AppText>
+      </>
+    );
   }
 
   if (screen1) {
@@ -368,13 +466,13 @@ export default function AddCattleForm() {
             {/* Cattle Name */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.cattleName}
+                {t.nameOfCattle}
                 {req}
               </AppText>
               <View
                 style={[
                   styles.inputContainer,
-                  errors.cattleName && styles.inputError,
+                  errors.nameOfCattle && styles.inputError,
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
@@ -387,15 +485,15 @@ export default function AddCattleForm() {
                 <TextInput
                   style={[styles.input, { color: colors.text }]}
                   placeholder={`${t.egdaisy}`}
-                  value={formData.cattleName}
+                  value={formData.nameOfCattle}
                   onChangeText={(val) =>
-                    setFormData({ ...formData, cattleName: val })
+                    setFormData({ ...formData, nameOfCattle: val })
                   }
                 />
               </View>
-              {errors.cattleName && (
+              {errors.nameOfCattle && (
                 <AppText style={styles.errorAppText}>
-                  {errors.cattleName}
+                  {errors.nameOfCattle}
                 </AppText>
               )}
             </View>
@@ -470,12 +568,12 @@ export default function AddCattleForm() {
                   { color: colors.text },
                 ]}
                 data={
-                  formData.cattleType === "buffalo" ? buffaloBreeds : cowBreeds
+                  formData.cattleType === "Buffalo" ? BuffaloBreeds : CowBreeds
                 }
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={!isBreedFocus ? "Select breed" : "..."}
+                placeholder={!isBreedFocus ? `${t.egselectbreed}` : "..."}
                 value={formData.breed}
                 onFocus={() => setIsBreedFocus(true)}
                 onBlur={() => setIsBreedFocus(false)}
@@ -499,15 +597,16 @@ export default function AddCattleForm() {
               )}
             </View>
 
-            {/* Treatment given */}
+            {/* treatmentGivenAtPurchase given */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                Treatment Given At Purchase{req}
+                {t.treatmentGivenAtPurchase}
+                {req}
               </AppText>
               <View
                 style={[
                   styles.inputContainer,
-                  errors.treatment && styles.inputError,
+                  errors.treatmentGivenAtPurchase && styles.inputError,
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
@@ -520,15 +619,15 @@ export default function AddCattleForm() {
                 <TextInput
                   style={[styles.input, { color: colors.text }]}
                   placeholder={`${t.egdeworming}`}
-                  value={formData.treatment}
+                  value={formData.treatmentGivenAtPurchase}
                   onChangeText={(val) =>
-                    setFormData({ ...formData, treatment: val })
+                    setFormData({ ...formData, treatmentGivenAtPurchase: val })
                   }
                 />
               </View>
-              {errors.treatment && (
+              {errors.treatmentGivenAtPurchase && (
                 <AppText style={styles.errorAppText}>
-                  {errors.treatment}
+                  {errors.treatmentGivenAtPurchase}
                 </AppText>
               )}
             </View>
@@ -536,12 +635,12 @@ export default function AddCattleForm() {
             {/* NDDB Number */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.nddbNumber}
+                {t.nddbRegistrationNumber}
               </AppText>
               <View
                 style={[
                   styles.inputContainer,
-                  errors.nddbNumber && styles.inputError,
+                  errors.nddbRegistrationNumber && styles.inputError,
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
@@ -554,15 +653,15 @@ export default function AddCattleForm() {
                 <TextInput
                   style={[styles.input, { color: colors.text }]}
                   placeholder={`${t.egnddb}`}
-                  value={formData.nddbNumber}
+                  value={formData.nddbRegistrationNumber}
                   onChangeText={(val) =>
-                    setFormData({ ...formData, nddbNumber: val })
+                    setFormData({ ...formData, nddbRegistrationNumber: val })
                   }
                 />
               </View>
-              {errors.nddbNumber && (
+              {errors.nddbRegistrationNumber && (
                 <AppText style={styles.errorAppText}>
-                  {errors.nddbNumber}
+                  {errors.nddbRegistrationNumber}
                 </AppText>
               )}
             </View>
@@ -605,13 +704,13 @@ export default function AddCattleForm() {
             {/* Cattle ID */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.purchaseCost}
+                {t.purchasingCost}
                 {req}
               </AppText>
               <View
                 style={[
                   styles.inputContainer,
-                  errors.purchaseCost && styles.inputError,
+                  errors.purchasingCost && styles.inputError,
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
@@ -624,16 +723,16 @@ export default function AddCattleForm() {
                 <TextInput
                   style={[styles.input, { color: colors.text }]}
                   placeholder="50000"
-                  value={formData.purchaseCost}
+                  value={formData.purchasingCost}
                   keyboardType="numeric"
                   onChangeText={(val) =>
-                    setFormData({ ...formData, purchaseCost: val })
+                    setFormData({ ...formData, purchasingCost: val })
                   }
                 />
               </View>
-              {errors.purchaseCost && (
+              {errors.purchasingCost && (
                 <AppText style={styles.errorAppText}>
-                  {errors.purchaseCost}
+                  {errors.purchasingCost}
                 </AppText>
               )}
             </View>
@@ -659,7 +758,7 @@ export default function AddCattleForm() {
                 />
                 <TextInput
                   style={[styles.input, { color: colors.text }]}
-                  placeholder="e.g. Local Farm"
+                  placeholder={t.egpurchasesource}
                   value={formData.purchaseSource}
                   onChangeText={(val) =>
                     setFormData({ ...formData, purchaseSource: val })
@@ -682,7 +781,7 @@ export default function AddCattleForm() {
               <TouchableOpacity
                 style={[
                   styles.inputContainer,
-                  errors.dob && styles.inputError,
+                  errors.dateOfBirth && styles.inputError,
                   {
                     justifyContent: "flex-start",
                     alignItems: "center",
@@ -690,7 +789,7 @@ export default function AddCattleForm() {
                     borderColor: colors.border,
                   },
                 ]}
-                onPress={() => setDatePickerFor("dob")}
+                onPress={() => setDatePickerFor("dateOfBirth")}
               >
                 <Ionicons
                   name="calendar-outline"
@@ -700,26 +799,28 @@ export default function AddCattleForm() {
                 />
                 <AppText
                   style={{
-                    color: formData.dob ? colors.text : "#999",
+                    color: formData.dateOfBirth ? colors.text : "#999",
                     paddingVertical: 10,
                   }}
                 >
-                  {formData.dob
-                    ? formData.dob.toLocaleDateString()
-                    : "Select Date"}
+                  {formData.dateOfBirth
+                    ? formData.dateOfBirth.toLocaleDateString()
+                    : `${t.egselectdate}`}
                 </AppText>
               </TouchableOpacity>
-              {datePickerFor === "dob" && (
+              {datePickerFor === "dateOfBirth" && (
                 <DateTimePicker
-                  value={formData.dob || new Date()}
+                  value={formData.dateOfBirth || new Date()}
                   mode="date"
                   display="default"
                   onChange={handleDateChange}
                   maximumDate={new Date()}
                 />
               )}
-              {errors.dob && (
-                <AppText style={styles.errorAppText}>{errors.dob}</AppText>
+              {errors.dateOfBirth && (
+                <AppText style={styles.errorAppText}>
+                  {errors.dateOfBirth}
+                </AppText>
               )}
             </View>
 
@@ -748,7 +849,7 @@ export default function AddCattleForm() {
                     styles.disabledInput,
                     { color: colors.text },
                   ]}
-                  placeholder="Select DOB to calculate age"
+                  placeholder={t.egselectdob}
                   value={formData.age}
                   editable={false}
                 />
@@ -761,13 +862,13 @@ export default function AddCattleForm() {
             {/* Cattle ID */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.weight}
+                {t.weightKg}
                 {req}
               </AppText>
               <View
                 style={[
                   styles.inputContainer,
-                  errors.weight && styles.inputError,
+                  errors.weightKg && styles.inputError,
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
@@ -780,15 +881,15 @@ export default function AddCattleForm() {
                 <TextInput
                   style={[styles.input, { color: colors.text }]}
                   placeholder="500"
-                  value={formData.weight}
+                  value={formData.weightKg}
                   keyboardType="numeric"
                   onChangeText={(val) =>
-                    setFormData({ ...formData, weight: val })
+                    setFormData({ ...formData, weightKg: val })
                   }
                 />
               </View>
-              {errors.weight && (
-                <AppText style={styles.errorAppText}>{errors.weight}</AppText>
+              {errors.weightKg && (
+                <AppText style={styles.errorAppText}>{errors.weightKg}</AppText>
               )}
             </View>
           </View>
@@ -890,11 +991,11 @@ export default function AddCattleForm() {
                   styles.selectedTextStyle,
                   { color: colors.text },
                 ]}
-                data={workers}
+                data={workerList}
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={!isWorkerFocus ? "Select worker" : "..."}
+                placeholder={!isWorkerFocus ? `${t.egselectworker}` : "..."}
                 value={formData.workerAssigned}
                 onFocus={() => setIsWorkerFocus(true)}
                 onBlur={() => setIsWorkerFocus(false)}
@@ -920,14 +1021,14 @@ export default function AddCattleForm() {
 
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.vetAssigned}
+                {t.veterinarianAssigned}
                 {req}
               </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
                   isVetFocus && { borderColor: "#2D6A4F" },
-                  errors.vetAssigned && { borderColor: "red" },
+                  errors.veterinarianAssigned && { borderColor: "red" },
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
@@ -935,16 +1036,16 @@ export default function AddCattleForm() {
                   styles.selectedTextStyle,
                   { color: colors.text },
                 ]}
-                data={vets}
+                data={vetList}
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={!isVetFocus ? "Select vet" : "..."}
-                value={formData.vetAssigned}
+                placeholder={!isVetFocus ? `${t.egselectvet}` : "..."}
+                value={formData.veterinarianAssigned}
                 onFocus={() => setIsVetFocus(true)}
                 onBlur={() => setIsVetFocus(false)}
                 onChange={(item) => {
-                  setFormValue("vetAssigned", item.value);
+                  setFormValue("veterinarianAssigned", item.value);
                   setIsVetFocus(false);
                 }}
                 renderLeftIcon={() => (
@@ -956,9 +1057,9 @@ export default function AddCattleForm() {
                   />
                 )}
               />
-              {errors.vetAssigned && (
+              {errors.veterinarianAssigned && (
                 <AppText style={styles.errorAppText}>
-                  {errors.vetAssigned}
+                  {errors.veterinarianAssigned}
                 </AppText>
               )}
             </View>
@@ -984,7 +1085,7 @@ export default function AddCattleForm() {
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={!isStateFocus ? "Select State" : "..."}
+                placeholder={!isStateFocus ? `${t.egselectdate}` : "..."}
                 value={formData.state}
                 onFocus={() => setIsStateFocus(true)}
                 onBlur={() => setIsStateFocus(false)}
@@ -1008,13 +1109,13 @@ export default function AddCattleForm() {
 
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.currentStateDate}
+                {t.stateDate}
                 {req}
               </AppText>
               <TouchableOpacity
                 style={[
                   styles.inputContainer,
-                  errors.currentStateDate && styles.inputError,
+                  errors.stateDate && styles.inputError,
                   {
                     justifyContent: "flex-start",
                     alignItems: "center",
@@ -1032,27 +1133,27 @@ export default function AddCattleForm() {
                 />
                 <AppText
                   style={{
-                    color: formData.currentStateDate ? colors.text : "#999",
+                    color: formData.stateDate ? colors.text : "#999",
                     paddingVertical: 10,
                   }}
                 >
-                  {formData.currentStateDate
-                    ? formData.currentStateDate.toLocaleDateString()
-                    : "Select Date"}
+                  {formData.stateDate
+                    ? formData.stateDate.toLocaleDateString()
+                    : `${t.egselectdate}`}
                 </AppText>
               </TouchableOpacity>
               {datePickerFor === "currentState" && (
                 <DateTimePicker
-                  value={formData.currentStateDate || new Date()}
+                  value={formData.stateDate || new Date()}
                   mode="date"
                   display="default"
                   onChange={handleDateChange}
                   maximumDate={new Date()}
                 />
               )}
-              {errors.currentStateDate && (
+              {errors.stateDate && (
                 <AppText style={styles.errorAppText}>
-                  {errors.currentStateDate}
+                  {errors.stateDate}
                 </AppText>
               )}
             </View>
@@ -1152,21 +1253,48 @@ export default function AddCattleForm() {
             </View>
           </View>
 
-          <View style={styles.sectionCard}>
-            <AppText style={[styles.sectionTitle, { color: colors.text }]}>
+          <View
+            style={[
+              styles.sectionCard,
+              {
+                backgroundColor: colors.card,
+                shadowColor: colors.shadow,
+                elevation: 5,
+              },
+            ]}
+          >
+            <AppText style={[styles.sectionTitle, { color: colors.primary }]}>
               {t.cattleImages}
             </AppText>
             <View style={styles.separator} />
-            <TouchableOpacity style={styles.uploadBox}>
-              <Ionicons name="cloud-upload-outline" size={40} color="#000000" />
-              <AppText style={styles.uploadAppText}>
-                Click to upload Cattle images
+            <TouchableOpacity
+              style={[
+                styles.uploadBox,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
+            >
+              <Ionicons
+                name="cloud-upload-outline"
+                size={40}
+                color={colors.primary}
+              />
+              <AppText style={[styles.uploadAppText, { color: colors.text }]}>
+                {t.egclicktouploadimage}
               </AppText>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.sectionCard}>
-            <AppText style={[styles.sectionTitle, { color: colors.text }]}>
+          <View
+            style={[
+              styles.sectionCard,
+              {
+                backgroundColor: colors.card,
+                shadowColor: colors.shadow,
+                elevation: 5,
+              },
+            ]}
+          >
+            <AppText style={[styles.sectionTitle, { color: colors.primary }]}>
               {t.additionalInformation}
             </AppText>
             <View style={styles.separator} />
@@ -1181,18 +1309,20 @@ export default function AddCattleForm() {
                   alignItems: "flex-start",
                   backgroundColor: colors.card,
                   borderColor: colors.border,
+                  shadowColor: colors.shadow,
+                  elevation: 2,
                 },
               ]}
             >
               <Ionicons
                 name="reader-outline"
                 size={20}
-                color="#666"
+                color={colors.text}
                 style={[styles.inputIcon, { paddingTop: 10 }]}
               />
               <TextInput
                 style={[styles.remarkInput, { color: colors.text }]}
-                placeholder="Add any additional remarks here..."
+                placeholder={t.egaddanyremarks}
                 multiline={true}
                 numberOfLines={4}
                 value={formData.remark}
@@ -1291,15 +1421,15 @@ const styles = StyleSheet.create({
   uploadBox: {
     justifyContent: "center",
     alignItems: "center",
-    height: 100,
-    borderWidth: 2,
-    borderStyle: "dashed",
-    borderColor: "#5fcd54",
+    height: 120,
+    borderWidth: 1,
     borderRadius: 10,
-    backgroundColor: "#e0f5e5c3",
     marginBottom: 20,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
-  uploadAppText: { marginTop: 8, color: "#333" },
+  uploadAppText: { marginTop: 8 },
   saveBtn: {
     flexDirection: "row",
     backgroundColor: "#2D6A4F",
@@ -1326,8 +1456,9 @@ const styles = StyleSheet.create({
   backBtnAppText: { color: "#666", fontWeight: "bold" },
   remarkInput: {
     flex: 1,
-    height: 100,
     padding: 10,
     textAlignVertical: "top",
+    minHeight: 80,
+    lineHeight: 20,
   },
 });

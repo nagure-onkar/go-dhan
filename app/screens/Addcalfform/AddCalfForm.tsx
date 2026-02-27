@@ -21,11 +21,11 @@ import {
   View,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import Success from "../success";
+import Success from "../../../src/components/common/success";
 
 const { t, setLanguage, language } = useLanguage();
 
-const buffaloBreeds = [
+const BuffaloBreeds = [
   { label: `${t.murrah}`, value: "murrah" },
   { label: `${t.nili_ravi}`, value: "nili_ravi" },
   { label: `${t.bhadawari}`, value: "bhadawari" },
@@ -38,7 +38,7 @@ const buffaloBreeds = [
   { label: `${t.toda}`, value: "toda" },
 ];
 
-const cowBreeds = [
+const CowBreeds = [
   { label: `${t.hf}`, value: "hf" },
   { label: `${t.jersey}`, value: "jersey" },
   { label: `${t.brown_swiss}`, value: "brown swiss" },
@@ -57,32 +57,32 @@ const cowBreeds = [
   { label: `${t.kankrej}`, value: "kankrej" },
 ];
 
-const breed = [
-  { label: "Buffalo", value: "buffalo" },
-  { label: "Cow", value: "cow" },
+const cattleType = [
+  { label: `${t.Buffalo}`, value: "Buffalo" },
+  { label: `${t.Cow}`, value: "Cow" },
 ];
 
-const ColostrumIntakes = [
+const colostrumIntakes = [
   {
-    label: "Calf Successfully suckled colostrum",
+    label: `${t.Calf_Successfully_suckled_colostrum}`,
     value: "Calf_Successfully_suckled_colostrum",
   },
   {
-    label: "Artificial feeding was required",
+    label: `${t.Artificial_feeding_was_required}`,
     value: "Artificial_feeding_was_required",
   },
 ];
 
 const calvingTypes = [
-  { label: "Assisted", value: "Assisted" },
-  { label: "C-Section", value: "C-Section" },
-  { label: "Premature", value: "Premature" },
-  { label: "Normal Delivery", value: "Normal_Delivery" },
+  { label: `${t.assisted}`, value: "Assisted" },
+  { label: `${t.cSection}`, value: "C-Section" },
+  { label: `${t.premature}`, value: "Premature" },
+  { label: `${t.normal_delivery}`, value: "Normal_Delivery" },
 ];
 
-const HealthObservations = [
-  { label: "Treatment Required", value: "Treatment_Required" },
-  { label: "Fully fit Calf", value: "Fully_fit_Calf" },
+const initialHealthObservations = [
+  { label: `${t.treatment_required}`, value: "Treatment_Required" },
+  { label: `${t.fully_fit_calf}`, value: "Fully_fit_Calf" },
 ];
 
 const calfStates = [
@@ -151,51 +151,55 @@ export default function AddCalfForm() {
   const { colors } = useTheme();
 
   const [formData, setFormData] = useState({
-    calfId: "",
-    calfName: "",
-    calfType: "buffalo",
+    cattleId: "",
+    nameOfCattle: "",
+    cattleType: "Buffalo",
     breed: null,
-    ColostrumIntake: null,
-    HealthObservations: null,
+    colostrumIntake: null,
+    initialHealthObservations: null,
     gender: "Female",
+    damMother: "",
     calvingType: "",
-    // treatment: "",
-    nddbNumber: "",
-    treatmentExpence: "",
-    dob: null,
+    nddbRegistrationNumber: "",
+    treatmentExpenses: "",
+    dateOfBirth: null,
     age: "",
-    weight: "",
+    weightKg: "",
     status: "active",
     workerAssigned: null,
-    vetAssigned: null,
+    veterinarianAssigned: null,
     state: null,
-    currentStateDate: null,
+    stateDate: null,
     insuranceNumber: "",
-    remark: "",
+    convertToFullGrown: true,
+    remarks: "",
+    images: [],
   });
 
   const reset = {
-    CalfId: "",
-    calfName: "",
-    calfType: "buffalo",
+    cattleId: "",
+    nameOfCattle: "",
+    cattleType: "Buffalo",
     breed: null,
-    ColostrumIntake: null,
-    HealthObservations: null,
+    colostrumIntake: null,
+    initialHealthObservations: null,
     gender: "Female",
+    damMother: "",
     calvingType: "",
-    // treatment: "",
-    nddbNumber: "",
-    treatmentExpence: "",
-    dob: null,
+    nddbRegistrationNumber: "",
+    treatmentExpenses: "",
+    dateOfBirth: null,
     age: "",
-    weight: "",
+    weightKg: "",
     status: "active",
     workerAssigned: null,
-    vetAssigned: null,
+    veterinarianAssigned: null,
     state: null,
-    currentStateDate: null,
+    stateDate: null,
     insuranceNumber: "",
-    remark: "",
+    convertToFullGrown: true,
+    remarks: "",
+    images: [],
   };
 
   const saveFormData = async (formData) => {
@@ -213,7 +217,7 @@ export default function AddCalfForm() {
     }
   };
 
-  const [mothercalfId, setMothercalfId] = useState("");
+  const [mothercattleId, setMothercattleId] = useState("");
   const [mothercalfData, setMothercalfData] = useState(null);
   const [mothercalfError, setMothercalfError] = useState("");
   const [isMothercalfLoading, setIsMothercalfLoading] = useState(false);
@@ -222,10 +226,10 @@ export default function AddCalfForm() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedImage, setSelectedImage] = useState<any>(null);
   const [focusState, setFocusState] = useState({
-    calfType: false,
+    cattleType: false,
     breed: false,
     colostrumIntake: false,
-    healthObservations: false,
+    initialHealthObservations: false,
     calvingType: false,
   });
   // Separate focus state for health management dropdowns
@@ -240,7 +244,7 @@ export default function AddCalfForm() {
   const req = <AppText style={{ color: "red" }}> *</AppText>;
 
   const handleSearchMothercalf = async () => {
-    if (!mothercalfId.trim()) {
+    if (!mothercattleId.trim()) {
       setMothercalfError("Please enter a calf ID to search.");
       return;
     }
@@ -248,7 +252,7 @@ export default function AddCalfForm() {
     setMothercalfError("");
     setMothercalfData(null);
     try {
-      const result = await GET(ENDPOINTS.calf.search(mothercalfId));
+      const result = await GET(ENDPOINTS.calf.search(mothercattleId));
       if (result) {
         setMothercalfData(result);
       } else {
@@ -267,9 +271,9 @@ export default function AddCalfForm() {
     const validationRules = {
       status: `${t.statusrequired}`,
       workerAssigned: `${t.workerAssignedrequired}`,
-      vetAssigned: `${t.vetAssignedrequired}`,
+      veterinarianAssigned: `${t.veterinarianAssignedrequired}`,
       state: `${t.staterequired}`,
-      currentStateDate: `${t.currentStateDaterequired}`,
+      stateDate: `${t.stateDaterequired}`,
     };
 
     // 2. Call the function
@@ -311,17 +315,16 @@ export default function AddCalfForm() {
 
   const next = () => {
     const validationRules = {
-      calfId: `${t.calfIdrequired}`,
-      calfName: `${t.calfNamerequired}`,
-      calfType: `${t.calfTyperequired}`,
+      cattleId: `${t.cattleIdrequired}`,
+      nameOfCattle: `${t.nameOfCattlerequired}`,
+      cattleType: `${t.cattleTyperequired}`,
       breed: `${t.breedrequired}`,
-      treatment: `${t.treatmentrequired}`,
-      treatmentExpence: `${t.treatmentExpencerequired}`,
-      dob: `${t.dobrequired}`,
+      treatmentExpenses: `${t.treatmentExpencerequired}`,
+      dateOfBirth: `${t.dateOfBirthrequired}`,
       age: `${t.agerequired}`,
-      weight: `${t.weightrequired}`,
-      ColostrumIntake: `${t.ColostrumIntakerequired}`,
-      HealthObservations: `${t.HealthObservationsrequired}`,
+      weightKg: `${t.weightKgKgrequired}`,
+      colostrumIntake: `${t.colostrumIntakerequired}`,
+      initialHealthObservations: `${t.initialHealthObservationsrequired}`,
       calvingType: `${t.calvingTyperequired}`,
     };
     const validationErrors = validateForm(formData, validationRules);
@@ -370,7 +373,7 @@ export default function AddCalfForm() {
       }
       setFormData({
         ...formData,
-        dob: selectedDate,
+        dateOfBirth: selectedDate,
         age: ageYears.toString(),
       });
     }
@@ -381,9 +384,9 @@ export default function AddCalfForm() {
     if (selectedDate) {
       setFormData({
         ...formData,
-        currentStateDate: selectedDate,
+        stateDate: selectedDate,
       });
-      setErrors((prev) => ({ ...prev, currentStateDate: null }));
+      setErrors((prev) => ({ ...prev, stateDate: null }));
     }
   };
 
@@ -397,7 +400,22 @@ export default function AddCalfForm() {
   };
 
   if (isSaved) {
-    return <Success style={{ flex: 1, backgroundColor: colors.background }} />;
+    return (
+      <>
+        <Success style={{ flex: 1, backgroundColor: colors.background }} />
+        <AppText
+          style={{
+            textAlign: "center",
+            fontSize: 24,
+            fontWeight: "bold",
+            marginBottom: 170,
+            backgroundColor: colors.background,
+          }}
+        >
+          Calf Added Successfully!
+        </AppText>
+      </>
+    );
   }
 
   if (screen1) {
@@ -427,7 +445,7 @@ export default function AddCalfForm() {
             {/* calf ID */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.calfId}
+                {t.cattleId}
                 {req}
               </AppText>
               <Ionicons
@@ -439,24 +457,24 @@ export default function AddCalfForm() {
               <TextInput
                 style={[
                   styles.input,
-                  errors.calfId && styles.inputError,
+                  errors.cattleId && styles.inputError,
                   { color: colors.text, borderColor: colors.border },
                 ]}
                 placeholder={`${t.egcalf}`}
-                value={formData.calfId}
+                value={formData.cattleId}
                 onChangeText={(val) =>
-                  setFormData({ ...formData, calfId: val })
+                  setFormData({ ...formData, cattleId: val })
                 }
               />
-              {errors.calfId && (
-                <AppText style={styles.errorText}>{errors.calfId}</AppText>
+              {errors.cattleId && (
+                <AppText style={styles.errorText}>{errors.cattleId}</AppText>
               )}
             </View>
 
             {/* calf Name */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.calfName}
+                {t.nameOfCattle}
                 {req}
               </AppText>
               <MaterialCommunityIcons
@@ -468,31 +486,33 @@ export default function AddCalfForm() {
               <TextInput
                 style={[
                   styles.input,
-                  errors.calfName && styles.inputError,
+                  errors.nameOfCattle && styles.inputError,
                   { color: colors.text, borderColor: colors.border },
                 ]}
                 placeholder={`${t.egdaisy}`}
-                value={formData.calfName}
+                value={formData.nameOfCattle}
                 onChangeText={(val) =>
-                  setFormData({ ...formData, calfName: val })
+                  setFormData({ ...formData, nameOfCattle: val })
                 }
               />
-              {errors.calfName && (
-                <AppText style={styles.errorText}>{errors.calfName}</AppText>
+              {errors.nameOfCattle && (
+                <AppText style={styles.errorText}>
+                  {errors.nameOfCattle}
+                </AppText>
               )}
             </View>
 
             {/* Dropdown: calf Type Selection */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.calfType}
+                {t.cattleType}
                 {req}
               </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
-                  focusState.calfType && { borderColor: "#2D6A4F" },
-                  errors.calfType && { borderColor: "red" },
+                  focusState.cattleType && { borderColor: "#2D6A4F" },
+                  errors.cattleType && { borderColor: "red" },
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
@@ -501,26 +521,28 @@ export default function AddCalfForm() {
                   { color: colors.text },
                 ]}
                 // inputSearchStyle={styles.inputSearchStyle}
-                data={breed}
+                data={cattleType}
                 // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={!focusState.calfType ? "Select calf type" : "..."}
+                placeholder={
+                  !focusState.cattleType ? "Select calf type" : "..."
+                }
                 // searchPlaceholder="Search type..."
-                value={formData.calfType}
-                onFocus={() => setFocus("calfType", true)}
-                onBlur={() => setFocus("calfType", false)}
+                value={formData.cattleType}
+                onFocus={() => setFocus("cattleType", true)}
+                onBlur={() => setFocus("cattleType", false)}
                 onChange={(item) => {
                   setFormData({
                     ...formData,
-                    calfType: item.value,
+                    cattleType: item.value,
                     breed: null,
                   });
-                  setFocus("calfType", false);
+                  setFocus("cattleType", false);
                   setErrors((prev) => ({
                     ...prev,
-                    calfType: null,
+                    cattleType: null,
                     breed: null,
                   }));
                 }}
@@ -533,8 +555,8 @@ export default function AddCalfForm() {
                   />
                 )}
               />
-              {errors.calfType && (
-                <AppText style={styles.errorText}>{errors.calfType}</AppText>
+              {errors.cattleType && (
+                <AppText style={styles.errorText}>{errors.cattleType}</AppText>
               )}
             </View>
 
@@ -558,7 +580,7 @@ export default function AddCalfForm() {
                 ]}
                 // inputSearchStyle={styles.inputSearchStyle}
                 data={
-                  formData.calfType === "buffalo" ? buffaloBreeds : cowBreeds
+                  formData.cattleType === "Buffalo" ? BuffaloBreeds : CowBreeds
                 }
                 // search
                 maxHeight={300}
@@ -582,7 +604,7 @@ export default function AddCalfForm() {
                     style={styles.icon}
                   />
                 )}
-                disable={!formData.calfType}
+                disable={!formData.cattleType}
               />
               {errors.breed && (
                 <AppText style={styles.errorText}>{errors.breed}</AppText>
@@ -632,19 +654,19 @@ export default function AddCalfForm() {
               <TextInput
                 style={[
                   styles.input,
-                  errors.treatmentExpence && styles.inputError,
+                  errors.treatmentExpenses && styles.inputError,
                   { color: colors.text, borderColor: colors.border },
                 ]}
                 placeholder={`${t.egtreatmentcost}`}
-                value={formData.treatmentExpence}
+                value={formData.treatmentExpenses}
                 keyboardType="numeric"
                 onChangeText={(val) =>
-                  setFormData({ ...formData, treatmentExpence: val })
+                  setFormData({ ...formData, treatmentExpenses: val })
                 }
               />
-              {errors.treatmentExpence && (
+              {errors.treatmentExpenses && (
                 <AppText style={styles.errorText}>
-                  {errors.treatmentExpence}
+                  {errors.treatmentExpenses}
                 </AppText>
               )}
             </View>
@@ -659,7 +681,7 @@ export default function AddCalfForm() {
                 style={[
                   styles.dropdown,
                   focusState.colostrumIntake && { borderColor: "#2D6A4F" },
-                  errors.ColostrumIntake && { borderColor: "red" },
+                  errors.colostrumIntake && { borderColor: "red" },
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
@@ -668,20 +690,20 @@ export default function AddCalfForm() {
                   { color: colors.text },
                 ]}
                 // inputSearchStyle={styles.inputSearchStyle}
-                data={ColostrumIntakes}
+                data={colostrumIntakes}
                 // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={
-                  !focusState.colostrumIntake ? "Select ColostrumIntake" : "..."
+                  !focusState.colostrumIntake ? "Select colostrumIntake" : "..."
                 }
-                // searchPlaceholder="Search ColostrumIntake..."
-                value={formData.ColostrumIntake}
+                // searchPlaceholder="Search colostrumIntake..."
+                value={formData.colostrumIntake}
                 onFocus={() => setFocus("colostrumIntake", true)}
                 onBlur={() => setFocus("colostrumIntake", false)}
                 onChange={(item) => {
-                  setFormData({ ...formData, ColostrumIntake: item.value });
+                  setFormData({ ...formData, colostrumIntake: item.value });
                   setFocus("colostrumIntake", false);
                 }}
                 renderLeftIcon={() => (
@@ -693,9 +715,9 @@ export default function AddCalfForm() {
                   />
                 )}
               />
-              {errors.ColostrumIntake && (
+              {errors.colostrumIntake && (
                 <AppText style={styles.errorText}>
-                  {errors.ColostrumIntake}
+                  {errors.colostrumIntake}
                 </AppText>
               )}
             </View>
@@ -703,13 +725,15 @@ export default function AddCalfForm() {
             {/* Health Observations */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.healthObservations} {req}
+                {t.initialHealthObservations} {req}
               </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
-                  focusState.healthObservations && { borderColor: "#2D6A4F" },
-                  errors.HealthObservations && { borderColor: "red" },
+                  focusState.initialHealthObservations && {
+                    borderColor: "#2D6A4F",
+                  },
+                  errors.initialHealthObservations && { borderColor: "red" },
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
@@ -718,26 +742,26 @@ export default function AddCalfForm() {
                   { color: colors.text },
                 ]}
                 // inputSearchStyle={styles.inputSearchStyle}
-                data={HealthObservations}
+                data={initialHealthObservations}
                 // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={
-                  !focusState.healthObservations
+                  !focusState.initialHealthObservations
                     ? "Select Health Observations"
                     : "..."
                 }
                 // searchPlaceholder="Search Health Observations..."
-                value={formData.HealthObservations}
-                onFocus={() => setFocus("healthObservations", true)}
-                onBlur={() => setFocus("healthObservations", false)}
+                value={formData.initialHealthObservations}
+                onFocus={() => setFocus("initialHealthObservations", true)}
+                onBlur={() => setFocus("initialHealthObservations", false)}
                 onChange={(item) => {
                   setFormData({
                     ...formData,
-                    HealthObservations: item.value,
+                    initialHealthObservations: item.value,
                   });
-                  setFocus("healthObservations", false);
+                  setFocus("initialHealthObservations", false);
                 }}
                 renderLeftIcon={() => (
                   <Ionicons
@@ -748,9 +772,9 @@ export default function AddCalfForm() {
                   />
                 )}
               />
-              {errors.HealthObservations && (
+              {errors.initialHealthObservations && (
                 <AppText style={styles.errorText}>
-                  {errors.HealthObservations}
+                  {errors.initialHealthObservations}
                 </AppText>
               )}
             </View>
@@ -758,7 +782,7 @@ export default function AddCalfForm() {
             {/* NDDB Number */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.nddbNumber}
+                {t.nddbRegistrationNumber}
               </AppText>
               <Ionicons
                 name="document-text-outline"
@@ -769,17 +793,19 @@ export default function AddCalfForm() {
               <TextInput
                 style={[
                   styles.input,
-                  errors.nddbNumber && styles.inputError,
+                  errors.nddbRegistrationNumber && styles.inputError,
                   { color: colors.text, borderColor: colors.border },
                 ]}
                 placeholder={`${t.egnddb}`}
-                value={formData.nddbNumber}
+                value={formData.nddbRegistrationNumber}
                 onChangeText={(val) =>
-                  setFormData({ ...formData, nddbNumber: val })
+                  setFormData({ ...formData, nddbRegistrationNumber: val })
                 }
               />
-              {errors.nddbNumber && (
-                <AppText style={styles.errorText}>{errors.nddbNumber}</AppText>
+              {errors.nddbRegistrationNumber && (
+                <AppText style={styles.errorText}>
+                  {errors.nddbRegistrationNumber}
+                </AppText>
               )}
             </View>
 
@@ -833,8 +859,8 @@ export default function AddCalfForm() {
                     { color: colors.text, borderColor: colors.border },
                   ]}
                   placeholder="Search Mother by ID"
-                  value={mothercalfId}
-                  onChangeText={setMothercalfId}
+                  value={mothercattleId}
+                  onChangeText={setMothercattleId}
                 />
                 <TouchableOpacity
                   style={styles.searchButton}
@@ -851,7 +877,7 @@ export default function AddCalfForm() {
                 <View style={styles.searchResult}>
                   <AppText>
                     <AppText style={{ fontWeight: "bold" }}>Name:</AppText>{" "}
-                    {mothercalfData.calfName}
+                    {mothercalfData.nameOfCattle}
                   </AppText>
                   <AppText>
                     <AppText style={{ fontWeight: "bold" }}>Breed:</AppText>{" "}
@@ -909,7 +935,7 @@ export default function AddCalfForm() {
               )}
             </View>
 
-            {/* DOB */}
+            {/* dateOfBirth */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
                 {t.dateOfBirth}
@@ -924,7 +950,7 @@ export default function AddCalfForm() {
               <TouchableOpacity
                 style={[
                   styles.input,
-                  errors.dob && styles.inputError,
+                  errors.dateOfBirth && styles.inputError,
                   {
                     justifyContent: "center",
                     backgroundColor: colors.card,
@@ -933,23 +959,25 @@ export default function AddCalfForm() {
                 ]}
                 onPress={() => setShowDatePicker(true)}
               >
-                <AppText style={{ color: formData.dob ? colors.text : "#999" }}>
-                  {formData.dob
-                    ? formData.dob.toLocaleDateString()
+                <AppText
+                  style={{ color: formData.dateOfBirth ? colors.text : "#999" }}
+                >
+                  {formData.dateOfBirth
+                    ? formData.dateOfBirth.toLocaleDateString()
                     : "Select Date"}
                 </AppText>
               </TouchableOpacity>
               {showDatePicker && (
                 <DateTimePicker
-                  value={formData.dob || new Date()}
+                  value={formData.dateOfBirth || new Date()}
                   mode="date"
                   display="default"
                   onChange={handleDateChange}
                   maximumDate={new Date()}
                 />
               )}
-              {errors.dob && (
-                <AppText style={styles.errorText}>{errors.dob}</AppText>
+              {errors.dateOfBirth && (
+                <AppText style={styles.errorText}>{errors.dateOfBirth}</AppText>
               )}
             </View>
 
@@ -983,7 +1011,7 @@ export default function AddCalfForm() {
             {/* Weight */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.weight}
+                {t.weightKg}
                 {req}
               </AppText>
               <Ionicons
@@ -995,18 +1023,18 @@ export default function AddCalfForm() {
               <TextInput
                 style={[
                   styles.input,
-                  errors.weight && styles.inputError,
+                  errors.weightKg && styles.inputError,
                   { color: colors.text, borderColor: colors.border },
                 ]}
                 placeholder="500"
-                value={formData.weight}
+                value={formData.weightKg}
                 keyboardType="numeric"
                 onChangeText={(val) =>
-                  setFormData({ ...formData, weight: val })
+                  setFormData({ ...formData, weightKg: val })
                 }
               />
-              {errors.weight && (
-                <AppText style={styles.errorText}>{errors.weight}</AppText>
+              {errors.weightKg && (
+                <AppText style={styles.errorText}>{errors.weightKg}</AppText>
               )}
             </View>
           </View>
@@ -1138,14 +1166,14 @@ export default function AddCalfForm() {
 
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.vetAssigned}
+                {t.veterinarianAssigned}
                 {req}
               </AppText>
               <Dropdown
                 style={[
                   styles.dropdown,
                   isVetFocus && { borderColor: "#2D6A4F" },
-                  errors.vetAssigned && { borderColor: "red" },
+                  errors.veterinarianAssigned && { borderColor: "red" },
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
                 placeholderStyle={styles.placeholderStyle}
@@ -1158,11 +1186,11 @@ export default function AddCalfForm() {
                 labelField="label"
                 valueField="value"
                 placeholder={!isVetFocus ? "Select vet" : "..."}
-                value={formData.vetAssigned}
+                value={formData.veterinarianAssigned}
                 onFocus={() => setIsVetFocus(true)}
                 onBlur={() => setIsVetFocus(false)}
                 onChange={(item) => {
-                  setFormValue("vetAssigned", item.value);
+                  setFormValue("veterinarianAssigned", item.value);
                   setIsVetFocus(false);
                 }}
                 renderLeftIcon={() => (
@@ -1174,8 +1202,10 @@ export default function AddCalfForm() {
                   />
                 )}
               />
-              {errors.vetAssigned && (
-                <AppText style={styles.errorText}>{errors.vetAssigned}</AppText>
+              {errors.veterinarianAssigned && (
+                <AppText style={styles.errorText}>
+                  {errors.veterinarianAssigned}
+                </AppText>
               )}
             </View>
 
@@ -1223,7 +1253,7 @@ export default function AddCalfForm() {
 
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                {t.currentStateDate}
+                {t.stateDate}
                 {req}
               </AppText>
               <Ionicons
@@ -1235,7 +1265,7 @@ export default function AddCalfForm() {
               <TouchableOpacity
                 style={[
                   styles.input,
-                  errors.currentStateDate && styles.inputError,
+                  errors.stateDate && styles.inputError,
                   {
                     justifyContent: "center",
                     backgroundColor: colors.card,
@@ -1246,27 +1276,25 @@ export default function AddCalfForm() {
               >
                 <AppText
                   style={{
-                    color: formData.currentStateDate ? colors.text : "#999",
+                    color: formData.stateDate ? colors.text : "#999",
                   }}
                 >
-                  {formData.currentStateDate
-                    ? formData.currentStateDate.toLocaleDateString()
+                  {formData.stateDate
+                    ? formData.stateDate.toLocaleDateString()
                     : "Select Date"}
                 </AppText>
               </TouchableOpacity>
               {showHealthManagementDatePicker && (
                 <DateTimePicker
-                  value={formData.currentStateDate || new Date()}
+                  value={formData.stateDate || new Date()}
                   mode="date"
                   display="default"
                   onChange={handleHealthManagementDateChange}
                   maximumDate={new Date()}
                 />
               )}
-              {errors.currentStateDate && (
-                <AppText style={styles.errorText}>
-                  {errors.currentStateDate}
-                </AppText>
+              {errors.stateDate && (
+                <AppText style={styles.errorText}>{errors.stateDate}</AppText>
               )}
             </View>
 
@@ -1342,28 +1370,28 @@ export default function AddCalfForm() {
             </AppText>
             <View style={styles.separator} />
             <AppText style={[styles.label, { color: colors.text }]}>
-              {t.remarks}
+              {t.remarkss}
             </AppText>
             <Ionicons
               name="reader-outline"
               size={20}
               color="#666"
-              style={styles.remarkIcon}
+              style={styles.remarksIcon}
             />
             <TextInput
               style={[
-                styles.remarkInput,
+                styles.remarksInput,
                 {
                   backgroundColor: colors.card,
                   borderColor: colors.border,
                   color: colors.text,
                 },
               ]}
-              placeholder="Add any additional remarks here..."
+              placeholder="Add any additional remarkss here..."
               multiline={true}
               numberOfLines={4}
-              value={formData.remark}
-              onChangeText={(val) => setFormValue("remark", val)}
+              value={formData.remarks}
+              onChangeText={(val) => setFormValue("remarks", val)}
             />
           </View>
 
@@ -1532,13 +1560,13 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     marginTop: 4,
   },
-  remarkIcon: {
+  remarksIcon: {
     position: "absolute",
     left: 10,
     top: 48,
     zIndex: 1,
   },
-  remarkInput: {
+  remarksInput: {
     height: 100,
     borderWidth: 1,
     borderRadius: 6,
