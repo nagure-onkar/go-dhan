@@ -16,6 +16,28 @@ todaysMilking: "आजचे दूध काढणे",
 workers: "कामगार",
 veterinarians: "पशुवैद्य",
 
+dairyFarmDashboard: "दुग्धशाळा डॅशबोर्ड",
+
+  totalAnimals: "एकूण जनावरे",
+  cattle: "गायी / मोठी जनावरे",
+  calves: "वासरे",
+
+  overallCount: "एकूण संख्या",
+  adultAnimals: "प्रौढ जनावरे",
+  youngAnimals: "लहान जनावरे",
+
+  
+  animalsMilkedToday: "आज दूध काढलेली जनावरे",
+
+  todaysTreatment: "आजचे उपचार",
+  appointmentsToday: "आजच्या भेटी",
+
+  treatmentExpensesMonth: "उपचार खर्च (या महिन्यात)",
+  totalSpentOnTreatments: "उपचारांवर एकूण खर्च",
+
+  assignedWorkers: "नियुक्त कामगार",
+  assignedVets: "नियुक्त पशुवैद्य",
+
 heatLifeCycle: " माज जीवनचक्र",
 onHeat: "माजावर आहे",
 cancel: "रद्द करा",

@@ -34,6 +34,7 @@ const [showPicker, setShowPicker] = React.useState(false);
 
 const BASE_URL = "https://astrabytte-ai.onrender.com";
 
+
 const [sales, setSales] = React.useState({
   dailyMilkSales: "",
   calfSales: "",
@@ -46,39 +47,67 @@ const [sales, setSales] = React.useState({
   farmId: "",
 });
 
+const getStoredToken = async () => {
+  const token = await AsyncStorage.getItem("access_token");
+  return token;
+};
 const handleSubmit = async () => {
   try {
-    const token = await AsyncStorage.getItem("authToken");
-    const farmId = await AsyncStorage.getItem("farmId");
+    const token = await getStoredToken();
+    const farmId = await AsyncStorage.getItem("farm_id");
 
-const safeNumber = (value: string) =>
-  value && value.trim() !== "" ? Number(value) : 0;
+    console.log("Retrieved Token:", token);
+    console.log("Retrieved Farm ID:", farmId);
 
-const payload = {
-  date: date.toISOString().split("T")[0],
-  session: "Morning",
+    if (!token) {
+      Alert.alert("Error", "User not authenticated");
+      return;
+    }
 
-  for_workers_litre: safeNumber(sales.workerSalary),
-  for_calf_litre: safeNumber(sales.calfSales),
-  for_utility_litre: safeNumber(sales.otherIncome),
-  wastage_litre: 0,
+    if (!farmId) {
+      Alert.alert("Error", "Farm ID not found");
+      return;
+    }
 
-  expected_fat_percent: 0,
-  expected_snf_percent: 0,
-  expected_price_per_litre: 0,
+    const safeNumber = (value: string) =>
+      value && value.trim() !== "" ? Number(value) : 0;
 
-  total_sales_litre: safeNumber(sales.dailyMilkSales),
-  sales_fat_percent: 0,
-  sales_snf_percent: 0,
-  org_price_per_litre: 0,
+    const payload = {
+      farmId: farmId,   
 
-  farm_id: farmId, // must be defined
-};
+      date: date.toISOString().split("T")[0],
+
+      manual: {
+        daily_milk_sales: safeNumber(sales.dailyMilkSales),
+        calf_sales: safeNumber(sales.calfSales),
+        cattle_sales: safeNumber(sales.cattleSales),
+        slurry_sales: safeNumber(sales.slurrySales),
+        other_income: safeNumber(sales.otherIncome),
+
+        feed_expenses: safeNumber(sales.feedExpenses),
+        worker_salary: safeNumber(sales.workerSalary),
+        medical_expenses: safeNumber(sales.medicalExpenses),
+
+        water_usage: safeNumber(expenseAmounts.water),
+        owner_salary: safeNumber(expenseAmounts.ownerSalary),
+        loan_interest: safeNumber(expenseAmounts.loanInterest),
+        electricity: safeNumber(expenseAmounts.electricity),
+        rent: safeNumber(expenseAmounts.rent),
+        repair_maintenance: safeNumber(expenseAmounts.infrastructureRepair),
+        equipment_purchase: safeNumber(expenseAmounts.farmEquipment),
+        misc_expense: safeNumber(expenseAmounts.miscellaneous),
+      },
+    };
+
+    console.log("Sending Profit Payload:", payload);
+    console.log("API URL:", `${BASE_URL}/api/v1/profit/daily/compute`);
+
     const response = await fetch(
-      "/api/v1/milk/profit/daily",
+      `${BASE_URL}/api/v1/profit/daily/compute`,
       {
         method: "POST",
         headers: {
+          Accept: "application/json",
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
@@ -86,16 +115,21 @@ const payload = {
       }
     );
 
-    const data = await response.json();
+    console.log("API Response Status:", response.status);
 
-    if (response.ok) {
-      Alert.alert("Success", "Profit & Loss saved successfully");
-    } else {
-      Alert.alert("Error", data.message || "Something went wrong");
+    const data = await response.json();
+    console.log("Profit API Response:", data);
+
+    if (!response.ok) {
+      Alert.alert("Error", JSON.stringify(data.detail || data.message));
+      return;
     }
-  } catch (error) {
-    console.log(error);
-    Alert.alert("Error", "Server error");
+
+    Alert.alert("Success", "Profit & Loss saved successfully");
+
+  } catch (error: any) {
+    console.log("API Error:", error);
+    Alert.alert("Error", error.message || "Server error");
   }
 };
 

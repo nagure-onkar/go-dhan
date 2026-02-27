@@ -43,7 +43,9 @@ const getStoredToken = async () => {
 };
 export default function HeatOnHeatScreen({ navigation }: any = {}) {
   
-  const [animalId, setAnimalId] = useState('C-001');
+
+  
+  const [animalId, setAnimalId] = useState('832ff39b-40e3-45fe-8f3f-cbb84be9d2bf');
   const [recommendInsemination, setRecommendInsemination] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -114,11 +116,12 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
   const styles = createStyles(colors);
 
 
+
   // Date picker states
   const [dateReportedDate, setDateReportedDate] = useState<Date | null>(null);
   const [showDateReportedPicker, setShowDateReportedPicker] = useState(false);
 
-  const [recommendedDateTime, setRecommendedDateTime] = useState<Date | null>(null);
+  const [recommendedAiDate, setRecommendedAiDate] = useState<Date | null>(null);
   const [showRecommendedPicker, setShowRecommendedPicker] = useState(false);
   const [recommendedPickerMode, setRecommendedPickerMode] = useState<'date' | 'time'>('date');
 
@@ -196,27 +199,28 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
     }
 
     const payload = {
-
-  animalId: animalId.trim(), 
+  animalId: animalId.trim(),
   isCattleLactating: isLactating === "yes",
+
   symptomsReportedDate: dateReportedDate
     ? dateReportedDate.toISOString().split("T")[0]
     : null,
-  methodOfConfirmation: methodConfirmation,
-  finalResult: finalResult,
-  recommendedAiDate: recommendedDateTime
-    ? recommendedDateTime.toISOString().split("T")[0]
-    : null,
 
-  diagnosisSummary: diagnosisSummary.trim() || "",
-  doctorFees: Number(doctorFees),
-  treatmentExpenses: Number(treatmentExpenses),
-  otherExpenses: Number(otherExpenses),
+  methodOfConfirmation: methodConfirmation.trim(),
+  finalResult: finalResult.trim(),
+ recommendedAiDate: recommendedAiDate
+    ? recommendedAiDate.toISOString().split("T")[0]
+    : null,
+  diagnosisSummary: diagnosisSummary.trim(),
+
+  doctorFees: Number(doctorFees) || 0,
+  treatmentExpenses: Number(treatmentExpenses) || 0,
+  otherExpenses: Number(otherExpenses) || 0,
 };
     console.log("Sending Heat Payload:", payload); 
-    console.log("API URL:", `${BASE_URL}/heat-/api/v1/heat-confirmation/`);
+    console.log("API URL:", `${BASE_URL}/api/v1/heat-confirmation/`);
 
-    const response = await fetch(`${BASE_URL}/heat-/api/v1/heat-confirmation/`, {
+    const response = await fetch(`${BASE_URL}/api/v1/heat-confirmation/`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -377,7 +381,7 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
 
           <AppText style={styles.label}>Recommended Date & Time for AI</AppText>
           <TouchableOpacity style={styles.selectInput} onPress={() => { setRecommendedPickerMode('date'); setShowRecommendedPicker(true); }}>
-            <AppText style={[styles.selectText, !recommendedDateTime && styles.selectPlaceholder]}>{recommendedDateTime ? formatDateTime(recommendedDateTime) : 'dd-mm-yyyy --:--'}</AppText>
+            <AppText style={[styles.selectText, !recommendedAiDate && styles.selectPlaceholder]}>{recommendedAiDate ? formatDateTime(recommendedAiDate) : 'dd-mm-yyyy --:--'}</AppText>
             <View style={styles.datetimeIcons}>
               <MaterialCommunityIcons name="calendar" size={spacing.md} color={colors.text} />
               <MaterialCommunityIcons name="clock" size={spacing.md} color={colors.text} style={{ marginLeft: 8 }} />
@@ -386,7 +390,7 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
 
           {showRecommendedPicker && (
             <DateTimePicker
-              value={recommendedDateTime || new Date()}
+              value={recommendedAiDate || new Date()}
               mode={recommendedPickerMode}
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
               is24Hour={true}
@@ -399,10 +403,10 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
 
                 if (recommendedPickerMode === 'date') {
                   const base = new Date(selected);
-                  if (recommendedDateTime) {
-                    base.setHours(recommendedDateTime.getHours(), recommendedDateTime.getMinutes());
+                  if (recommendedAiDate) {
+                    base.setHours(recommendedAiDate.getHours(), recommendedAiDate.getMinutes());
                   }
-                  setRecommendedDateTime(base);
+                  setRecommendedAiDate(base);
                   setRecommendedAI(formatDateTime(base));
 
                   if (Platform.OS !== 'ios') {
@@ -410,9 +414,9 @@ export default function HeatOnHeatScreen({ navigation }: any = {}) {
                     setShowRecommendedPicker(true);
                   }
                 } else {
-                  const dt = recommendedDateTime ? new Date(recommendedDateTime) : new Date();
+                  const dt = recommendedAiDate ? new Date(recommendedAiDate) : new Date();
                   dt.setHours((selected as Date).getHours(), (selected as Date).getMinutes());
-                  setRecommendedDateTime(dt);
+                  setRecommendedAiDate(dt);
                   setRecommendedAI(formatDateTime(dt));
                   setRecommendedPickerMode('date');
                   setShowRecommendedPicker(Platform.OS === 'ios');

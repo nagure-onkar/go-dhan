@@ -30,17 +30,34 @@ const ICON_SIZES = {
   expense: 20,
 };
 
-interface StatsData {
-  totalAnimals: number;
-  totalCattle: number;
-  totalCalves: number;
-  todayMilking: number;
-  todayTreatments: number;
-  upcomingTreatments: number;
-  treatmentExpenses: number;
-  workers: number;
-  veterinarians: number;
+interface DashboardData {
+  summary: {
+    date: string;
+    total_animals: number;
+    total_cattle: number;
+    total_calves: number;
+  };
+
+  milk: {
+    today: {
+      total_litre: number;
+    };
+  };
+
+  health: {
+    treatments_today: number;
+  };
+
+  expenses_month_to_date: {
+    medical_total: number;
+  };
+
+  people: {
+    workers: number;
+    veterinarians: number;
+  };
 }
+
 
 interface Activity {
   id: number;
@@ -53,7 +70,7 @@ const DashboardScreen: React.FC = () => {
   const { colors } = useTheme();
   const { t } = useLanguage();
   const styles = createStyles(colors);
-  const [stats, setStats] = useState<StatsData | null>(null);
+  const [stats, setStats] = useState<DashboardData | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -89,8 +106,8 @@ const DashboardScreen: React.FC = () => {
         throw new Error(data.message || "Failed to fetch dashboard");
       }
 
-      setStats(data.stats);
-      setActivities(data.activities);
+      setStats(data);
+      
     } catch (error) {
       console.log("Dashboard error:", error);
     } finally {
@@ -138,7 +155,7 @@ const DashboardScreen: React.FC = () => {
               <View style={styles.cardGrid}>
                 <StatCard
                   label="Total Animals"
-                  value={stats.totalAnimals.toString()}
+                  value={stats.summary.total_animals.toString()}
                   icon="cow"
                   backgroundColor={colors.card}
                   iconColor={colors.primary}
@@ -146,7 +163,7 @@ const DashboardScreen: React.FC = () => {
                 />
                 <StatCard
                   label="Cattle"
-                  value={stats.totalCattle.toString()}
+                  value={stats.summary.total_cattle.toString()}
                   icon="sheep"
                   backgroundColor={colors.card}
                   iconColor={colors.primary}
@@ -154,7 +171,7 @@ const DashboardScreen: React.FC = () => {
                 />
                 <StatCard
                   label="Calves"
-                  value={stats.totalCalves.toString()}
+                  value={stats.summary.total_calves.toString()}
                   icon="baby-face"
                   backgroundColor={colors.card}
                   iconColor={colors.primary}
@@ -165,7 +182,7 @@ const DashboardScreen: React.FC = () => {
               <SectionTitle title={t.milkingDetails} />
               <StatCard
                 label="Today's Milking"
-                value={stats.todayMilking.toString()}
+                value={stats.milk.today.total_litre.toString()}
                 icon="water"
                 backgroundColor={colors.card}
                 iconColor={colors.primary}
@@ -179,21 +196,21 @@ const DashboardScreen: React.FC = () => {
                 <StatCard
                   containerStyle={styles.statCardTwo}
                   label="Today's Treatment"
-                  value={stats.todayTreatments.toString()}
+                  value={stats.health.treatments_today.toString()}
                   icon="medical-bag"
                   backgroundColor={colors.card}
                   iconColor={colors.primary}
                   subtext="Appointments today"
                 />
-                <StatCard
+                {/*<StatCard
                   containerStyle={[styles.statCardTwo, styles.statCardTwoLast]}
                   label="Upcoming Treatment"
-                  value={stats.upcomingTreatments.toString()}
+                  value={stats.summary.upcoming_treatments.toString()}
                   icon="calendar-clock"
                   backgroundColor={colors.card}
                   iconColor={colors.primary}
                   subtext="Next 7 days"
-                />
+                />*/}
               </View>
 
               <View style={styles.expenseCard}>
@@ -208,7 +225,7 @@ const DashboardScreen: React.FC = () => {
                   </AppText>
                 </View>
                 <AppText style={styles.expenseAmount}>
-                  ₹{stats.treatmentExpenses.toLocaleString()}
+                  ₹{stats.expenses_month_to_date.medical_total.toLocaleString()}
                 </AppText>
                 <AppText style={styles.expenseSubtext}>
                   Total spent on treatments
@@ -220,7 +237,7 @@ const DashboardScreen: React.FC = () => {
                 <StatCard
                   containerStyle={styles.statCardTwo}
                   label="Workers"
-                  value={stats.workers.toString()}
+                  value={stats.people.workers.toString()}
                   icon="account-multiple"
                   backgroundColor={colors.card}
                   iconColor={colors.primary}
@@ -230,7 +247,7 @@ const DashboardScreen: React.FC = () => {
                 <StatCard
                   containerStyle={[styles.statCardTwo, styles.statCardTwoLast]}
                   label="Veterinarians"
-                  value={stats.veterinarians.toString()}
+                  value={stats.people.veterinarians.toString()}
                   icon="doctor"
                   backgroundColor={colors.card}
                   iconColor={colors.primary}
@@ -239,8 +256,7 @@ const DashboardScreen: React.FC = () => {
                 />
               </View>
 
-              <SectionTitle title={t.recentActivities} />
-              <ActivityList activities={activities} />
+             
             </>
           )}
 

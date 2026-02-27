@@ -58,13 +58,42 @@ const BASE_URL = "https://astrabytte-ai.onrender.com/api/v1/milk/profit/daily";
 
 const handleSave = async () => {
   try {
-    const token = await AsyncStorage.getItem("token");
+    const token = await AsyncStorage.getItem("access_token");
+
+    if (!token) {
+      Alert.alert("Error", "User not authenticated");
+      return;
+    }
+
+    if (!recordType) {
+      Alert.alert("Error", "Please select session");
+      return;
+    }
+
+    if (!cattleType || !recordType) {
+      Alert.alert("Error", "Please select cattle type and record type");
+      return;
+    }
 
     const payload = {
-      cattleType,
-      date: date.toISOString(),
-      recordType,
-      ...form,
+      date: date.toISOString().split("T")[0],
+
+      session: recordType === "morning" ? "Morning" : "Evening",
+
+      for_workers_litre: Number(form.forWorkers) || 0,
+      for_calf_litre: Number(form.forCalf) || 0,
+      for_utility_litre: Number(form.inHouseUtility) || 0,
+      wastage_litre: Number(form.wastage) || 0,
+
+      expected_fat_percent: Number(form.fat) || 0,
+      expected_snf_percent: Number(form.snf) || 0,
+      expected_price_per_litre: Number(form.expectedRate) || 0,
+
+      total_sales_litre: Number(form.salesLitres) || 0,
+      sales_fat_percent: Number(form.salesFat) || 0,
+      sales_snf_percent: Number(form.salesSnf) || 0,
+
+      org_price_per_litre: Number(form.orgRate) || 0,
     };
 
     const response = await fetch(
@@ -86,6 +115,7 @@ const handleSave = async () => {
     } else {
       Alert.alert("Error", data.message || "Something went wrong");
     }
+
   } catch (error) {
     console.log(error);
     Alert.alert("Error", "Server error");
@@ -294,14 +324,28 @@ const handleSave = async () => {
           </View>
           <View style={styles.col}>
             <AppText style={styles.label}>SNF %</AppText>
-            <TextInput style={styles.input} />
+            <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.snf}
+  onChangeText={(text) =>
+    setForm({ ...form, snf: text })
+  }
+/>
           </View>
         </View>
 
         <View style={styles.row}>
   <View style={styles.col}>
     <AppText style={styles.label}>Expected Rate per litre</AppText>
-    <TextInput style={styles.input} />
+    <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.expectedRate}
+  onChangeText={(text) =>
+    setForm({ ...form, expectedRate: text })
+  }
+/>
   </View>
 
   <View style={styles.col}>
@@ -340,11 +384,25 @@ const handleSave = async () => {
         <View style={styles.row}>
           <View style={styles.col}>
             <AppText style={styles.label}>Sales SNF %</AppText>
-            <TextInput style={styles.input} />
+            <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.salesSnf}
+  onChangeText={(text) =>
+    setForm({ ...form, salesSnf: text })
+  }
+/>
           </View>
           <View style={styles.col}>
             <AppText style={styles.label}>Org Rate per Litre</AppText>
-            <TextInput style={styles.input} />
+            <TextInput
+  style={styles.input}
+  keyboardType="numeric"
+  value={form.orgRate}
+  onChangeText={(text) =>
+    setForm({ ...form, orgRate: text })
+  }
+/>
           </View>
         </View>
 
