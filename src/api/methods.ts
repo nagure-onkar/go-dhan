@@ -1,67 +1,92 @@
-import { AppConfig } from "@/config/env";
-import apiClient from "./client";
+import { apiClient } from "./client";
+import { ENDPOINTS } from "./endpoints";
 
-const isDev = __DEV__ && AppConfig.env == "dev";
+/* ================= LOGIN ================= */
 
-const BASE_URL = "https://astrabytte-ai.onrender.com";
-
-const withBaseUrl = (url: string) => `${BASE_URL}${url}`;
-
-export const GET = async <T>(url: string, params?: object): Promise<T> => {
-  const finalUrl = withBaseUrl(url);
-
-  if (isDev) {
-    console.log("📡 GET:", { url: finalUrl, params });
-  }
-
-  try {
-    const response = await apiClient.get<T>(finalUrl, { params });
-
-    if (isDev) {
-      console.log("✅ GET SUCCESS:", { url: finalUrl, response });
-    }
-
-    return response;
-  } catch (error: any) {
-    if (isDev) {
-      console.log("❌ GET ERROR:", {
-        url: finalUrl,
-        error: error?.response || error?.message,
-      });
-    }
-    throw error;
-  }
+export const loginApi = async (payload: {
+  username: string;
+  password: string;
+}) => {
+  const response = await apiClient.post(
+    ENDPOINTS.LOGIN,
+    payload
+  );
+  return response.data;
 };
 
-export const POST = async <T>(url: string, data?: object): Promise<T> => {
-  const finalUrl = withBaseUrl(url);
-  if (isDev) {
-    console.log("📡 POST:", { url: finalUrl, data });
-  }
+/* ================= ADD WORKER ================= */
 
-  try {
-    const response = await apiClient.post<T>(finalUrl, data);
-
-    if (isDev) {
-      console.log("✅ POST SUCCESS:", { url: finalUrl, response });
-    }
-
-    return response;
-  } catch (error: any) {
-    if (isDev) {
-      console.log("❌ POST ERROR:", {
-        url: finalUrl,
-        error: error?.response || error?.message,
-      });
-    }
-    throw error;
-  }
+export const addWorkerApi = async (payload: any) => {
+  const response = await apiClient.post(
+    ENDPOINTS.ADD_WORKER,
+    payload
+  );
+  return response.data;
 };
 
-export const PUT = <T>(url: string, data?: object) =>
-  apiClient.put<T>(withBaseUrl(url), data);
+/* ================= GET ALL WORKERS ================= */
 
-export const PATCH = <T>(url: string, data?: object) =>
-  apiClient.patch<T>(withBaseUrl(url), data);
+export const getWorkersApi = async () => {
+  const response = await apiClient.get(
+    ENDPOINTS.GET_WORKERS
+  );
+  return response.data;
+};
 
-export const DELETE = <T>(url: string) => apiClient.delete<T>(withBaseUrl(url));
+/* ================= GET WORKER BY ID ================= */
+
+export const getWorkerByIdApi = async (id: string) => {
+  const response = await apiClient.get(
+    ENDPOINTS.GET_WORKER_BY_ID(id)
+  );
+  return response.data;
+};
+
+/* ================= UPDATE WORKER ================= */
+
+export const updateWorkerApi = async (
+  id: string,
+  payload: any
+) => {
+  const response = await apiClient.patch(
+    ENDPOINTS.UPDATE_WORKER(id),
+    payload
+  );
+  return response.data;
+};
+
+/* ================= DELETE WORKER ================= */
+
+export const deleteWorkerApi = async (id: string) => {
+  const response = await apiClient.delete(
+    ENDPOINTS.DELETE_WORKER(id)
+  );
+  return response.data;
+};
+
+/* ================= UPLOAD AADHAAR ================= */
+
+export const uploadAadharApi = async (
+  id: string,
+  image: any
+) => {
+  const formData = new FormData();
+
+  formData.append("file", {
+    uri: image.uri,
+    name: "aadhaar.jpg",
+    type: "image/jpeg",
+  } as any);
+
+  const response = await apiClient.post(
+    ENDPOINTS.UPLOAD_AADHAR(id),
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};
