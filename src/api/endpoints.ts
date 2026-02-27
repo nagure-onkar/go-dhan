@@ -1,6 +1,7 @@
 export const ENDPOINTS = {
   auth: {
     login: "/api/v1/auth/login",
+    refresh: "/api/v1/auth/refresh",
   },
   healthCheck: {
     root: "",
@@ -20,10 +21,9 @@ export const ENDPOINTS = {
   },
 
   dashboard: {
-  stats: "/api/v1/dashboard/stats",
-  activities: "/api/v1/dashboard/activities",
-},
-
+    stats: "/api/v1/dashboard/stats",
+    activities: "/api/v1/dashboard/activities",
+  },
 };
 
 export const HEAT_ON_HEAT = "/heat/on-heat";
