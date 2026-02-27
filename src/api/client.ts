@@ -1,38 +1,39 @@
-import { AppConfig } from "@/config/env";
-import { session } from "@/store/session";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const apiClient = axios.create({
-  baseURL: AppConfig.baseURL,
-  timeout: 15000,
+const BASE_URL = "https://astrabytte-ai.onrender.com";
+
+export const apiClient = axios.create({
+  baseURL: BASE_URL,
   headers: {
-    "Content-Type": "application/json",
+    Accept: "application/json",
   },
 });
 
-// 🔐 Request interceptor
 apiClient.interceptors.request.use(
   async (config) => {
-    const token = session.getToken();
+    try {
+      const token = await AsyncStorage.getItem("access_token");
 
-    console.log("Token: ", token);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      return config;
+    } catch (error) {
+      return config;
     }
-
-    return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
-// ❌ Response interceptor
 apiClient.interceptors.response.use(
-  (response) => response.data,
-  (error) => {
-    console.log("API Error:", error?.response || error.message);
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      console.log("Token expired or unauthorized");
+ 
+    }
     return Promise.reject(error);
-  },
+  }
 );
-
-export default apiClient;
