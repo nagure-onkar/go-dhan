@@ -1,7 +1,7 @@
 // Success.tsx
 import LottieView from "lottie-react-native";
 import React from "react";
-import { StyleProp, Text, View, ViewStyle } from "react-native";
+import { StyleProp, View, ViewStyle } from "react-native";
 
 interface SuccessProps {
   style?: StyleProp<ViewStyle>;
@@ -16,16 +16,6 @@ const Success = ({ style }: SuccessProps) => {
         autoPlay
         loop={false}
       />
-      <Text
-        style={{
-          textAlign: "center",
-          fontSize: 24,
-          fontWeight: "bold",
-          marginBottom: 170,
-        }}
-      >
-        Added Successfully!
-      </Text>
     </View>
   );
 };
