@@ -1,6 +1,7 @@
 import { Redirect } from "expo-router";
 
 export default function Index() {
+  return <Redirect href="/screens/login" />;
   // return <Redirect href="/tabs/dashboard" />;
-  return <Redirect href="/tabs/ProfitLossStatement" />;
+  // return <Redirect href="/tabs/ProfitLossStatement" />;
 }

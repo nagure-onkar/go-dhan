@@ -2,11 +2,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useState } from "react";
 
-import AppText from "../../src/components/common/AppText";
-import ScreenWrapper from "../../src/components/common/ScreenWrapper";
-import { useLanguage } from "../../src/constants/localization/useLanguage";
-import spacing from "../../src/constants/spacing";
-import { useTheme } from "../../src/theme/useTheme";
+import AppText from "@/components/common/AppText";
+import ScreenWrapper from "@/components/common/ScreenWrapper";
+import { useLanguage } from "@/constants/localization/useLanguage";
+import spacing from "@/constants/spacing";
+import { useTheme } from "@/theme/useTheme";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -58,7 +58,6 @@ interface DashboardData {
   };
 }
 
-
 interface Activity {
   id: number;
   message: string;
@@ -100,14 +99,13 @@ const DashboardScreen: React.FC = () => {
 
       const data = await response.json();
 
-      console.log("\n📦 Pretty Response:\n", JSON.stringify(data, null, 2));
+      // console.log("\n📦 Pretty Response:\n", JSON.stringify(data, null, 2));
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to fetch dashboard");
       }
 
       setStats(data);
-      
     } catch (error) {
       console.log("Dashboard error:", error);
     } finally {
@@ -255,8 +253,6 @@ const DashboardScreen: React.FC = () => {
                   compact
                 />
               </View>
-
-             
             </>
           )}
 
