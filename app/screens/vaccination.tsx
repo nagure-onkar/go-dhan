@@ -1,357 +1,473 @@
 import React, { useState } from "react";
 import {
   View,
+  TextInput,
+  StyleSheet,
   ScrollView,
   TouchableOpacity,
-  StyleSheet,
-  TextInput,
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
 import { useTheme } from "../../src/theme/useTheme";
-import { useLanguage } from "../../src/constants/localization/useLanguage";
-import AppText from "../../src/components/common/AppText";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const CallDoctor = () => {
+import AppText from "../../src/components/common/AppText";
+import { useLanguage } from "../../src/constants/localization/useLanguage";
+const BASE_URL = "https://astrabytte-ai.onrender.com";
+
+const Vaccination = () => {
   const { t } = useLanguage();
   const { colors } = useTheme();
 
-  const [visitConfirmed, setVisitConfirmed] = useState("");
-  const [reason, setReason] = useState("");
-  const [cattleId, setCattleId] = useState("");
-  const [remarks, setRemarks] = useState("");
+  const [bcs, setBcs] = useState("");
+  const [illness, setIllness] = useState("No");
+  const [category, setCategory] = useState("");
+  const [route, setRoute] = useState("");
+  const [site, setSite] = useState("");
 
-  const [openVisitDropdown, setOpenVisitDropdown] = useState(false);
-  const [openReasonDropdown, setOpenReasonDropdown] = useState(false);
+  const [doctorFees, setDoctorFees] = useState("");
+  const [treatmentFees, setTreatmentFees] = useState("");
+  const [otherFees, setOtherFees] = useState("");
+  // ADD THESE STATES inside Vaccination component (top)
 
-  /* ================= DATE TIME STATES ================= */
-  const [dateTime, setDateTime] = useState<Date | null>(null);
-  const [showPicker, setShowPicker] = useState(false);
-  const [pickerMode, setPickerMode] = useState<"date" | "time">("date");
+const [loading, setLoading] = useState(false);
 
-  /* ================= FORMAT FUNCTION ================= */
-  const formatDateTime = (date: Date) => {
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const year = date.getFullYear();
+const [animalId, setAnimalId] = useState("");
+const [bodyTemp, setBodyTemp] = useState("");
+const [vaccineName, setVaccineName] = useState("");
+const [doseAmount, setDoseAmount] = useState("");
+const [batchNumber, setBatchNumber] = useState("");
+const [manufacturer, setManufacturer] = useState("");
+const [illnessDetails, setIllnessDetails] = useState("");
+const [remarks, setRemarks] = useState("");
+const [nextDoseNeeded, setNextDoseNeeded] = useState("No");
 
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
+  const [expiryDate, setExpiryDate] = useState(new Date());
+  const [vaccinationDate, setVaccinationDate] = useState(new Date());
+  const [nextDate, setNextDate] = useState(new Date());
 
-    return `${month}/${day}/${year} ${hours}:${minutes}`;
+  const [showPicker, setShowPicker] = useState<
+    null | "expiry" | "vaccination" | "next"
+  >(null);
+
+  const onChangeDate = (event: any, selectedDate?: Date) => {
+    setShowPicker(null);
+
+    if (event?.type === "set" && selectedDate) {
+      if (showPicker === "expiry") setExpiryDate(selectedDate);
+      if (showPicker === "vaccination") setVaccinationDate(selectedDate);
+      if (showPicker === "next") setNextDate(selectedDate);
+    }
   };
-  
-  const handleScheduleVisit = async () => {
+ const handleSaveVaccination = async () => {
   try {
+    setLoading(true);
+
     const token = await AsyncStorage.getItem("access_token");
 
-    if (!cattleId || !dateTime || !visitConfirmed || !reason) {
-      alert("Please fill all required fields");
+    if (!token) {
+      alert("User not logged in");
       return;
     }
 
-    const body = {
-      cattleId: cattleId,
-      dateTime: dateTime.toISOString(), // IMPORTANT (API needs ISO)
-      isDoctorVisitConfirmed: visitConfirmed === "Yes",
-      selectedDoctorId: "string", // change if dynamic
-      reasonToCall: reason,
-      remarks: remarks || "",
+    const payload = {
+      animal_id: animalId.trim(),
+
+      body_temperature: bodyTemp ? Number(bodyTemp) : 0,
+      bcs_score: bcs ? Number(bcs) : 0,
+
+      any_illness_signs: illness === "Yes",
+      illness_details: illness === "Yes" ? illnessDetails.trim() : "",
+
+      vaccine_name: vaccineName.trim(),
+      vaccination_category: category || "",
+
+      dose_amount_ml: doseAmount ? Number(doseAmount) : 0,
+      batch_number: batchNumber.trim(),
+      manufacturer: manufacturer.trim(),
+
+      expiry_date: expiryDate.toISOString().split("T")[0],
+
+      route_of_administration: route || "",
+      body_site: site || "",
+
+      vaccination_date: vaccinationDate.toISOString().split("T")[0],
+
+      next_dose_needed: nextDoseNeeded === "Yes",
+
+      next_vaccination_date:
+        nextDoseNeeded === "Yes"
+          ? nextDate.toISOString().split("T")[0]
+          : null,
+
+      follow_up_date:
+        nextDoseNeeded === "Yes"
+          ? nextDate.toISOString().split("T")[0]
+          : null,
+
+      doctor_fees: doctorFees ? Number(doctorFees) : 0,
+      treatment_expenses: treatmentFees
+        ? Number(treatmentFees)
+        : 0,
+      other_expenses: otherFees ? Number(otherFees) : 0,
     };
 
-    console.log("Request Body:", body);
+    console.log("Sending Payload:", payload);
 
     const response = await fetch(
-      "https://astrabytte-ai.onrender.com/api/v1/call-doctor",
+      "https://astrabytte-ai.onrender.com/api/v1/vaccinations",
       {
         method: "POST",
         headers: {
+          Accept: "application/json",
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // if API requires auth
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload),
       }
     );
 
-    const data = await response.json();
-    console.log("Response:", data);
+    const result = await response.json();
+    console.log("Server Response:", result);
 
-    if (response.ok) {
-      alert("Doctor visit scheduled successfully");
-      router.back();
-    } else {
-      alert(data.message || "Something went wrong");
+    if (!response.ok) {
+      alert(result?.detail || "Something went wrong");
+      return;
     }
+
+    alert("Vaccination Saved Successfully");
+    router.back();
   } catch (error) {
-    console.log("API Error:", error);
-    alert("Network error");
+    console.log("Vaccination Error:", error);
+    alert("Server Error");
+  } finally {
+    setLoading(false);
   }
 };
 
-
+  const formatDate = (date: Date) => {
+    return date.toISOString().split("T")[0];
+  };
+  
 
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      {/* ================= HEADER ================= */}
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <View style={styles.avatar}>
-          <Ionicons name="call" size={22} color="#16a34a" />
+    <View style={styles.screen}>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <View style={styles.headerIcon}>
+          <Ionicons name="medkit-outline" size={22} color={colors.primary} />
         </View>
         <View>
-          <AppText style={styles.title}>{t("Call Doctor")}</AppText>
-          <AppText style={styles.subtitle}>
-            {t("Schedule a veterinary visit for your cattle")}
+          <AppText style={styles.headerTitle}>{t.vaccination}</AppText>
+          <AppText style={styles.headerSub}>
+            {t.recordVaccinationDetails}
           </AppText>
         </View>
       </View>
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* ================= BASIC DETAILS ================= */}
-        <View style={[styles.section, { borderColor: colors.border }]}>
-          <AppText style={styles.sectionTitle}>
-            {t("Basic Details")}
-          </AppText>
-
-          {/* Cattle ID */}
-          <View style={{ marginBottom: 14 }}>
-            <AppText style={styles.label}>
-              {t("Cattle ID")}
-            </AppText>
-            <View style={styles.inputWrapper}>
-              <TextInput
-  style={styles.input}
-  placeholder="Enter cattle ID"
-  placeholderTextColor="#9ca3af"
-  value={cattleId}
-  onChangeText={setCattleId}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
+        {/* Health Status */}
+        <Section title="Cattle Health Status Before Vaccination">
+          <Input
+  icon="thermometer-outline"
+  label="Body Temperature (°C)*"
+  keyboardType="numeric"
+  value={bodyTemp}
+  onChangeText={setBodyTemp}
 />
-            </View>
-          </View>
 
-          {/* Date & Time Field */}
-          <AppText style={styles.label}>
-            {t("Date & Time")} *
-          </AppText>
+          <Dropdown
+            icon="stats-chart-outline"
+            label="BCS Score"
+            value={bcs}
+            onChange={setBcs}
+            items={[
+              { label: "Select", value: "" },
+              { label: "1", value: "1" },
+              { label: "2", value: "2" },
+              { label: "3", value: "3" },
+              { label: "4", value: "4" },
+              { label: "5", value: "5" },
+            ]}
+          />
+          <Input
+        icon="id-card-outline"
+        label="Animal ID"
+        value={animalId}
+        onChangeText={setAnimalId}
+      />
 
-          <TouchableOpacity
-            style={styles.dateBox}
-            onPress={() => {
-              setPickerMode("date");
-              setShowPicker(true);
-            }}
-          >
-            <AppText
-              style={{
-                color: dateTime ? "#111827" : "#9ca3af",
-              }}
-            >
-              {dateTime
-                ? formatDateTime(dateTime)
-                : "mm/dd/yyyy --:--"}
-            </AppText>
+          <Dropdown
+            icon="alert-circle-outline"
+            label="Any Illness Signs?"
+            value={illness}
+            onChange={setIllness}
+            items={[
+              { label: "No", value: "No" },
+              { label: "Yes", value: "Yes" },
+            ]}
+          />
+            {illness === "Yes" && (
+        <Input
+          icon="alert-circle-outline"
+          label="Illness Details"
+          value={illnessDetails}
+          onChangeText={setIllnessDetails}
+        />
+      )}
+        </Section>
 
-            <Ionicons name="calendar-outline" size={18} color="#6b7280" />
-          </TouchableOpacity>
+        {/* Vaccine Info */}
+        <Section title="Vaccine Information">
+          <Input
+  icon="medical-outline"
+  label="Vaccine Name"
+  value={vaccineName}
+  onChangeText={setVaccineName}
+/>
 
-          {showPicker && (
-            <DateTimePicker
-              value={dateTime || new Date()}
-              mode={pickerMode}
-              display="default"
-              is24Hour
-              onChange={(event, selected) => {
-                if (!selected) {
-                  setShowPicker(false);
-                  return;
-                }
+          <Dropdown
+            icon="list-outline"
+            label="Vaccination Category*"
+            value={category}
+            onChange={setCategory}
+            items={[
+              { label: "Select", value: "" },
+              { label: "Routine", value: "Routine" },
+              { label: "Booster", value: "Booster" },
+              { label: "Emergency", value: "Emergency" },
+            ]}
+          />
 
-                if (pickerMode === "date") {
-                  const base = new Date(selected);
+          <Input icon="time-outline" label="Age" />
+          <Input
+  icon="flask-outline"
+  label="Dose Amount (ml)*"
+  value={doseAmount}
+  onChangeText={setDoseAmount}
+  keyboardType="numeric"
+/>
+          <Input
+  icon="barcode-outline"
+  label="Batch Number"
+  value={batchNumber}
+  onChangeText={setBatchNumber}
+/>
+          <Input
+  icon="business-outline"
+  label="Manufacturer*"
+  value={manufacturer}
+  onChangeText={setManufacturer}
+/>
 
-                  if (dateTime) {
-                    base.setHours(
-                      dateTime.getHours(),
-                      dateTime.getMinutes()
-                    );
-                  }
+          <DateInput
+            label="Expiry Date*"
+            value={formatDate(expiryDate)}
+            onPress={() => setShowPicker("expiry")}
+          />
 
-                  setDateTime(base);
+          <Dropdown
+            icon="git-branch-outline"
+            label="Route of Administration*"
+            value={route}
+            onChange={setRoute}
+            items={[
+              { label: "Select", value: "" },
+              { label: "IM", value: "IM" },
+              { label: "SC", value: "SC" },
+              { label: "Oral", value: "Oral" },
+              { label: "Nasal", value: "Nasal" },
+            ]}
+          />
 
-                  if (Platform.OS !== "ios") {
-                    setPickerMode("time");
-                    setShowPicker(true);
-                  }
-                } else {
-                  const updated = dateTime
-                    ? new Date(dateTime)
-                    : new Date();
+          <Dropdown
+            icon="body-outline"
+            label="Body Site*"
+            value={site}
+            onChange={setSite}
+            items={[
+              { label: "Select", value: "" },
+              { label: "Shoulder", value: "Shoulder" },
+              { label: "Neck", value: "Neck" },
+              { label: "Thigh", value: "Thigh" },
+              { label: "Other", value: "Other" },
+            ]}
+          />
+        </Section>
 
-                  updated.setHours(
-                    selected.getHours(),
-                    selected.getMinutes()
-                  );
+        {/* Schedule */}
+        <Section title="Administration Details / Schedule">
+          <DateInput
+            label="Date of Vaccination*"
+            value={formatDate(vaccinationDate)}
+            onPress={() => setShowPicker("vaccination")}
+          />
 
-                  setDateTime(updated);
-                  setShowPicker(false);
-                  setPickerMode("date");
-                }
-              }}
-            />
-          )}
-        </View>
+          <Dropdown
+  icon="repeat-outline"
+  label="Next Dose Needed?*"
+  value={nextDoseNeeded}
+  onChange={setNextDoseNeeded}
+  items={[
+    { label: "No", value: "No" },
+    { label: "Yes", value: "Yes" },
+  ]}
+/>
 
-        {/* ================= VISIT DETAILS ================= */}
-        <View style={[styles.section, { borderColor: colors.border }]}>
-          <AppText style={styles.sectionTitle}>
-            {t("Visit Details")}
-          </AppText>
+          <DateInput
+            label="Next Vaccination Date*"
+            value={formatDate(nextDate)}
+            onPress={() => setShowPicker("next")}
+          />
+        </Section>
 
-          {/* Doctor Visit Confirmed */}
-          <AppText style={styles.label}>
-            {t("Doctor Visit Confirmed")} *
-          </AppText>
-          <TouchableOpacity
-            style={styles.dropdownBox}
-            onPress={() => {
-              setOpenVisitDropdown(!openVisitDropdown);
-              setOpenReasonDropdown(false);
-            }}
-          >
-            <AppText style={{ color: visitConfirmed ? "#111" : "#9ca3af" }}>
-              {visitConfirmed || "Select"}
-            </AppText>
-            <Ionicons name="chevron-down" size={18} />
-          </TouchableOpacity>
+        {/* Expenses */}
+        <Section title="Expenses">
+          <Input
+            icon="cash-outline"
+            label="Doctor Fees*"
+            value={doctorFees}
+            onChangeText={setDoctorFees}
+            keyboardType="numeric"
+          />
+          <Input
+            icon="wallet-outline"
+            label="Treatment Expenses*"
+            value={treatmentFees}
+            onChangeText={setTreatmentFees}
+            keyboardType="numeric"
+          />
+          <Input
+            icon="pricetag-outline"
+            label="Other Expenses*"
+            value={otherFees}
+            onChangeText={setOtherFees}
+            keyboardType="numeric"
+          />
+        </Section>
 
-          {openVisitDropdown && (
-            <View style={styles.dropdownList}>
-              {["Yes", "No"].map((item) => (
-                <TouchableOpacity
-                  key={item}
-                  style={styles.dropdownItem}
-                  onPress={() => {
-                    setVisitConfirmed(item);
-                    setOpenVisitDropdown(false);
-                  }}
-                >
-                  <AppText>{item}</AppText>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {/* Reason */}
-          <AppText style={styles.label}>
-            {t("Reason to Call Doctor")} *
-          </AppText>
-          <TouchableOpacity
-            style={styles.dropdownBox}
-            onPress={() => {
-              setOpenReasonDropdown(!openReasonDropdown);
-              setOpenVisitDropdown(false);
-            }}
-          >
-            <AppText style={{ color: reason ? "#111" : "#9ca3af" }}>
-              {reason || "Select Reason"}
-            </AppText>
-            <Ionicons name="chevron-down" size={18} />
-          </TouchableOpacity>
-
-          {openReasonDropdown && (
-            <View style={styles.dropdownList}>
-              {[
-                "Heat Confirmation",
-                "Treatment",
-                "Insemination / Delivery Details",
-                "Treatment Follow Up",
-              ].map((item) => (
-                <TouchableOpacity
-                  key={item}
-                  style={styles.dropdownItem}
-                  onPress={() => {
-                    setReason(item);
-                    setOpenReasonDropdown(false);
-                  }}
-                >
-                  <AppText>{item}</AppText>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
-
-        {/* ================= ADDITIONAL INFO ================= */}
-        <View style={[styles.section, { borderColor: colors.border }]}>
-          <AppText style={styles.sectionTitle}>
-            {t("Additional Information")}
-          </AppText>
-
-          <AppText style={styles.label}>{t("Remarks")}</AppText>
-          <TextInput
+        <TextInput
   style={styles.textArea}
-  placeholder="Any additional notes or observations..."
-  placeholderTextColor="#9ca3af"
   multiline
+  placeholder="Enter remarks"
   value={remarks}
   onChangeText={setRemarks}
 />
-        </View>
 
-        {/* ================= BUTTONS ================= */}
+        {/* Buttons */}
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={styles.cancelBtn}
             onPress={() => router.back()}
           >
-            <AppText>Cancel and Go back to Cattle Dashboard</AppText>
+            <AppText>{t.cancel}</AppText>
           </TouchableOpacity>
 
           <TouchableOpacity
-  style={styles.saveBtn}
-  onPress={handleScheduleVisit}
+  style={[styles.saveBtn, { backgroundColor: colors.primary }]}
+  onPress={handleSaveVaccination}
+  disabled={loading}
 >
-            <Ionicons name="calendar" size={18} color="#fff" />
-            <AppText style={styles.saveText}>
-              Schedule Visit
-            </AppText>
-          </TouchableOpacity>
+  <Ionicons name="save-outline" size={18} color="#fff" />
+  <AppText style={styles.saveText}>
+    {loading ? "Saving..." : t.saveVaccination}
+  </AppText>
+</TouchableOpacity>
         </View>
       </ScrollView>
+
+      {showPicker && (
+        <DateTimePicker
+          value={
+            showPicker === "expiry"
+              ? expiryDate
+              : showPicker === "vaccination"
+              ? vaccinationDate
+              : nextDate
+          }
+          mode="date"
+          display={Platform.OS === "android" ? "default" : "spinner"}
+          onChange={onChangeDate}
+        />
+      )}
     </View>
   );
 };
 
-export default CallDoctor;
+export default Vaccination;
 
-/* ================= INPUT ================= */
+/* COMPONENTS */
 
-const Input = ({
-  label,
-  icon,
-  ...props
-}: {
-  label: string;
-  icon: any;
-  [key: string]: any;
-}) => (
-  <View style={{ marginBottom: 14 }}>
+const Section = ({ title, children }: any) => (
+  <View style={styles.section}>
+    <AppText style={styles.sectionTitle}>{title}</AppText>
+    {children}
+  </View>
+);
+
+const Input = ({ icon, label, ...props }: any) => (
+  <View style={styles.inputWrapper}>
     <AppText style={styles.label}>{label}</AppText>
-    <View style={styles.inputWrapper}>
-      <Ionicons name={icon} size={18} color="#6b7280" />
-      <TextInput
-        style={styles.input}
-        placeholderTextColor="#9ca3af"
-        {...props}
-      />
+    <View style={styles.inputBox}>
+      <Ionicons name={icon} size={18} color="#9ca3af" />
+      <TextInput style={styles.input} {...props} />
     </View>
   </View>
 );
 
+const DateInput = ({ label, value, onPress }: any) => (
+  <View style={styles.inputWrapper}>
+    <AppText style={styles.label}>{label}</AppText>
+    <TouchableOpacity style={styles.inputBox} onPress={onPress}>
+      <Ionicons name="calendar-outline" size={18} color="#9ca3af" />
+      <TextInput
+        style={styles.input}
+        value={value}
+        editable={false}
+        pointerEvents="none"
+      />
+    </TouchableOpacity>
+  </View>
+);
+
+const Dropdown = ({ icon, label, value, onChange, items }: any) => (
+  <View style={styles.inputWrapper}>
+    <AppText style={styles.label}>{label}</AppText>
+
+    <View style={styles.dropdownBox}>
+      <Ionicons
+        name={icon}
+        size={18}
+        color="#9ca3af"
+        style={{ marginRight: 8 }}
+      />
+
+      <Picker
+        selectedValue={value}
+        onValueChange={onChange}
+        dropdownIconColor="#6b7280"
+        style={styles.picker}
+        mode="dropdown"
+      >
+        {items.map((i: any, idx: number) => (
+          <Picker.Item key={idx} label={i.label} value={i.value} />
+        ))}
+      </Picker>
+    </View>
+  </View>
+);
+
+
+/* ================= STYLES ================= */
+
 const styles = StyleSheet.create({
-  screen: { flex: 1 },
+  screen: { flex: 1, backgroundColor: "#f8fafc" },
 
   header: {
     flexDirection: "row",
@@ -359,97 +475,85 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#fff",
     borderBottomWidth: 1,
-  },
-
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#dcfce7",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-
-  title: { fontSize: 20, fontWeight: "700" },
-  subtitle: { fontSize: 13, color: "#6b7280" },
-
-  container: { padding: 16 },
-
-  section: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 20,
-    borderWidth: 1,
-  },
-
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    borderBottomWidth: 1.5,
-    borderBottomColor: "#22c55e",
-    paddingBottom: 6,
-    marginBottom: 14,
-  },
-
-  label: { fontSize: 13, marginBottom: 4 },
-
-  inputWrapper: {
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    backgroundColor: "#f9fafb",
-  },
-
-  input: { flex: 1 },
-
-  dateBox: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 10,
-    padding: 12,
-    backgroundColor: "#f9fafb",
-    marginBottom: 12,
-  },
-
-  dropdownBox: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 10,
-    padding: 12,
-    backgroundColor: "#f9fafb",
-    marginBottom: 8,
-  },
-
-  dropdownList: {
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 10,
-    backgroundColor: "#fff",
-    marginBottom: 14,
-  },
-
-  dropdownItem: {
-    padding: 12,
-    borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
   },
 
-  textArea: {
+  headerIcon: {
+    backgroundColor: "#dcfce7",
+    padding: 10,
+    borderRadius: 50,
+    marginRight: 12,
+  },
+
+  headerTitle: { fontSize: 18, fontWeight: "600" },
+  headerSub: { fontSize: 12, color: "#6b7280" },
+
+  content: { padding: 16, paddingBottom: 30 },
+
+  section: {
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 18,
+  },
+
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderColor: "#e5e7eb",
+    paddingBottom: 6,
+  },
+
+  inputWrapper: { marginBottom: 14 },
+  label: { fontSize: 12, marginBottom: 6 },
+
+  inputBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f9fafb",
+    borderRadius: 10,
+    paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: "#e5e7eb",
+  },
+
+  input: { flex: 1, padding: 10 },
+
+  // dropdownBox: {
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   backgroundColor: "#f9fafb",
+  //   borderRadius: 10,
+  //   borderWidth: 1,
+  //   borderColor: "#e5e7eb",
+  // },
+  dropdownBox: {
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: "#f9fafb",
+  borderRadius: 10,
+  borderWidth: 1,
+  borderColor: "#e5e7eb",
+  paddingHorizontal: 10,
+  height: 50,
+},
+
+picker: {
+  flex: 1,
+  height: 50,
+  color: "#111827",
+},
+
+  //picker: { flex: 1, height: 48 },
+
+  textArea: {
+    height: 90,
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
     padding: 12,
-    height: 110,
     backgroundColor: "#f9fafb",
     textAlignVertical: "top",
   },
@@ -457,28 +561,32 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 24,
+    marginTop: 20,
   },
 
   cancelBtn: {
-    width: "60%",
+    width: "45%",
     borderWidth: 1,
     borderColor: "#d1d5db",
-    padding: 12,
-    borderRadius: 8,
+    padding: 14,
+    borderRadius: 10,
     alignItems: "center",
+    backgroundColor: "#fff",
   },
 
   saveBtn: {
-    width: "35%",
-    backgroundColor: "#16a34a",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
+    width: "45%",
     flexDirection: "row",
     justifyContent: "center",
-    gap: 6,
+    alignItems: "center",
+    backgroundColor: "#16a34a",
+    padding: 14,
+    borderRadius: 10,
   },
 
-  saveText: { color: "#fff", fontWeight: "600" },
+  saveText: {
+    color: "#fff",
+    fontWeight: "600",
+    marginLeft: 8,
+  },
 });
