@@ -101,9 +101,9 @@ const CallDoctor = () => {
           <Ionicons name="call" size={22} color="#16a34a" />
         </View>
         <View>
-          <AppText style={styles.title}>{t("Call Doctor")}</AppText>
+          <AppText style={styles.title}>{t.callDoctor}</AppText>
           <AppText style={styles.subtitle}>
-            {t("Schedule a veterinary visit for your cattle")}
+            {t.scheduleVetVisit}
           </AppText>
         </View>
       </View>
@@ -112,13 +112,13 @@ const CallDoctor = () => {
         {/* ================= BASIC DETAILS ================= */}
         <View style={[styles.section, { borderColor: colors.border }]}>
           <AppText style={styles.sectionTitle}>
-            {t("Basic Details")}
+            {t.basicDetails}
           </AppText>
 
           {/* Cattle ID */}
           <View style={{ marginBottom: 14 }}>
             <AppText style={styles.label}>
-              {t("Cattle ID")}
+              {t.cattleId}
             </AppText>
             <View style={styles.inputWrapper}>
               <TextInput
@@ -133,7 +133,7 @@ const CallDoctor = () => {
 
           {/* Date & Time Field */}
           <AppText style={styles.label}>
-            {t("Date & Time")} *
+            {t.dateTime} *
           </AppText>
 
           <TouchableOpacity
@@ -206,12 +206,12 @@ const CallDoctor = () => {
         {/* ================= VISIT DETAILS ================= */}
         <View style={[styles.section, { borderColor: colors.border }]}>
           <AppText style={styles.sectionTitle}>
-            {t("Visit Details")}
+            {t.visitDetails}
           </AppText>
 
           {/* Doctor Visit Confirmed */}
           <AppText style={styles.label}>
-            {t("Doctor Visit Confirmed")} *
+            {t.doctorVisitConfirmed} *
           </AppText>
           <TouchableOpacity
             style={styles.dropdownBox}
@@ -245,7 +245,7 @@ const CallDoctor = () => {
 
           {/* Reason */}
           <AppText style={styles.label}>
-            {t("Reason to Call Doctor")} *
+            {t.reasonToCallDoctor} *
           </AppText>
           <TouchableOpacity
             style={styles.dropdownBox}
@@ -286,10 +286,10 @@ const CallDoctor = () => {
         {/* ================= ADDITIONAL INFO ================= */}
         <View style={[styles.section, { borderColor: colors.border }]}>
           <AppText style={styles.sectionTitle}>
-            {t("Additional Information")}
+            {t.additionalInformation}
           </AppText>
 
-          <AppText style={styles.label}>{t("Remarks")}</AppText>
+          <AppText style={styles.label}>{t.remarks}</AppText>
           <TextInput
   style={styles.textArea}
   placeholder="Any additional notes or observations..."
