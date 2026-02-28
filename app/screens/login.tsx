@@ -38,7 +38,7 @@ export default function Index() {
   // ✅ Check if token exists on app start
   const checkToken = async () => {
     try {
-      // AsyncStorage.clear();
+      AsyncStorage.clear();
       const token = await AsyncStorage.getItem("access_token");
 
       if (token) {
