@@ -123,10 +123,10 @@ const Assessment = () => {
         </View>
         <View>
           <AppText style={styles.title}>
-            {t("Assessment Details")}
+            {t.assessmentDetails}
           </AppText>
           <AppText style={[styles.subtitle, { color: colors.text }]}>
-            {t("Record BCS assessment details")}
+            {t.assessmentDetails}
           </AppText>
         </View>
       </View>
@@ -134,12 +134,12 @@ const Assessment = () => {
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         
         {/* Assessment Details */}
-        <Section title={t("Assessment Details")} icon="document-text-outline">
+        <Section title={t.assessmentDetails} icon="document-text-outline">
 
           {/* Date */}
           <View style={{ marginBottom: 14 }}>
             <AppText style={[styles.label, { color: colors.text }]}>
-              {t("Assessment Date*")}
+              {t.assessmentDate}
             </AppText>
 
             <TouchableOpacity
@@ -163,87 +163,87 @@ const Assessment = () => {
           </View>
 
           <Input
-  label={t("Cattle ID*")}
+  label={t.cattleId}
   icon="pricetag-outline"
   value={animalId}
   onChangeText={setAnimalId}
 />
-          <Input label={t("Age*")} icon="time-outline" editable={false} />
-          <Input label={t("Current State*")} icon="information-circle-outline" editable={false} />
+          <Input label={t.age} icon="time-outline" editable={false} />
+          <Input label={t.currentState} icon="information-circle-outline" editable={false} />
 
           <Dropdown
-            label={t("Assessed By*")}
+            label={t.assessedBy}
             icon="person-outline"
-            items={[t("Owner"), t("Doctor")]}
+            items={[t.owner, t.doctor]}
           />
         </Section>
 
         {/* Backbone & Ribs */}
-        <Section title={t("Backbone & Ribs")} icon="body-outline">
+        <Section title={t.backboneAndRibs} icon="body-outline">
           <Dropdown
             icon="eye-outline"
-            label={t("Visibility of Ribs*")}
-            items={[t("Visible"), t("Slightly visible"), t("Not visible")]}
+            label={t.visibilityOfRibs}
+            items={[t.visible, t.slightlyVisible, t.notVisible]}
           />
           <Dropdown
             icon="fitness-outline"
-            label={t("Spinous Process Sharpness")}
-            items={[t("Sharp"), t("Slight"), t("Smooth")]}
+            label={t.spinousProcessSharpness}
+            items={[t.sharp, t.slight, t.smooth]}
           />
         </Section>
 
         {/* Hip & Pin Bones */}
-        <Section title={t("Hip & Pin Bones")} icon="analytics-outline">
+        <Section title={t.hipAndPinBones} icon="analytics-outline">
           <Dropdown
             icon="ellipse-outline"
-            label={t("Hook Bone Visibility*")}
-            items={[t("High"), t("Medium"), t("Low")]}
+            label={t.hookBoneVisibility}
+            items={[t.high, t.medium, t.low]}
           />
           <Dropdown
             icon="ellipse-outline"
-            label={t("Pin Bone Visibility*")}
-            items={[t("High"), t("Medium"), t("Low")]}
+            label={t.pinBoneVisibility}
+            items={[t.high, t.medium, t.low]}
           />
           <Dropdown
             icon="leaf-outline"
-            label={t("Tail Head Fat Cover*")}
-            items={[t("Sunken"), t("Slight cover"), t("Full cover")]}
+            label={t.tailHeadFatCover}
+            items={[t.sunken, t.slightCover, t.fullCover]}
           />
         </Section>
 
         {/* Thigh & Loin */}
-        <Section title={t("Thigh & Loin Area")} icon="barbell-outline">
+        <Section title={t.thighAndLoinArea} icon="barbell-outline">
           <Dropdown
             icon="layers-outline"
-            label={t("Loin Fat Cover*")}
-            items={[t("Hollow"), t("Flat"), t("Filled")]}
+            label={t.loinFatCover}
+            items={[t.hollow, t.flat, t.filled]}
           />
           <Dropdown
             icon="trending-up-outline"
-            label={t("Thigh Area Fullness*")}
-            items={[t("Thin"), t("Normal"), t("Fatty")]}
+            label={t.thighAndLoinArea}
+            items={[t.thin, t.normal, t.fatty]}
           />
         </Section>
 
         {/* Body Length */}
-        <Section title={t("Body Length & Weight")} icon="resize-outline">
-          <Input icon="scale-outline" label={t("Weight (KG)")} />
-          <Input icon="resize-outline" label={t("Hip Height")} />
-          <Input icon="expand-outline" label={t("Body Length")} />
-          <Input icon="heart-outline" label={t("Heart Girth")} />
+        <Section title={t.bodyLength} icon="resize-outline">
+          <Input icon="scale-outline" label={t.weightKg} />
+          <Input icon="resize-outline" label={t.hipHeight} />
+          <Input icon="expand-outline" label={t.bodyLength} />
+          <Input icon="heart-outline" label={t.heartGirth} />
         </Section>
 
         {/* ✅ BCS Score Section (Before Expenses) */}
-        <Section title={t("BCS Score")} icon="star-outline">
+        <Section title={t.bcsScore} icon="star-outline">
           <Dropdown
             icon="star-outline"
-            label={t("BCS Score*")}
+            label={t.bcsScore}
             items={["1", "2", "3", "4", "5"]}
           />
 
          <View style={{ marginTop: 16 }}>
   <AppText style={styles.label}>
-    {t("Remarks")}
+    {t.remarks}
   </AppText>
 
   <TextInput
@@ -257,16 +257,16 @@ const Assessment = () => {
         </Section>
 
         {/* Expenses */}
-        <Section title={t("Expenses")} icon="cash-outline">
-          <Input icon="cash-outline" label={t("Doctor Fees*")} />
-          <Input icon="wallet-outline" label={t("Treatment Expenses*")} />
-          <Input icon="card-outline" label={t("Other Expenses*")} />
+        <Section title={t.expenses} icon="cash-outline">
+          <Input icon="cash-outline" label={t.doctorFees} />
+          <Input icon="wallet-outline" label={t.treatmentExpenses} />
+          <Input icon="card-outline" label={t.otherExpenses} />
         </Section>
 
         {/* Buttons */}
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.cancelBtn} onPress={router.back}>
-            <AppText>{t("Cancel")}</AppText>
+            <AppText>{t.cancel}</AppText>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -275,7 +275,7 @@ const Assessment = () => {
 >
             <Ionicons name="save" size={18} color="#fff" />
             <AppText style={styles.saveText}>
-              {t("Save Assessment")}
+              {t.saveAssessment}
             </AppText>
           </TouchableOpacity>
         </View>
