@@ -189,8 +189,8 @@ const handleSave = async () => {
           <Ionicons name="person" size={22} color="#16a34a" />
         </View>
         <View>
-          <AppText style={styles.title}>{t("Add New Veterinarian")}</AppText>
-          <AppText style={styles.subtitle}>{t("Register a new veterinarian with complete details")}</AppText>
+          <AppText style={styles.title}>{t.addNewVeterinarian}</AppText>
+          <AppText style={styles.subtitle}>{t.registerVeterinarian}</AppText>
         </View>
       </View>
 
@@ -198,25 +198,25 @@ const handleSave = async () => {
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* ===== PERSONAL INFO ===== */}
         <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>{t("Personal Information")}</AppText>
+          <AppText style={styles.sectionTitle}>{t.personalInformation}</AppText>
 
-          <Input label={t("Veterinarian ID*")} placeholder={t("e.g., VET-001")} icon="id-card" value={vetId} onChangeText={setVetId} />
-          <Input label={t("First Name*")} placeholder={t("e.g., Dr. Meena")} icon="person" value={firstName} onChangeText={setFirstName} />
-          <Input label={t("Father's Name*")} placeholder={t("e.g., Suresh")} icon="person-outline" value={fathersName} onChangeText={setFathersName} />
-          <Input label={t("Surname*")} placeholder={t("e.g., Patil")} icon="person-circle-outline" value={surname} onChangeText={setSurname} />
+          <Input label={t.veterinarianId} placeholder={("e.g., VET-001")} icon="id-card" value={vetId} onChangeText={setVetId} />
+          <Input label={t.firstName} placeholder={("e.g., Dr. Meena")} icon="person" value={firstName} onChangeText={setFirstName} />
+          <Input label={t.fathersName} placeholder={("e.g., Suresh")} icon="person-outline" value={fathersName} onChangeText={setFathersName} />
+          <Input label={t.surname} placeholder={("e.g., Patil")} icon="person-circle-outline" value={surname} onChangeText={setSurname} />
 
-          <AppText style={styles.label}>{t("Gender*")}</AppText>
+          <AppText style={styles.label}>{t.gender}</AppText>
           <View style={styles.row}>
-            {["Male", "Female", "Other"].map((g) => (
+            {[t.male, t.female, t.other].map((g) => (
               <TouchableOpacity key={g} style={[styles.radio, gender === g && styles.radioSelected]} onPress={() => setGender(g)}>
-                <AppText>{t(g.toLowerCase())}</AppText>
+                <AppText>{(g.toLowerCase())}</AppText>
               </TouchableOpacity>
             ))}
           </View>
 
           <Input
-            label={t("Date of Birth*")}
-            placeholder={t("mm/dd/yyyy")}
+            label={t.dateOfBirth}
+            placeholder={("mm/dd/yyyy")}
             icon="calendar"
             value={dob}
             onFocus={() => setShowDatePicker(true)}
@@ -231,11 +231,11 @@ const handleSave = async () => {
             />
           )}
 
-          <Input label={t("Age")} placeholder={t("Auto-calculated")} icon="calculator" editable={false} value={age} />
+          <Input label={t.age} placeholder={("Auto-calculated")} icon="calculator" editable={false} value={age} />
 
           <Input
-            label={t("Date of Joining*")}
-            placeholder={t("mm/dd/yyyy")}
+            label={t.dateOfJoining}
+            placeholder={("mm/dd/yyyy")}
             icon="calendar-outline"
             value={joiningDate}
             onFocus={() => setShowJoiningPicker(true)}
@@ -253,34 +253,34 @@ const handleSave = async () => {
 
         {/* ===== CONTACT INFO ===== */}
         <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>{t("Contact Information")}</AppText>
+          <AppText style={styles.sectionTitle}>{t.contactInformation}</AppText>
 
           <Input
-            label={t("Mobile Number*")}
-            placeholder={t("9876543211")}
+            label={t.mobileNumber}
+            placeholder={("9876543211")}
             keyboardType="phone-pad"
             icon="call"
             value={mobile}
             onChangeText={handleMobileChange}
           />
           <Input
-            label={t("Alternate Contact Number")}
-            placeholder={t("Optional")}
+            label={t.alternateContactNumber}
+            placeholder={("Optional")}
             keyboardType="phone-pad"
             icon="call-outline"
             value={alternateMobile}
             onChangeText={handleAlternateMobileChange}
           />
-          <Input label={t("Address*")} placeholder={t("e.g., Pune District Hospital, Pune")} icon="location" value={address} onChangeText={setAddress} />
+          <Input label={t.address} placeholder={("e.g., Pune District Hospital, Pune")} icon="location" value={address} onChangeText={setAddress} />
         </View>
 
         {/* ===== PROFESSIONAL INFO ===== */}
         <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>{t("Professional Information")}</AppText>
-          <AppText style={styles.label}>{t("Specialization & Remarks")}</AppText>
+          <AppText style={styles.sectionTitle}>{t.professionalInformation}</AppText>
+          <AppText style={styles.label}>{t.specializationRemarks}</AppText>
           <TextInput
             style={styles.textArea}
-            placeholder={t("e.g., Specialist in bovine health, Large animal surgery expertise...")}
+            placeholder={("e.g., Specialist in bovine health, Large animal surgery expertise...")}
             placeholderTextColor="#9ca3af"
             multiline
             value={specialization}
@@ -291,12 +291,12 @@ const handleSave = async () => {
         {/* ===== BUTTONS ===== */}
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.cancelBtn}>
-            <AppText>{t("Cancel")}</AppText>
+            <AppText>{t.cancel}</AppText>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
             <Ionicons name="save" size={18} color="#fff" />
-            <AppText style={styles.saveText}>{t("Save Veterinarian")}</AppText>
+            <AppText style={styles.saveText}>{t.saveVeterinarian}</AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>
