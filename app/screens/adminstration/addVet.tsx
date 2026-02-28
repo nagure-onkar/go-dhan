@@ -2,52 +2,45 @@ import AppText from "@/components/common/AppText";
 import { useLanguage } from "@/constants/localization/useLanguage";
 import { useTheme } from "@/theme/useTheme";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
-  Image,
+  Platform,
   ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
 const BASE_URL = "https://astrabytte-ai.onrender.com";
 
-const AddWorker = () => {
+const AddVeterinarian = () => {
   const { t } = useLanguage();
   const { colors } = useTheme();
 
-  const [gender, setGender] = useState<string>("");
-  const [dob, setDob] = useState<string>("");
-  const [age, setAge] = useState<string>("");
-  const [joiningDate, setJoiningDate] = useState<string>("");
+  // ================= STATE =================
+  const [vetId, setVetId] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [fathersName, setFathersName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [gender, setGender] = useState("");
+  const [dob, setDob] = useState("");
+  const [age, setAge] = useState("");
+  const [joiningDate, setJoiningDate] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [alternateMobile, setAlternateMobile] = useState("");
+  const [address, setAddress] = useState("");
+  const [specialization, setSpecialization] = useState("");
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showJoiningPicker, setShowJoiningPicker] = useState(false);
 
-  const [selectedImage, setSelectedImage] = useState<any>(null);
-
-  const [workerId, setWorkerId] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [fatherName, setFatherName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [salary, setSalary] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [alternateMobile, setAlternateMobile] = useState("");
-  const [address, setAddress] = useState("");
-  const [remarks, setRemarks] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  /* ================= DOB PICKER ================= */
-
+  // ================= DOB PICKER =================
   const handleDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(false);
+    if (Platform.OS === "android") setShowDatePicker(false);
     if (!selectedDate) return;
 
     const formatted =
@@ -57,27 +50,24 @@ const AddWorker = () => {
       selectedDate.getDate() +
       "/" +
       selectedDate.getFullYear();
-
     setDob(formatted);
 
+    // Calculate age
     const today = new Date();
     let calculatedAge = today.getFullYear() - selectedDate.getFullYear();
     const monthDiff = today.getMonth() - selectedDate.getMonth();
-
     if (
       monthDiff < 0 ||
       (monthDiff === 0 && today.getDate() < selectedDate.getDate())
     ) {
       calculatedAge--;
     }
-
     setAge(calculatedAge.toString());
   };
 
-  /* ================= JOINING DATE PICKER ================= */
-
+  // ================= JOINING DATE PICKER =================
   const handleJoiningChange = (event: any, selectedDate?: Date) => {
-    setShowJoiningPicker(false);
+    if (Platform.OS === "android") setShowJoiningPicker(false);
     if (!selectedDate) return;
 
     const formatted =
@@ -87,52 +77,22 @@ const AddWorker = () => {
       selectedDate.getDate() +
       "/" +
       selectedDate.getFullYear();
-
     setJoiningDate(formatted);
   };
 
-  /* ================= IMAGE PICKER ================= */
-
-  const pickImage = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permission.granted) {
-      Alert.alert("Permission required");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.7,
-    });
-
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0]);
-    }
-  };
-
-  /* ================= MOBILE VALIDATION ================= */
-
+  // ================= MOBILE VALIDATION =================
   const handleMobileChange = (text: string) => {
     const cleaned = text.replace(/[^0-9]/g, "");
-    if (cleaned.length <= 10) {
-      setMobile(cleaned);
-    }
+    if (cleaned.length <= 10) setMobile(cleaned);
   };
-
   const handleAlternateMobileChange = (text: string) => {
     const cleaned = text.replace(/[^0-9]/g, "");
-    if (cleaned.length <= 10) {
-      setAlternateMobile(cleaned);
-    }
+    if (cleaned.length <= 10) setAlternateMobile(cleaned);
   };
 
-  /* ================= SAVE ================= */
-
+  // ================= SAVE =================
   const handleSave = async () => {
     try {
-      setLoading(true);
-
       const token = await AsyncStorage.getItem("access_token");
 
       if (!token) {
@@ -140,16 +100,29 @@ const AddWorker = () => {
         return;
       }
 
-      if (!salary) {
-        Alert.alert("Error", "Salary is required");
-        return;
-      }
+      if (!vetId.trim())
+        return Alert.alert("Validation Error", "Enter Veterinarian ID");
+      if (!firstName.trim())
+        return Alert.alert("Validation Error", "Enter First Name");
+      if (!fathersName.trim())
+        return Alert.alert("Validation Error", "Enter Father's Name");
+      if (!surname.trim())
+        return Alert.alert("Validation Error", "Enter Surname");
+      if (!gender) return Alert.alert("Validation Error", "Select Gender");
+      if (!dob) return Alert.alert("Validation Error", "Select Date of Birth");
+      if (!joiningDate)
+        return Alert.alert("Validation Error", "Select Date of Joining");
+      if (!mobile || mobile.length !== 10)
+        return Alert.alert(
+          "Validation Error",
+          "Enter valid 10 digit mobile number",
+        );
+      if (!address.trim())
+        return Alert.alert("Validation Error", "Enter Address");
 
-      const formatDate = (dateString) => {
-        if (!dateString) return null;
-
-        const parts = dateString.split("/"); // MM/DD/YYYY
-
+      // FORMAT DATE
+      const formatDate = (dateString: string) => {
+        const parts = dateString.split("/");
         if (parts.length !== 3) return null;
 
         const month = parts[0].padStart(2, "0");
@@ -159,33 +132,41 @@ const AddWorker = () => {
         return `${year}-${month}-${day}`;
       };
 
+      const formattedDOB = formatDate(dob);
+      const formattedJoining = formatDate(joiningDate);
+
+      if (!formattedDOB || !formattedJoining) {
+        Alert.alert("Error", "Invalid date format");
+        return;
+      }
+
       const formattedGender =
-        gender.toLowerCase() === "male"
-          ? "Male"
-          : gender.toLowerCase() === "female"
-            ? "Female"
-            : "";
+        gender === "Male" ? "Male" : gender === "Female" ? "Female" : "";
+
+      if (!formattedGender) {
+        Alert.alert("Error", "Gender must be Male or Female");
+        return;
+      }
 
       const payload = {
-        workerId: workerId,
-        firstName: firstName,
-        fathersName: fatherName,
-        surname: surname,
+        vetId: vetId.trim(),
+        firstName: firstName.trim(),
+        fathersName: fathersName.trim(),
+        surname: surname.trim(),
         gender: formattedGender,
-        dateOfBirth: formatDate(dob),
-        age: 0,
-        address: address,
-        dateOfJoining: formatDate(joiningDate),
+        dateOfBirth: formattedDOB,
+        age: Number(age) || 0,
+        address: address.trim(),
+        dateOfJoining: formattedJoining,
         mobileNumber: mobile,
         alternateContactNumber: alternateMobile || null,
-        remarks: remarks || "",
-        aadharImage: null,
-        salary: Number(salary),
+        remarks: specialization || "",
       };
 
       console.log("Sending Payload:", payload);
 
-      const response = await fetch(`${BASE_URL}/api/v1/worker-registry/`, {
+      // ✅ CORRECT ENDPOINT
+      const response = await fetch(`${BASE_URL}/api/v1/vet-registry/`, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -196,63 +177,69 @@ const AddWorker = () => {
       });
 
       const result = await response.json();
-      console.log("Worker API Response:", result);
+      console.log("Veterinarian API Response:", result);
 
       if (!response.ok) {
-        Alert.alert("Error", JSON.stringify(result.detail));
+        Alert.alert(
+          "Error",
+          result?.detail?.[0]?.msg || result?.detail || "Something went wrong",
+        );
         return;
       }
 
-      Alert.alert("Success", "Worker Added Successfully");
+      Alert.alert("Success", "Veterinarian Added Successfully");
+      router.replace("/tabs");
     } catch (error) {
       console.log("SAVE ERROR:", error);
       Alert.alert("Error", "Server Error");
-    } finally {
-      setLoading(false);
     }
   };
+
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+    <View style={styles.screen}>
+      {/* ================= HEADER ================= */}
       <View style={styles.header}>
         <View style={styles.avatar}>
-          <Ionicons name="person-add" size={22} color={colors.primary} />
+          <Ionicons name="person" size={22} color="#16a34a" />
         </View>
         <View>
-          <AppText style={styles.title}>{t.addNewWorker}</AppText>
-          <AppText style={styles.subtitle}>{t.registerWorker}</AppText>
+          <AppText style={styles.title}>{t.addNewVeterinarian}</AppText>
+          <AppText style={styles.subtitle}>{t.registerVeterinarian}</AppText>
         </View>
       </View>
 
+      {/* ================= CONTENT ================= */}
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* ===== PERSONAL INFO ===== */}
         <View style={styles.section}>
           <AppText style={styles.sectionTitle}>{t.personalInformation}</AppText>
 
           <Input
-            label={t.workerId}
+            label={t.veterinarianId}
+            placeholder={"e.g., VET-001"}
             icon="id-card"
-            placeholder="eg.WKR-001 "
-            value={workerId}
-            onChangeText={setWorkerId}
+            value={vetId}
+            onChangeText={setVetId}
           />
           <Input
             label={t.firstName}
+            placeholder={"e.g., Dr. Meena"}
             icon="person"
-            placeholder=" eg Ravi "
             value={firstName}
             onChangeText={setFirstName}
           />
           <Input
             label={t.fathersName}
+            placeholder={"e.g., Suresh"}
             icon="person-outline"
-            placeholder="eg. Mohan "
-            value={fatherName}
-            onChangeText={setFatherName}
+            value={fathersName}
+            onChangeText={setFathersName}
           />
           <Input
             label={t.surname}
-            icon="people-outline"
+            placeholder={"e.g., Patil"}
+            icon="person-circle-outline"
             value={surname}
-            placeholder="eg.Patil"
             onChangeText={setSurname}
           />
 
@@ -264,26 +251,18 @@ const AddWorker = () => {
                 style={[styles.radio, gender === g && styles.radioSelected]}
                 onPress={() => setGender(g)}
               >
-                <AppText>{g}</AppText>
+                <AppText>{g.toLowerCase()}</AppText>
               </TouchableOpacity>
             ))}
           </View>
 
-          {/* DOB */}
-          <AppText style={styles.label}>{t.dateOfBirth}</AppText>
-          <TouchableOpacity
-            style={styles.inputWrapper}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Ionicons name="calendar" size={18} color="#6b7280" />
-            <TextInput
-              style={styles.input}
-              placeholder="mm/dd/yyyy"
-              value={dob}
-              editable={false}
-            />
-          </TouchableOpacity>
-
+          <Input
+            label={t.dateOfBirth}
+            placeholder={"mm/dd/yyyy"}
+            icon="calendar"
+            value={dob}
+            onFocus={() => setShowDatePicker(true)}
+          />
           {showDatePicker && (
             <DateTimePicker
               value={dob ? new Date(dob) : new Date()}
@@ -296,36 +275,19 @@ const AddWorker = () => {
 
           <Input
             label={t.age}
+            placeholder={"Auto-calculated"}
             icon="calculator"
-            placeholder="0"
-            value={age}
             editable={false}
+            value={age}
           />
 
           <Input
-            label={t.salary}
-            icon="cash"
-            placeholder="0"
-            keyboardType="numeric"
-            value={salary}
-            onChangeText={setSalary}
+            label={t.dateOfJoining}
+            placeholder={"mm/dd/yyyy"}
+            icon="calendar-outline"
+            value={joiningDate}
+            onFocus={() => setShowJoiningPicker(true)}
           />
-
-          {/* JOINING DATE */}
-          <AppText style={styles.label}>{t.dateOfJoining}</AppText>
-          <TouchableOpacity
-            style={styles.inputWrapper}
-            onPress={() => setShowJoiningPicker(true)}
-          >
-            <Ionicons name="calendar-outline" size={18} color="#6b7280" />
-            <TextInput
-              style={styles.input}
-              placeholder="mm/dd/yyyy"
-              value={joiningDate}
-              editable={false}
-            />
-          </TouchableOpacity>
-
           {showJoiningPicker && (
             <DateTimePicker
               value={joiningDate ? new Date(joiningDate) : new Date()}
@@ -337,91 +299,62 @@ const AddWorker = () => {
           )}
         </View>
 
-        {/* CONTACT */}
+        {/* ===== CONTACT INFO ===== */}
         <View style={styles.section}>
           <AppText style={styles.sectionTitle}>{t.contactInformation}</AppText>
 
           <Input
             label={t.mobileNumber}
-            icon="call"
+            placeholder={"9876543211"}
             keyboardType="phone-pad"
-            placeholder="9876543210"
+            icon="call"
             value={mobile}
             onChangeText={handleMobileChange}
           />
-
           <Input
             label={t.alternateContactNumber}
-            icon="call-outline"
+            placeholder={"Optional"}
             keyboardType="phone-pad"
-            placeholder="Optional"
+            icon="call-outline"
             value={alternateMobile}
             onChangeText={handleAlternateMobileChange}
           />
-
           <Input
             label={t.address}
-            placeholder="Village Road,City name"
+            placeholder={"e.g., Pune District Hospital, Pune"}
             icon="location"
             value={address}
             onChangeText={setAddress}
           />
         </View>
 
-        {/* DOCUMENT UPLOAD */}
-        <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>{t.documentUpload}</AppText>
-
-          <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
-            <Ionicons name="cloud-upload-outline" size={30} color="#16a34a" />
-            <AppText style={styles.uploadText}>{t.uploadAadhar}</AppText>
-            <AppText style={styles.uploadSub}>PNG, JPG up to 10MB</AppText>
-          </TouchableOpacity>
-
-          {selectedImage && (
-            <Image
-              source={{ uri: selectedImage.uri }}
-              style={{
-                width: "100%",
-                height: 150,
-                marginTop: 10,
-                borderRadius: 8,
-              }}
-              resizeMode="cover"
-            />
-          )}
-        </View>
-
-        {/* ADDITIONAL */}
+        {/* ===== PROFESSIONAL INFO ===== */}
         <View style={styles.section}>
           <AppText style={styles.sectionTitle}>
-            {t.additionalInformation}
+            {t.professionalInformation}
           </AppText>
-
-          <AppText style={styles.label}>{t.remarks}</AppText>
+          <AppText style={styles.label}>{t.specializationRemarks}</AppText>
           <TextInput
             style={styles.textArea}
-            placeholder="Any additional notes..."
+            placeholder={
+              "e.g., Specialist in bovine health, Large animal surgery expertise..."
+            }
+            placeholderTextColor="#9ca3af"
             multiline
-            value={remarks}
-            onChangeText={setRemarks}
+            value={specialization}
+            onChangeText={setSpecialization}
           />
         </View>
 
+        {/* ===== BUTTONS ===== */}
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.cancelBtn}>
-            <AppText style={{ fontWeight: "600" }}>{t.cancel}</AppText>
+            <AppText>{t.cancel}</AppText>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.saveBtn}
-            onPress={handleSave}
-            disabled={loading}
-          >
+          <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
             <Ionicons name="save" size={18} color="#fff" />
-            <AppText style={styles.saveText}>
-              {loading ? t.saving : t.saveWorker}
-            </AppText>
+            <AppText style={styles.saveText}>{t.saveVeterinarian}</AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -429,10 +362,9 @@ const AddWorker = () => {
   );
 };
 
-export default AddWorker;
+export default AddVeterinarian;
 
 /* ================= INPUT COMPONENT ================= */
-
 const Input = ({
   icon,
   label,
@@ -456,7 +388,6 @@ const Input = ({
 );
 
 /* ================= STYLES ================= */
-
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: "#f9fafb" },
   header: {
@@ -514,28 +445,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
   },
-  radioSelected: {
-    backgroundColor: "#dcfce7",
-    borderColor: "#22c55e",
-  },
-  uploadBox: {
-    borderWidth: 1,
-    borderStyle: "dashed",
-    borderColor: "#22c55e",
-    padding: 20,
-    borderRadius: 12,
-    alignItems: "center",
-    backgroundColor: "#f0fdf4",
-  },
-  uploadText: {
-    marginTop: 8,
-    fontWeight: "500",
-  },
-  uploadSub: {
-    fontSize: 12,
-    color: "#6b7280",
-    marginTop: 4,
-  },
+  radioSelected: { backgroundColor: "#dcfce7", borderColor: "#22c55e" },
   textArea: {
     borderWidth: 1,
     borderColor: "#e5e7eb",

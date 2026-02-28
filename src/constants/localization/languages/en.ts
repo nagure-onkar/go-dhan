@@ -205,4 +205,43 @@ export default {
   enterremarksoptional: "Enter remarks (optional)",
 
   confirmconsumption: "Confirm Consumption",
+
+  addNewWorker: "Add New Worker",
+  registerWorker: "Register a new worker with complete details",
+  personalInformation: "Personal Information",
+  contactInformation: "Contact Information",
+  workerId: "Worker ID *",
+  firstName: "First Name *",
+  fathersName: "Father's Name *",
+  surname: "Surname *",
+  male: "Male",
+  female: "Female",
+  other: "Other",
+  salary: "Salary *",
+  dateOfJoining: "Date of Joining *",
+  mobileNumber: "Mobile Number *",
+  alternateContactNumber: "Alternate Contact Number",
+  address: "Address *",
+  documentUpload: "Document Upload",
+  uploadAadhar: "Upload Aadhar Card Image",
+  saveWorker: "Save Worker",
+  saving: "Saving...",
+  success: "Success",
+  workerAdded: "Worker Added Successfully",
+
+  /* ================= Add Veterinarian ================= */
+
+  addNewVeterinarian: "Add New Veterinarian",
+  registerVeterinarian: "Register a new veterinarian with complete details",
+
+  professionalInformation: "Professional Information",
+
+  veterinarianId: "Veterinarian ID *",
+  specializationRemarks: "Specialization & Remarks",
+
+  saveVeterinarian: "Save Veterinarian",
+  veterinarianAdded: "Veterinarian Added Successfully",
+
+  userNotLoggedIn: "User not logged in",
+  serverError: "Server Error",
 };

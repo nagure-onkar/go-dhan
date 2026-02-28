@@ -11,6 +11,8 @@ export const reproductionCycleRouteMap: Record<string, string> = {
 
 export const LiveStockScreen = "/screens/liveStock/liveStock";
 
+export const AdministrationScreen = "/screens/adminstration/adminDashboard";
+
 export const liveStockRouteMap = {
   Manage_Activities:
     "/screens/liveStock/cattleReproduction/cattleReproductionCycle",

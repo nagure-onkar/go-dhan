@@ -1,9 +1,12 @@
 import AppText from "@/components/common/AppText";
 import { useLanguage } from "@/constants/localization/useLanguage";
 import { useTheme } from "@/theme/useTheme";
-import { LiveStockScreen } from "app/navigation/AppNavigator";
+import {
+  AdministrationScreen,
+  LiveStockScreen,
+} from "app/navigation/AppNavigator";
 import { useRouter } from "expo-router";
-import { Gear, Globe } from "phosphor-react-native";
+import { Gear, Globe, Shield } from "phosphor-react-native";
 import React, { useState } from "react";
 import {
   Modal,
@@ -36,6 +39,16 @@ export default function DrawerContent() {
       ]}
     >
       <AppText style={styles.title}>{t.menu}</AppText>
+
+      <TouchableOpacity
+        style={styles.item}
+        onPress={() => {
+          router.push(AdministrationScreen);
+        }}
+      >
+        <Shield size={28} color={colors.text} />
+        <AppText>Administration</AppText>
+      </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.item}
@@ -83,15 +96,6 @@ export default function DrawerContent() {
           </View>
         </Pressable>
       </Modal>
-
-      {/* <Picker
-        selectedValue={language}
-        onValueChange={(value) => setLanguage(value)}
-        style={{ color: colors.text }}
-      >
-        <Picker.Item label="English" value="en" />
-        <Picker.Item label="मराठी" value="mr" />
-      </Picker> */}
     </View>
   );
 }
