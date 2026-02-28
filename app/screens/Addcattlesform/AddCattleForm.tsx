@@ -83,12 +83,12 @@ const cattleStates = [
 ];
 
 const cattleStatuses = [
-  { label: `${t.active}`, value: "active" },
-  { label: `${t.inactive}`, value: "inactive" },
+  { label: `${t.active}`, value: "Active" },
+  { label: `${t.inactive}`, value: "Inactive" },
 ];
 
 export default function AddCattleForm() {
-  const { t, setLanguage, language } = useLanguage();
+  const { t } = useLanguage();
   const { colors } = useTheme();
   const [isSaved, setIsSaved] = useState(false);
   const [formData, setFormData] = useState({
@@ -200,47 +200,127 @@ export default function AddCattleForm() {
     }
   };
 
+  // const saveFormData = async () => {
+  //   try {
+  //     setIsLoading(true);
+  //     const token = await getStoredToken();
+  //     const url = `${BASE_URL}/api/v1/cattle/`;
+
+  //     // 1. Improved Formatter: Handles Undefined, Strings, and Date Objects
+  //     const formatDate = (dateValue) => {
+  //       if (!dateValue) return null; // If empty, don't try to split
+
+  //       // If it's a Date object, convert to ISO string first
+  //       const isoString =
+  //         typeof dateValue === "string" ? dateValue : dateValue.toISOString();
+  //       return isoString.split("T")[0];
+  //     };
+
+  //     // 2. Prepare the clean object
+  //     const cleanData = {
+  //       ...formData,
+  //       // Use the safer formatter
+  //       dateOfBirth: formatDate(formData.dateOfBirth),
+  //       stateDate: formatDate(formData.stateDate),
+
+  //       // Fix the naming mismatch from your previous error
+  //       remarks: formData.remark || "",
+
+  //       // Convert numbers to actual Integers if they are strings
+  //       purchasingCost: formData.purchasingCost
+  //         ? Number(formData.purchasingCost)
+  //         : 0,
+  //       weightKg: formData.weightKg ? Number(formData.weightKg) : 0,
+  //       lactationNumber: formData.lactationNumber
+  //         ? Number(formData.lactationNumber)
+  //         : 0,
+  //       age: formData.age ? Number(formData.age) : 0,
+  //     };
+
+  //     // Remove the key the backend doesn't like
+  //     delete cleanData.remark;
+
+  //     // console.log("Sending clean data:", cleanData);
+
+  //     const response = await fetch(url, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify(cleanData),
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       console.log(
+  //         "BACKEND VALIDATION ERROR:",
+  //         JSON.stringify(errorData, null, 2),
+  //       );
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+
+  //     const result = await response.json();
+  //     console.log("Success:", result);
+  //     return result;
+  //   } catch (error) {
+  //     console.error("Error saving form data:", error);
+  //     throw error;
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const saveFormData = async () => {
     try {
       setIsLoading(true);
       const token = await getStoredToken();
       const url = `${BASE_URL}/api/v1/cattle/`;
 
-      // 1. Improved Formatter: Handles Undefined, Strings, and Date Objects
-      const formatDate = (dateValue) => {
-        if (!dateValue) return null; // If empty, don't try to split
-
-        // If it's a Date object, convert to ISO string first
-        const isoString =
-          typeof dateValue === "string" ? dateValue : dateValue.toISOString();
-        return isoString.split("T")[0];
+      // Helper to format date as YYYY-MM-DD for stateDate
+      const toShortDate = (date) => {
+        if (!date) return new Date().toISOString().split("T")[0];
+        return new Date(date).toISOString().split("T")[0];
       };
 
-      // 2. Prepare the clean object
-      const cleanData = {
-        ...formData,
-        // Use the safer formatter
-        dateOfBirth: formatDate(formData.dateOfBirth),
-        stateDate: formatDate(formData.stateDate),
+      // Helper to format date as Full ISO for dateOfBirth
+      const toFullIso = (date) => {
+        if (!date) return new Date().toISOString();
+        return new Date(date).toISOString();
+      };
 
-        // Fix the naming mismatch from your previous error
+      console.log(formData);
+
+      const payload = {
+        cattleId: formData.cattleId || "",
+        nddbRegistrationNumber: formData.nddbRegistrationNumber || "N/A",
+        cattleType: formData.cattleType || "",
+        breed: formData.breed || "",
+        gender: formData.gender || "Female",
+        purchasingCost: Number(formData.purchasingCost) || 0,
+        purchaseSource: formData.purchaseSource || "",
+
+        // Matches "2026-02-27T16:25:02.090Z"
+        dateOfBirth: toFullIso(formData.dateOfBirth),
+
+        age: Number(formData.age) || 0,
+        workerAssigned: formData.workerAssigned || "",
+        veterinarianAssigned: formData.veterinarianAssigned || "",
+        state: formData.state || "",
+
+        // Matches "2026-02-27"
+        stateDate: toShortDate(formData.stateDate),
+
+        status: formData.status || "active",
+        lactationNumber: Number(formData.lactationNumber) || 0,
+        bloodLine: formData.bloodLine || "",
         remarks: formData.remark || "",
-
-        // Convert numbers to actual Integers if they are strings
-        purchasingCost: formData.purchasingCost
-          ? Number(formData.purchasingCost)
-          : 0,
-        weightKg: formData.weightKg ? Number(formData.weightKg) : 0,
-        lactationNumber: formData.lactationNumber
-          ? Number(formData.lactationNumber)
-          : 0,
-        age: formData.age ? Number(formData.age) : 0,
+        insuranceNumber: formData.insuranceNumber || "",
+        weightKg: Number(formData.weightKg) || 0,
+        images: formData.images || [],
+        nameOfCattle: formData.nameOfCattle || "",
+        treatmentGivenAtPurchase: formData.treatmentGivenAtPurchase || "",
       };
-
-      // Remove the key the backend doesn't like
-      delete cleanData.remark;
-
-      // console.log("Sending clean data:", cleanData);
 
       const response = await fetch(url, {
         method: "POST",
@@ -248,19 +328,20 @@ export default function AddCattleForm() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(cleanData),
+        body: JSON.stringify(payload),
       });
+      console.log(response);
+      // The line that was causing your error is now safely inside an async function
+      const result = await response.json();
 
       if (!response.ok) {
-        const errorData = await response.json();
         console.log(
           "BACKEND VALIDATION ERROR:",
-          JSON.stringify(errorData, null, 2),
+          JSON.stringify(result, null, 2),
         );
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
       console.log("Success:", result);
       return result;
     } catch (error) {
@@ -737,7 +818,6 @@ export default function AddCattleForm() {
               )}
             </View>
 
-            {/* Cattle Name */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
                 {t.purchaseSource}
@@ -772,7 +852,6 @@ export default function AddCattleForm() {
               )}
             </View>
 
-            {/* Cattle ID */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
                 {t.dateOfBirth}
@@ -859,7 +938,6 @@ export default function AddCattleForm() {
               )}
             </View>
 
-            {/* Cattle ID */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
                 {t.weightKg}
@@ -1231,8 +1309,8 @@ export default function AddCattleForm() {
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
-                <Ionicons
-                  name=""
+                <MaterialCommunityIcons
+                  name="bucket-outline"
                   size={20}
                   color="#666"
                   style={styles.inputIcon}

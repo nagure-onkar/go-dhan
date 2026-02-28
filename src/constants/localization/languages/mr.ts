@@ -79,6 +79,7 @@ export default {
   cattleTyperequired: "पशूचा प्रकार निवडणे आवश्यक आहे",
   purchasingCostrequired: "खरेदीची किंमत लिहिणे आवश्यक आहे",
   purchaseSourcerequired: "खरेदीचे ठिकाण/स्त्रोत आवश्यक आहे",
+  purchaseDetails: "खरेदीचा तपशील",
 
   //this is for the breed dropdown in the AddCattle and AddCalf forms
   murrah: "मुर्‍हा",

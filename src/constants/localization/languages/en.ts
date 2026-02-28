@@ -79,6 +79,7 @@ export default {
   cattleTyperequired: "Cattle type is required",
   purchasingCostrequired: "Purchase Cost is required",
   purchaseSourcerequired: "Purchase Source is required",
+  purchaseDetails: "Purchase Details",
 
   //this is for the breed dropdown in the AddCattle and AddCalf forms
   murrah: "Murrah",
