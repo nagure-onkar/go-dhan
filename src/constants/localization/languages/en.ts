@@ -123,6 +123,7 @@ export default {
   non_pregnantlactating: "Non-Pregnant & Lactating",
   non_pregnantnot_lactating: "Non-Pregnant & Not Lactating",
   dry_off: "Dry Off",
+  on_heat: "On Heat",
 
   //this is for remaining dropdowns
 

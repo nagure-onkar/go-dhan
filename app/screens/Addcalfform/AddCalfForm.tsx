@@ -1,13 +1,13 @@
-import { ENDPOINTS } from "@/api/endpoints";
 import { GET } from "@/api/methods";
 import AppText from "@/components/common/AppText";
 import { useLanguage } from "@/constants/localization/useLanguage";
 import { useTheme } from "@/theme/useTheme";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -23,7 +23,10 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import Success from "../../../src/components/common/success";
 
-const { t, setLanguage, language } = useLanguage();
+const BASE_URL = "https://astrabytte-ai.onrender.com";
+
+const { t } = useLanguage();
+const router = useRouter();
 
 const BuffaloBreeds = [
   { label: `${t.murrah}`, value: "murrah" },
@@ -86,49 +89,28 @@ const initialHealthObservations = [
 ];
 
 const calfStates = [
+  { label: `${t.on_heatlactating}`, value: "calf" },
   { label: `${t.heifer}`, value: "heifer" },
-  { label: `${t.on_heatlactating}`, value: "on_heatlactating" },
-  { label: `${t.on_heatnot_lactating}`, value: "on_heatnot_lactating" },
+  { label: `${t.on_heat}`, value: "on_heat" },
+  { label: `${t.calvedlactating}`, value: "inseminated" },
   { label: `${t.calved}`, value: "calved" },
-  { label: `${t.calvedlactating}`, value: "calvedlactating" },
-  { label: `${t.calvednot_lactating}`, value: "calvednot_lactating" },
-  { label: `${t.inseminatedlactating}`, value: "inseminatedlactating" },
-  {
-    label: `${t.inseminatednot_lactating}`,
-    value: "inseminated_&_not_lactating",
-  },
-  { label: `${t.pregnantlactating}`, value: "pregnantlactating" },
-  { label: `${t.pregnantnot_lactating}`, value: "pregnantnot_lactating" },
-  { label: `${t.non_pregnantlactating}`, value: "non_pregnantlactating" },
-  {
-    label: `${t.non_pregnantnot_lactating}`,
-    value: "non_pregnant_&_not_lactating",
-  },
   { label: `${t.dry_off}`, value: "dry_off" },
 ];
 
 const calfStatuses = [
-  { label: `${t.active}`, value: "active" },
-  { label: `${t.inactive}`, value: "inactive" },
+  { label: `${t.active}`, value: "Active" },
+  { label: `${t.inactive}`, value: "Inactive" },
 ];
 
-// Mock data - replace with your actual data source (e.g., API call)
-// const workers = async () => {
-//   const url = "http://10.124.247.84:3000/workers";
-//   let result = await fetch(url);
-//   result = await result.json();
-//   return result;
-// };
-
-const workers = [
-  { label: "Ram", value: "ram" },
-  { label: "Sham", value: "sham" },
-];
-
-const vets = [
-  { label: "Dr. Patil", value: "dr_patil" },
-  { label: "Dr. Shinde", value: "dr_shinde" },
-];
+const getStoredToken = async () => {
+  try {
+    const token = await AsyncStorage.getItem("access_token");
+    return token; // Returns the string or null
+  } catch (error) {
+    console.error("Error retrieving the token:", error);
+    return null;
+  }
+};
 
 const validateForm = (data, rules) => {
   let errors = {};
@@ -147,77 +129,182 @@ const validateForm = (data, rules) => {
 };
 
 export default function AddCalfForm() {
-  const { t, setLanguage, language } = useLanguage();
+  const { t } = useLanguage();
   const { colors } = useTheme();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 1. States for the dropdown lists
+  const [workerList, setWorkerList] = useState([]);
+  const [vetList, setVetList] = useState([]);
+
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  const fetchAllData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      // Fetch both Workers and Vets at the same time
+      const [workerRes, vetRes] = await Promise.all([
+        fetch(`${BASE_URL}/api/v1/worker-registry/`, { headers }),
+        fetch(`${BASE_URL}/api/v1/vet-registry/`, { headers }),
+      ]);
+
+      const workers = await workerRes.json();
+      const vets = await vetRes.json();
+
+      // Transform data for the Dropdown component
+      if (Array.isArray(workers)) {
+        setWorkerList(
+          workers.map((w) => ({ label: w.full_name, value: w.worker_id })),
+        );
+      }
+      if (Array.isArray(vets)) {
+        setVetList(vets.map((v) => ({ label: v.full_name, value: v.vet_id })));
+      }
+    } catch (error) {
+      console.error("Error loading dropdown data:", error);
+    }
+  };
 
   const [formData, setFormData] = useState({
     cattleId: "",
+    nddbRegistrationNumber: "",
     nameOfCattle: "",
+    colostrumIntake: "",
+    initialHealthObservations: "",
+    treatmentExpenses: null,
     cattleType: "Buffalo",
-    breed: null,
-    colostrumIntake: null,
-    initialHealthObservations: null,
+    breed: "",
     gender: "Female",
     damMother: "",
+    dateOfBirth: "",
+    age: null,
     calvingType: "",
-    nddbRegistrationNumber: "",
-    treatmentExpenses: "",
-    dateOfBirth: null,
-    age: "",
-    weightKg: "",
-    status: "active",
-    workerAssigned: null,
-    veterinarianAssigned: null,
-    state: null,
-    stateDate: null,
-    insuranceNumber: "",
-    convertToFullGrown: true,
+    state: "",
+    stateDate: "",
+    status: "Active",
+    workerAssigned: "",
+    veterinarianAssigned: "",
     remarks: "",
+    convertToFullGrown: false,
+    weightKg: null,
+    insuranceNumber: "",
     images: [],
   });
 
   const reset = {
     cattleId: "",
+    nddbRegistrationNumber: "N/A",
     nameOfCattle: "",
-    cattleType: "Buffalo",
-    breed: null,
-    colostrumIntake: null,
-    initialHealthObservations: null,
-    gender: "Female",
+    colostrumIntake: "",
+    initialHealthObservations: "",
+    treatmentExpenses: null,
+    cattleType: "",
+    breed: "",
+    gender: "",
     damMother: "",
+    dateOfBirth: "",
+    age: null,
     calvingType: "",
-    nddbRegistrationNumber: "",
-    treatmentExpenses: "",
-    dateOfBirth: null,
-    age: "",
-    weightKg: "",
-    status: "active",
-    workerAssigned: null,
-    veterinarianAssigned: null,
-    state: null,
-    stateDate: null,
-    insuranceNumber: "",
-    convertToFullGrown: true,
+    state: "",
+    stateDate: "",
+    status: "",
+    workerAssigned: "",
+    veterinarianAssigned: "",
     remarks: "",
+    convertToFullGrown: false,
+    weightKg: null,
+    insuranceNumber: "",
     images: [],
   };
 
-  const saveFormData = async (formData) => {
-    const url = "http://10.124.247.84:3000/calfstock";
-    let result = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-    result = await result.json();
-    if (result) {
-      console.log("Form data saved successfully:");
+  const saveCalfFormData = async () => {
+    try {
+      setIsLoading(true);
+      const token = await getStoredToken();
+
+      const url = `${BASE_URL}/api/v1/calf/`;
+
+      // Helper to format date as YYYY-MM-DD for both dateOfBirth and stateDate
+      const toShortDate = (date) => {
+        if (!date) return new Date().toISOString().split("T")[0];
+        return new Date(date).toISOString().split("T")[0];
+      };
+
+      // console.log("Calf Form Data:", formData);
+
+      const payload = {
+        cattleId: formData.cattleId || "",
+        nddbRegistrationNumber: formData.nddbRegistrationNumber || "N/A",
+        nameOfCattle: formData.nameOfCattle || "",
+        colostrumIntake: formData.colostrumIntake || "",
+        initialHealthObservations: formData.initialHealthObservations || "",
+        treatmentExpenses: Number(formData.treatmentExpenses) || 0,
+        cattleType: formData.cattleType || "Calf",
+        breed: formData.breed || "",
+        gender: formData.gender || "Female",
+        damMother: formData.damMother || "",
+
+        // Matches "2026-02-28"
+        dateOfBirth: toShortDate(formData.dateOfBirth),
+
+        age: Number(formData.age) || 0,
+        calvingType: formData.calvingType || "",
+        state: formData.state || "",
+
+        // Matches "2026-02-28"
+        stateDate: toShortDate(formData.stateDate),
+
+        status: formData.status || "active",
+        workerAssigned: formData.workerAssigned || "",
+        veterinarianAssigned: formData.veterinarianAssigned || "",
+
+        // Adjusted from formData.remark to formData.remarks to match your new payload
+        remarks: formData.remarks || formData.remark || "",
+
+        // Ensures this is strictly a boolean value
+        convertToFullGrown: Boolean(formData.convertToFullGrown),
+
+        weightKg: Number(formData.weightKg) || 0,
+        insuranceNumber: formData.insuranceNumber || "",
+        images: formData.images || [],
+      };
+      // console.log("Payload:", payload);
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      console.log("Raw Response:", response);
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.log(
+          "BACKEND VALIDATION ERROR:",
+          JSON.stringify(result, null, 2),
+        );
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log("Success:", result);
+      return result;
+    } catch (error) {
+      console.error("Error saving calf form data:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const [mothercattleId, setMothercattleId] = useState("");
+  const [mothercattleId, setMothercattleId] = useState();
   const [mothercalfData, setMothercalfData] = useState(null);
   const [mothercalfError, setMothercalfError] = useState("");
   const [isMothercalfLoading, setIsMothercalfLoading] = useState(false);
@@ -240,7 +327,6 @@ export default function AddCalfForm() {
   const [showHealthManagementDatePicker, setShowHealthManagementDatePicker] =
     useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const router = useRouter();
   const req = <AppText style={{ color: "red" }}> *</AppText>;
 
   const handleSearchMothercalf = async () => {
@@ -252,11 +338,21 @@ export default function AddCalfForm() {
     setMothercalfError("");
     setMothercalfData(null);
     try {
-      const result = await GET(ENDPOINTS.calf.search(mothercattleId));
-      if (result) {
-        setMothercalfData(result);
+      const result = await GET(
+        `${BASE_URL}/api/v1/cattle/search?q=${mothercattleId}&page=1&page_size=10`,
+      );
+      console.log("Search Result:", result);
+
+      // Handle if result is an array (common for search) or a paginated object
+      const cattleList = Array.isArray(result)
+        ? result
+        : result?.results || result?.data;
+
+      if (cattleList && cattleList.length > 0) {
+        setMothercalfData(cattleList[0]); // Select the first match
       } else {
-        setMothercalfError("No calf found with this ID.");
+        setMothercalfError("No Cattle found with this ID.");
+        setMothercalfData(null);
       }
     } catch (error) {
       console.error(error);
@@ -266,7 +362,7 @@ export default function AddCalfForm() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // 1. Define what needs to be checked
     const validationRules = {
       status: `${t.statusrequired}`,
@@ -284,23 +380,18 @@ export default function AddCalfForm() {
 
     // 4. If no errors (empty object), save and show success
     if (Object.keys(validationErrors).length === 0) {
-      console.log("Success! All form data validated:", formData);
-      setIsSaved(true);
-      saveFormData(formData);
-      if (selectedImage) {
-        formData.append("calf_image", {
-          uri: selectedImage.uri,
-          name: "calf_image.jpg",
-          type: "image/jpeg",
-        } as any);
-      }
-      setTimeout(() => {
-        router.push("../../tabs");
-        setIsSaved(false);
-      }, 2000);
-      setFormData(reset);
-      {
-        back();
+      try {
+        await saveCalfFormData(); // Wait for the API to finish
+        setIsSaved(true); // Only show success if no error was thrown
+
+        setTimeout(() => {
+          router.push("../../tabs");
+          setIsSaved(false);
+          setFormData(reset);
+          back();
+        }, 2000);
+      } catch (error) {
+        Alert.alert("Error", "Failed to save calf details. Please try again.");
       }
     }
   };
@@ -322,7 +413,7 @@ export default function AddCalfForm() {
       treatmentExpenses: `${t.treatmentExpencerequired}`,
       dateOfBirth: `${t.dateOfBirthrequired}`,
       age: `${t.agerequired}`,
-      weightKg: `${t.weightKgKgrequired}`,
+      weightKg: `${t.weightKgrequired}`,
       colostrumIntake: `${t.colostrumIntakerequired}`,
       initialHealthObservations: `${t.initialHealthObservationsrequired}`,
       calvingType: `${t.calvingTyperequired}`,
@@ -1136,7 +1227,7 @@ export default function AddCalfForm() {
                   styles.selectedTextStyle,
                   { color: colors.text },
                 ]}
-                data={workers}
+                data={workerList}
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
@@ -1181,7 +1272,7 @@ export default function AddCalfForm() {
                   styles.selectedTextStyle,
                   { color: colors.text },
                 ]}
-                data={vets}
+                data={vetList}
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
@@ -1368,9 +1459,52 @@ export default function AddCalfForm() {
             <AppText style={[styles.sectionTitle, { color: colors.primary }]}>
               {t.additionalInformation}
             </AppText>
+            <AppText
+              style={[styles.label, { color: colors.text, marginTop: 15 }]}
+            >
+              Convert to Full Grown
+            </AppText>
+            <View style={styles.genderRow}>
+              <TouchableOpacity
+                style={[
+                  styles.genderBtn,
+                  formData.convertToFullGrown === true &&
+                    styles.genderBtnActive,
+                ]}
+                onPress={() => setFormValue("convertToFullGrown", true)}
+              >
+                <AppText
+                  style={
+                    formData.convertToFullGrown === true
+                      ? styles.genderTextActive
+                      : styles.genderText
+                  }
+                >
+                  Yes
+                </AppText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.genderBtn,
+                  formData.convertToFullGrown === false &&
+                    styles.genderBtnActive,
+                ]}
+                onPress={() => setFormValue("convertToFullGrown", false)}
+              >
+                <AppText
+                  style={
+                    formData.convertToFullGrown === false
+                      ? styles.genderTextActive
+                      : styles.genderText
+                  }
+                >
+                  No
+                </AppText>
+              </TouchableOpacity>
+            </View>
             <View style={styles.separator} />
             <AppText style={[styles.label, { color: colors.text }]}>
-              {t.remarkss}
+              {t.remarks}
             </AppText>
             <Ionicons
               name="reader-outline"
@@ -1507,6 +1641,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
+    position: "relative",
   },
   searchInput: {
     flex: 1,

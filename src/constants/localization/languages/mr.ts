@@ -123,6 +123,7 @@ export default {
   non_pregnantlactating: "गाभण नसलेली आणि दूध देत असलेली",
   non_pregnantnot_lactating: "गाभण नसलेली आणि दूध न देणारी",
   dry_off: "दूध बंद (आटलेली)",
+  on_heat: "माजवर",
 
   //this is for remaining dropdowns
 
