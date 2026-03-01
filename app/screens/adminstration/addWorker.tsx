@@ -19,7 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const BASE_URL = "https://astrabytte-ai.onrender.com";
 
-const AddWorker = () => {
+export default function AddWorker() {
   const { t } = useLanguage();
   const { colors } = useTheme();
 
@@ -427,9 +427,9 @@ const AddWorker = () => {
       </ScrollView>
     </View>
   );
-};
+}
 
-export default AddWorker;
+// export default AddWorker;
 
 /* ================= INPUT COMPONENT ================= */
 

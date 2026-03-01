@@ -3,6 +3,10 @@ export const ENDPOINTS = {
     login: "/api/v1/auth/login",
     refresh: "/api/v1/auth/refresh",
   },
+  administration: {
+    profile: "/api/v1/user/profile",
+    combinedRegistry: "/api/v1/combined-registry",
+  },
   healthCheck: {
     root: "",
   },

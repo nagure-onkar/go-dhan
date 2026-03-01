@@ -13,6 +13,10 @@ export const LiveStockScreen = "/screens/liveStock/liveStock";
 
 export const AdministrationScreen = "/screens/adminstration/adminDashboard";
 
+export const AddVetScreen = "/screens/adminstration/addVet";
+
+export const AddWorkerScreen = "/screens/adminstration/addWorker";
+
 export const liveStockRouteMap = {
   Manage_Activities:
     "/screens/liveStock/cattleReproduction/cattleReproductionCycle",

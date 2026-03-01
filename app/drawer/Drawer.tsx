@@ -1,10 +1,7 @@
 import AppText from "@/components/common/AppText";
 import { useLanguage } from "@/constants/localization/useLanguage";
 import { useTheme } from "@/theme/useTheme";
-import {
-  AdministrationScreen,
-  LiveStockScreen,
-} from "app/navigation/AppNavigator";
+import { AdministrationScreen } from "app/navigation/AppNavigator";
 import { useRouter } from "expo-router";
 import { Gear, Globe, Shield } from "phosphor-react-native";
 import React, { useState } from "react";
@@ -50,7 +47,7 @@ export default function DrawerContent() {
         <AppText>Administration</AppText>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.item}
         onPress={() => {
           router.push(LiveStockScreen);
@@ -58,7 +55,7 @@ export default function DrawerContent() {
       >
         <AppText style={{ fontSize: 24 }}>🐄</AppText>
         <AppText>{t.live_stock}</AppText>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <TouchableOpacity style={styles.item}>
         <Gear size={28} color={colors.text} />
