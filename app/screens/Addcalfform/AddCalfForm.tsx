@@ -89,17 +89,17 @@ const initialHealthObservations = [
 ];
 
 const calfStates = [
-  { label: `${t.on_heatlactating}`, value: "calf" },
+  { label: `${t.calf}`, value: "calf" },
   { label: `${t.heifer}`, value: "heifer" },
   { label: `${t.on_heat}`, value: "on_heat" },
-  { label: `${t.calvedlactating}`, value: "inseminated" },
+  { label: `${t.inseminated}`, value: "inseminated" },
   { label: `${t.calved}`, value: "calved" },
   { label: `${t.dry_off}`, value: "dry_off" },
 ];
 
 const calfStatuses = [
-  { label: `${t.active}`, value: "Active" },
-  { label: `${t.inactive}`, value: "Inactive" },
+  { label: `${t.Active}`, value: "Active" },
+  { label: `${t.Inactive}`, value: "Inactive" },
 ];
 
 const getStoredToken = async () => {
@@ -197,21 +197,21 @@ export default function AddCalfForm() {
 
   const reset = {
     cattleId: "",
-    nddbRegistrationNumber: "N/A",
+    nddbRegistrationNumber: "",
     nameOfCattle: "",
     colostrumIntake: "",
     initialHealthObservations: "",
     treatmentExpenses: null,
-    cattleType: "",
+    cattleType: "Buffalo",
     breed: "",
-    gender: "",
+    gender: "Female",
     damMother: "",
     dateOfBirth: "",
     age: null,
     calvingType: "",
     state: "",
     stateDate: "",
-    status: "",
+    status: "Active",
     workerAssigned: "",
     veterinarianAssigned: "",
     remarks: "",
@@ -243,7 +243,7 @@ export default function AddCalfForm() {
         colostrumIntake: formData.colostrumIntake || "",
         initialHealthObservations: formData.initialHealthObservations || "",
         treatmentExpenses: Number(formData.treatmentExpenses) || 0,
-        cattleType: formData.cattleType || "Calf",
+        cattleType: formData.cattleType || "Buffalo",
         breed: formData.breed || "",
         gender: formData.gender || "Female",
         damMother: formData.damMother || "",
@@ -263,7 +263,7 @@ export default function AddCalfForm() {
         veterinarianAssigned: formData.veterinarianAssigned || "",
 
         // Adjusted from formData.remark to formData.remarks to match your new payload
-        remarks: formData.remarks || formData.remark || "",
+        remarks: formData.remarks || "",
 
         // Ensures this is strictly a boolean value
         convertToFullGrown: Boolean(formData.convertToFullGrown),
@@ -304,10 +304,11 @@ export default function AddCalfForm() {
     }
   };
 
-  const [mothercattleId, setMothercattleId] = useState();
-  const [mothercalfData, setMothercalfData] = useState(null);
-  const [mothercalfError, setMothercalfError] = useState("");
-  const [isMothercalfLoading, setIsMothercalfLoading] = useState(false);
+  const [mothercattleId, setMothercattleId] = useState("");
+  const [mothercattleData, setMothercattleData] = useState(null);
+  const [motherCattleResults, setMotherCattleResults] = useState([]);
+  const [mothercattleError, setMothercattleError] = useState("");
+  const [isMothercattleLoading, setIsMothercattleLoading] = useState(false);
 
   const [errors, setErrors] = useState({});
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -329,17 +330,17 @@ export default function AddCalfForm() {
   const [isSaved, setIsSaved] = useState(false);
   const req = <AppText style={{ color: "red" }}> *</AppText>;
 
-  const handleSearchMothercalf = async () => {
+  const handleSearchMothercattle = async () => {
     if (!mothercattleId.trim()) {
-      setMothercalfError("Please enter a calf ID to search.");
+      setMothercattleError("Please enter a cattle ID to search.");
       return;
     }
-    setIsMothercalfLoading(true);
-    setMothercalfError("");
-    setMothercalfData(null);
+    setIsMothercattleLoading(true);
+    setMothercattleError("");
+    // setMothercattleData(null); // Keep previous selection visible until new one is picked or list updates
     try {
       const result = await GET(
-        `${BASE_URL}/api/v1/cattle/search?q=${mothercattleId}&page=1&page_size=10`,
+        `/api/v1/cattle/search?q=${mothercattleId}&page=1&page_size=10`,
       );
       console.log("Search Result:", result);
 
@@ -349,18 +350,52 @@ export default function AddCalfForm() {
         : result?.results || result?.data;
 
       if (cattleList && cattleList.length > 0) {
-        setMothercalfData(cattleList[0]); // Select the first match
+        setMotherCattleResults(cattleList);
       } else {
-        setMothercalfError("No Cattle found with this ID.");
-        setMothercalfData(null);
+        setMothercattleError("No Cattle found with this ID.");
+        setMotherCattleResults([]);
+        setFormData((prev) => ({ ...prev, damMother: "" }));
+        setMothercattleId("");
+        setMothercattleData(null);
+        setIsMothercattleLoading(false);
       }
     } catch (error) {
       console.error(error);
-      setMothercalfError("An error occurred while searching for the calf.");
+      setMothercattleError("An error occurred while searching for the cattle.");
     } finally {
-      setIsMothercalfLoading(false);
+      setIsMothercattleLoading(false);
     }
   };
+
+  const selectMotherCattle = (item) => {
+    setMothercattleData(item);
+    setFormData((prev) => ({
+      ...prev,
+      damMother: item.cattleId,
+    }));
+    setMothercattleId(item.cattleId);
+    setMotherCattleResults([]);
+    setMothercattleError("");
+  };
+
+  // Auto-search when mothercattleId changes (Debounced)
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (mothercattleId.trim()) {
+        if (mothercattleData && mothercattleId === mothercattleData.cattleId) {
+          return;
+        }
+        handleSearchMothercattle();
+      } else {
+        setMothercattleData(null);
+        setMothercattleError("");
+        setIsMothercattleLoading(false);
+        setMotherCattleResults([]);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [mothercattleId, mothercattleData]);
 
   const handleSave = async () => {
     // 1. Define what needs to be checked
@@ -424,8 +459,6 @@ export default function AddCalfForm() {
       setScreen1(!screen1);
       setScreen2(!screen2);
     }
-    // setScreen1(!screen1);
-    // setScreen2(!screen2);
   };
   const back = () => {
     setScreen1(!screen1);
@@ -618,7 +651,7 @@ export default function AddCalfForm() {
                 labelField="label"
                 valueField="value"
                 placeholder={
-                  !focusState.cattleType ? "Select calf type" : "..."
+                  !focusState.cattleType ? `${t.egselectcalftype}` : "..."
                 }
                 // searchPlaceholder="Search type..."
                 value={formData.cattleType}
@@ -787,7 +820,9 @@ export default function AddCalfForm() {
                 labelField="label"
                 valueField="value"
                 placeholder={
-                  !focusState.colostrumIntake ? "Select colostrumIntake" : "..."
+                  !focusState.colostrumIntake
+                    ? `${t.egselectcolostrumintake}`
+                    : "..."
                 }
                 // searchPlaceholder="Search colostrumIntake..."
                 value={formData.colostrumIntake}
@@ -840,7 +875,7 @@ export default function AddCalfForm() {
                 valueField="value"
                 placeholder={
                   !focusState.initialHealthObservations
-                    ? "Select Health Observations"
+                    ? `${t.egselecthealthobservations}`
                     : "..."
                 }
                 // searchPlaceholder="Search Health Observations..."
@@ -902,26 +937,32 @@ export default function AddCalfForm() {
 
             {/* Gender Selector */}
             <AppText style={[styles.label, { color: colors.text }]}>
-              Gender{req}
+              {t.gender}
+              {req}
             </AppText>
             <View style={styles.genderRow}>
-              {["Male", "Female"].map((gender) => (
+              {[
+                { label: `${t.male}`, value: "Male" },
+                { label: `${t.female}`, value: "Female" },
+              ].map((item) => (
                 <TouchableOpacity
-                  key={gender}
+                  key={item.value}
                   style={[
                     styles.genderBtn,
-                    formData.gender === gender && styles.genderBtnActive,
+                    formData.gender === item.value && styles.genderBtnActive,
                   ]}
-                  onPress={() => setFormData({ ...formData, gender: gender })}
+                  onPress={() =>
+                    setFormData({ ...formData, gender: item.value })
+                  }
                 >
                   <AppText
                     style={
-                      formData.gender === gender
+                      formData.gender === item.value
                         ? styles.genderTextActive
                         : styles.genderText
                     }
                   >
-                    {gender}
+                    {item.label}
                   </AppText>
                 </TouchableOpacity>
               ))}
@@ -935,7 +976,7 @@ export default function AddCalfForm() {
             <View style={styles.separator} />
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: colors.text }]}>
-                Dam (Mother calf){req}
+                {t.dam} {req}
               </AppText>
               <View style={styles.searchRow}>
                 <Ionicons
@@ -949,30 +990,59 @@ export default function AddCalfForm() {
                     styles.searchInput,
                     { color: colors.text, borderColor: colors.border },
                   ]}
-                  placeholder="Search Mother by ID"
+                  placeholder={`${t.egsearchmothercattlebyid}`}
                   value={mothercattleId}
                   onChangeText={setMothercattleId}
                 />
                 <TouchableOpacity
                   style={styles.searchButton}
-                  onPress={handleSearchMothercalf}
+                  onPress={handleSearchMothercattle}
                 >
                   <AppText style={styles.searchButtonText}>Search</AppText>
                 </TouchableOpacity>
               </View>
-              {isMothercalfLoading && <ActivityIndicator />}
-              {mothercalfError && (
-                <AppText style={styles.errorText}>{mothercalfError}</AppText>
+
+              {/* Search Results List */}
+              {motherCattleResults.length > 0 && (
+                <View
+                  style={[
+                    styles.searchResultsList,
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: colors.border,
+                    },
+                  ]}
+                >
+                  {motherCattleResults.map((item, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.searchResultItem,
+                        { borderBottomColor: colors.border },
+                      ]}
+                      onPress={() => selectMotherCattle(item)}
+                    >
+                      <AppText style={{ color: colors.text }}>
+                        {item.cattleId} - {item.nameOfCattle}
+                      </AppText>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               )}
-              {mothercalfData && (
+
+              {isMothercattleLoading && <ActivityIndicator />}
+              {mothercattleError && (
+                <AppText style={styles.errorText}>{mothercattleError}</AppText>
+              )}
+              {mothercattleData && (
                 <View style={styles.searchResult}>
                   <AppText>
                     <AppText style={{ fontWeight: "bold" }}>Name:</AppText>{" "}
-                    {mothercalfData.nameOfCattle}
+                    {mothercattleData.cattleId}
                   </AppText>
                   <AppText>
                     <AppText style={{ fontWeight: "bold" }}>Breed:</AppText>{" "}
-                    {mothercalfData.breed}
+                    {mothercattleData.breed}
                   </AppText>
                 </View>
               )}
@@ -1002,7 +1072,7 @@ export default function AddCalfForm() {
                 labelField="label"
                 valueField="value"
                 placeholder={
-                  !focusState.calvingType ? "Select Calving Type" : "..."
+                  !focusState.calvingType ? `${t.egselectcalvingtype}` : "..."
                 }
                 // searchPlaceholder="Search Calving Type..."
                 value={formData.calvingType}
@@ -1055,7 +1125,7 @@ export default function AddCalfForm() {
                 >
                   {formData.dateOfBirth
                     ? formData.dateOfBirth.toLocaleDateString()
-                    : "Select Date"}
+                    : `${t.egselectdate}`}
                 </AppText>
               </TouchableOpacity>
               {showDatePicker && (
@@ -1188,7 +1258,7 @@ export default function AddCalfForm() {
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={!isStatusFocus ? "Select status" : "..."}
+                placeholder={!isStatusFocus ? `${t.egselectstatus}` : "..."}
                 value={formData.status}
                 onFocus={() => setIsStatusFocus(true)}
                 onBlur={() => setIsStatusFocus(false)}
@@ -1231,7 +1301,7 @@ export default function AddCalfForm() {
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={!isWorkerFocus ? "Select worker" : "..."}
+                placeholder={!isWorkerFocus ? `${t.egselectworker}` : "..."}
                 value={formData.workerAssigned}
                 onFocus={() => setIsWorkerFocus(true)}
                 onBlur={() => setIsWorkerFocus(false)}
@@ -1276,7 +1346,7 @@ export default function AddCalfForm() {
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={!isVetFocus ? "Select vet" : "..."}
+                placeholder={!isVetFocus ? `${t.egselectvet}` : "..."}
                 value={formData.veterinarianAssigned}
                 onFocus={() => setIsVetFocus(true)}
                 onBlur={() => setIsVetFocus(false)}
@@ -1320,7 +1390,7 @@ export default function AddCalfForm() {
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={!isStateFocus ? "Select State" : "..."}
+                placeholder={!isStateFocus ? `${t.egselectstate}` : "..."}
                 value={formData.state}
                 onFocus={() => setIsStateFocus(true)}
                 onBlur={() => setIsStateFocus(false)}
@@ -1372,7 +1442,7 @@ export default function AddCalfForm() {
                 >
                   {formData.stateDate
                     ? formData.stateDate.toLocaleDateString()
-                    : "Select Date"}
+                    : `${t.egselectdate}`}
                 </AppText>
               </TouchableOpacity>
               {showHealthManagementDatePicker && (
@@ -1436,7 +1506,7 @@ export default function AddCalfForm() {
             <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
               <Ionicons name="cloud-upload-outline" size={30} color="#16a34a" />
               <AppText style={styles.uploadText}>
-                Click to upload calf images
+                {t.egclicktouploadimage}
               </AppText>
               <AppText style={styles.uploadSub}>PNG, JPG up to 10MB</AppText>
             </TouchableOpacity>
@@ -1462,45 +1532,33 @@ export default function AddCalfForm() {
             <AppText
               style={[styles.label, { color: colors.text, marginTop: 15 }]}
             >
-              Convert to Full Grown
+              {t.egconverttofullgrown}
             </AppText>
             <View style={styles.genderRow}>
-              <TouchableOpacity
-                style={[
-                  styles.genderBtn,
-                  formData.convertToFullGrown === true &&
-                    styles.genderBtnActive,
-                ]}
-                onPress={() => setFormValue("convertToFullGrown", true)}
-              >
-                <AppText
-                  style={
-                    formData.convertToFullGrown === true
-                      ? styles.genderTextActive
-                      : styles.genderText
-                  }
+              {[
+                { label: "Yes", value: true },
+                { label: "No", value: false },
+              ].map((item) => (
+                <TouchableOpacity
+                  key={item.label}
+                  style={[
+                    styles.genderBtn,
+                    formData.convertToFullGrown === item.value &&
+                      styles.genderBtnActive,
+                  ]}
+                  onPress={() => setFormValue("convertToFullGrown", item.value)}
                 >
-                  Yes
-                </AppText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.genderBtn,
-                  formData.convertToFullGrown === false &&
-                    styles.genderBtnActive,
-                ]}
-                onPress={() => setFormValue("convertToFullGrown", false)}
-              >
-                <AppText
-                  style={
-                    formData.convertToFullGrown === false
-                      ? styles.genderTextActive
-                      : styles.genderText
-                  }
-                >
-                  No
-                </AppText>
-              </TouchableOpacity>
+                  <AppText
+                    style={
+                      formData.convertToFullGrown === item.value
+                        ? styles.genderTextActive
+                        : styles.genderText
+                    }
+                  >
+                    {item.label}
+                  </AppText>
+                </TouchableOpacity>
+              ))}
             </View>
             <View style={styles.separator} />
             <AppText style={[styles.label, { color: colors.text }]}>
@@ -1521,7 +1579,7 @@ export default function AddCalfForm() {
                   color: colors.text,
                 },
               ]}
-              placeholder="Add any additional remarkss here..."
+              placeholder={t.egaddanyremarks}
               multiline={true}
               numberOfLines={4}
               value={formData.remarks}
@@ -1668,6 +1726,16 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#e9f5e9",
     borderRadius: 6,
+  },
+  searchResultsList: {
+    borderWidth: 1,
+    borderRadius: 6,
+    marginTop: 5,
+    maxHeight: 200,
+  },
+  searchResultItem: {
+    padding: 10,
+    borderBottomWidth: 1,
   },
   // uploadBox: {
   //   justifyContent: "center",

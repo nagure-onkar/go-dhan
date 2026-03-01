@@ -69,8 +69,8 @@ export default {
   dateOfBirthrequired: "जन्म तारीख आवश्यक आहे",
   agerequired: "वय नमूद करणे आवश्यक आहे",
   weightKgrequired: "वजन लिहिणे आवश्यक आहे",
-  ColostrumIntakerequired: "चीक पाजल्याची नोंद आवश्यक आहे",
-  HealthObservationsrequired: "आरोग्य निरीक्षणाची नोंद आवश्यक आहे",
+  colostrumIntakerequired: "चीक पाजल्याची नोंद आवश्यक आहे",
+  initialHealthObservationsrequired: "आरोग्य निरीक्षणाची नोंद आवश्यक आहे",
   calvingTyperequired: "विण्याचा प्रकार निवडणे आवश्यक आहे",
   lactationNumberrequired: "वेताचा क्रमांक लिहिणे आवश्यक आहे",
   bloodLinerequired: "रक्त ओळ नमूद करणे आवश्यक आहे",
@@ -80,6 +80,12 @@ export default {
   purchasingCostrequired: "खरेदीची किंमत लिहिणे आवश्यक आहे",
   purchaseSourcerequired: "खरेदीचे ठिकाण/स्त्रोत आवश्यक आहे",
   purchaseDetails: "खरेदीचा तपशील",
+
+  dam: "माता पशू (Dam)",
+  male: "नर",
+  female: "मादी",
+  yes: "हो",
+  no: "नाही",
 
   //this is for the breed dropdown in the AddCattle and AddCalf forms
   murrah: "मुर्‍हा",
@@ -124,14 +130,16 @@ export default {
   non_pregnantnot_lactating: "गाभण नसलेली आणि दूध न देणारी",
   dry_off: "दूध बंद (आटलेली)",
   on_heat: "माजवर",
+  calf: "वासरू",
+  inseminated: "रेतन केलेली",
 
   //this is for remaining dropdowns
 
-  active: "सक्रिय",
-  inactive: "निष्क्रिय",
+  Active: "सक्रिय",
+  Inactive: "निष्क्रिय",
 
-  buffalo: "म्हैस",
-  cow: "गाय",
+  Buffalo: "म्हैस",
+  Cow: "गाय",
 
   calf_successfully_suckled_colostrum: "वासराने स्वतःहून चीक पिला",
   artificial_feeding_was_required: "कृत्रिमरीत्या दूध/चीक पाजण्याची गरज पडली",

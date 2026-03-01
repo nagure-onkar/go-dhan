@@ -68,7 +68,7 @@ export default {
   treatmentExpencerequired: "Cost is required",
   dateOfBirthrequired: "Date of Birth is required",
   agerequired: "Age is required",
-  weightKgKgrequired: "Weight is required",
+  weightKgrequired: "Weight is required",
   colostrumIntakerequired: "Colostrum Intake is required",
   initialHealthObservationsrequired: "Health Observations is required",
   calvingTyperequired: "Calving Type is required",
@@ -80,6 +80,12 @@ export default {
   purchasingCostrequired: "Purchase Cost is required",
   purchaseSourcerequired: "Purchase Source is required",
   purchaseDetails: "Purchase Details",
+
+  dam: "Dam (Mother Cattle)",
+  male: "Male",
+  female: "Female",
+  yes: "Yes",
+  no: "No",
 
   //this is for the breed dropdown in the AddCattle and AddCalf forms
   murrah: "Murrah",
@@ -124,11 +130,13 @@ export default {
   non_pregnantnot_lactating: "Non-Pregnant & Not Lactating",
   dry_off: "Dry Off",
   on_heat: "On Heat",
+  calf: "Calf",
+  inseminated: "Inseminated",
 
   //this is for remaining dropdowns
 
-  active: "Active",
-  inactive: "Inactive",
+  Active: "Active",
+  Inactive: "Inactive",
 
   Buffalo: "Buffalo",
   Cow: "Cow",
@@ -168,6 +176,8 @@ export default {
   egselectdob: "Select Date of Birth",
   egclicktouploadimage: "Click to upload image",
   egaddanyremarks: "Add any remarks",
+  egselectstatus: "Select status",
+  egconverttofullgrown: "Convert to full-grown",
 
   // this is for feed management
   feedmanagement: "Manage Feed",
