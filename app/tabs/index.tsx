@@ -1,77 +1,66 @@
-import AppText from "@/components/common/AppText";
-import ScreenWrapper from "@/components/common/ScreenWrapper";
-import { useLanguage } from "@/constants/localization/useLanguage";
-import { commonPageStyles } from "@/constants/styles/pageStyling";
-import { useTheme } from "@/theme/useTheme";
-import { StyleSheet, View } from "react-native";
+// import DashboardScreen from "app/screens/home/dashboard";
+// import { useState } from "react";
 
-export default function HomeScreen() {
-  const { t, setLanguage, language } = useLanguage();
-  const { colors } = useTheme();
+// export default function Index() {
+//   const [username, setUsername] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [secure, setSecure] = useState(true);
 
-  const stats = [
-    { id: 1, number: 24, emoji: "𓃖", label: "Total Animals" },
-    { id: 2, number: 16, emoji: "🐄", label: "Cattle" },
-    { id: 3, number: 8, emoji: "𓃔", label: "Calves" },
-  ];
+//   return <DashboardScreen />;
+// }
 
-  return (
-    <ScreenWrapper>
-      <View style={commonPageStyles.container}>
-        {/* Horizontal Cards Row */}
-        <View style={styles.row}>
-          {stats.map((item) => {
-            return (
-              <View
-                key={item.id}
-                style={[styles.card, { backgroundColor: colors.card }]}
-              >
-                <AppText style={styles.number}>{item.number}</AppText>
-                <AppText style={styles.emoji}>{item.emoji}</AppText>
-                <AppText style={styles.label}>{item.label}</AppText>
-              </View>
-            );
-          })}
-        </View>
-      </View>
-    </ScreenWrapper>
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
+import DashboardScreen from "app/screens/home/dashboard";
+import React, { useCallback } from "react";
+import { Alert, BackHandler } from "react-native";
+
+export default function Index() {
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        AsyncStorage.getItem("access_token")
+          .then((token) => {
+            if (token) {
+              Alert.alert("Exit App", "Do you really want to close the app?", [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Yes",
+                  onPress: async () => {
+                    try {
+                      await AsyncStorage.clear();
+                    } catch (error) {
+                      console.log("Error clearing storage:", error);
+                    }
+                    BackHandler.exitApp();
+                  },
+                },
+              ]);
+            } else {
+              BackHandler.exitApp();
+            }
+          })
+          .catch((error) => {
+            console.log("Error reading token:", error);
+            BackHandler.exitApp();
+          });
+
+        return true; // required: prevent default behavior
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress,
+      );
+
+      return () => {
+        subscription.remove();
+      };
+    }, []),
   );
-}
 
-const styles = StyleSheet.create({
-  header: {
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "600",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 0, // reduce top space
-    marginBottom: 2,
-    width: "100%", // IMPORTANT — makes it span full screen
-  },
-  card: {
-    padding: 8,
-    borderRadius: 16,
-    alignItems: "center",
-    width: "30%", // 3 cards in one row
-    elevation: 3,
-  },
-  number: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  label: {
-    marginTop: 6,
-    fontSize: 12,
-    textAlign: "center",
-  },
-  emoji: {
-    fontSize: 28,
-    marginVertical: 6,
-  },
-});
+  return <DashboardScreen />;
+}
